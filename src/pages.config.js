@@ -6,6 +6,7 @@ import History from './pages/History';
 import HistoryDetail from './pages/HistoryDetail';
 import Settings from './pages/Settings';
 import ReviewInventory from './pages/ReviewInventory';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -22,4 +23,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Onboarding",
     Pages: PAGES,
+    Layout: __Layout,
 };

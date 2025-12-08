@@ -10,8 +10,10 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import ProfileEditor from '@/components/settings/ProfileEditor';
+import useTheme from '@/components/theme/useTheme';
 
 export default function Settings() {
+  const { updateTheme } = useTheme();
   const [user, setUser] = useState(null);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -50,6 +52,9 @@ export default function Settings() {
     try {
       await base44.auth.updateMe(newSettings);
       setSettings(newSettings);
+      if (newSettings.theme_color) {
+        updateTheme(newSettings.theme_color);
+      }
     } catch (err) {
       console.error(err);
     }
