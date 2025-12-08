@@ -32,11 +32,15 @@ export default function Home() {
     }
   };
   
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, refetch } = useQuery({
     queryKey: ['inventoryEntries'],
     queryFn: () => base44.entities.InventoryEntry.list('-date', 50),
     enabled: !!user
   });
+
+  const handleDeleteEntry = (deletedId) => {
+    refetch();
+  };
   
   // Calculate streak
   const calculateStreak = () => {
@@ -188,7 +192,7 @@ export default function Home() {
           ) : (
             <div className="space-y-3">
               {entries.slice(0, 5).map((entry, index) => (
-                <InventoryCard key={entry.id} entry={entry} index={index} />
+                <InventoryCard key={entry.id} entry={entry} index={index} onDelete={handleDeleteEntry} />
               ))}
             </div>
           )}

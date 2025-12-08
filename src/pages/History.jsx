@@ -28,11 +28,15 @@ export default function History() {
     }
   };
   
-  const { data: entries = [], isLoading } = useQuery({
+  const { data: entries = [], isLoading, refetch } = useQuery({
     queryKey: ['allInventoryEntries'],
     queryFn: () => base44.entities.InventoryEntry.list('-date', 100),
     enabled: !!user
   });
+
+  const handleDeleteEntry = (deletedId) => {
+    refetch();
+  };
   
   if (!user) {
     return (
@@ -98,7 +102,7 @@ export default function History() {
         ) : (
           <div className="space-y-3">
             {entries.map((entry, index) => (
-              <InventoryCard key={entry.id} entry={entry} index={index} />
+              <InventoryCard key={entry.id} entry={entry} index={index} onDelete={handleDeleteEntry} />
             ))}
           </div>
         )}
