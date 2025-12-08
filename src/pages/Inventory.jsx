@@ -23,7 +23,7 @@ const AA_QUESTIONS = [
 
 const GENERAL_QUESTIONS = [
   { id: 'emotions', question: 'What emotions did you feel most strongly today?', type: 'text' },
-  { id: 'challenged', question: 'What challenged you today?', type: 'yesno-text' },
+  { id: 'challenged', question: 'What challenged you today?', type: 'text' },
   { id: 'well', question: 'What did you do well today?', type: 'text' },
   { id: 'alignment', question: 'Did you act out of alignment with your values? If so, explain.', type: 'yesno-text' },
   { id: 'avoided', question: 'Did you avoid anything important today?', type: 'yesno-text' },
