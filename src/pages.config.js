@@ -5,6 +5,7 @@ import Summary from './pages/Summary';
 import History from './pages/History';
 import HistoryDetail from './pages/HistoryDetail';
 import Settings from './pages/Settings';
+import ReviewInventory from './pages/ReviewInventory';
 
 
 export const PAGES = {
@@ -15,6 +16,7 @@ export const PAGES = {
     "History": History,
     "HistoryDetail": HistoryDetail,
     "Settings": Settings,
+    "ReviewInventory": ReviewInventory,
 }
 
 export const pagesConfig = {

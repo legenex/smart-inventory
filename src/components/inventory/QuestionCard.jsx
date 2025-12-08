@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Check, X } from 'lucide-react';
+import GratitudeInput from './GratitudeInput';
 
 export default function QuestionCard({ 
   question, 
   questionNumber,
-  type, // 'yesno', 'text', 'yesno-text'
+  type, // 'yesno', 'text', 'yesno-text', 'gratitude'
   value,
   details,
   onValueChange,
@@ -19,8 +20,11 @@ export default function QuestionCard({
 }) {
   const showDetails = type === 'yesno-text' && value === true;
   const isTextOnly = type === 'text';
+  const isGratitude = type === 'gratitude';
   
-  const canProceed = isTextOnly 
+  const canProceed = isGratitude
+    ? Array.isArray(value) && value.length > 0
+    : isTextOnly 
     ? value && value.trim().length > 0 
     : value !== null && value !== undefined;
 
@@ -69,7 +73,20 @@ export default function QuestionCard({
         )}
         
         <AnimatePresence>
-          {(showDetails || isTextOnly) && (
+          {isGratitude && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GratitudeInput
+                values={Array.isArray(value) ? value : []}
+                onChange={onValueChange}
+              />
+            </motion.div>
+          )}
+          {!isGratitude && (showDetails || isTextOnly) && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
