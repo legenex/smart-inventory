@@ -11,24 +11,24 @@ import ProgressBar from '@/components/inventory/ProgressBar';
 import QuestionCard from '@/components/inventory/QuestionCard';
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Were you resentful or angry today?', type: 'yesno-text' },
-  { id: 'dishonest', question: 'Were you dishonest in any way today?', type: 'yesno-text' },
-  { id: 'selfish', question: 'Were you selfish or self-centered today?', type: 'yesno-text' },
-  { id: 'fearful', question: 'Were you fearful or anxious today?', type: 'yesno-text' },
-  { id: 'harmful', question: 'Did you harm anyone today? Do you owe an apology?', type: 'yesno-text' },
-  { id: 'secret', question: 'Did you keep a secret or withhold the truth from someone?', type: 'yesno-text' },
-  { id: 'unkind', question: 'Were you unkind or unloving? Could you have done better?', type: 'yesno-text' },
-  { id: 'gratitude', question: 'What are you grateful for today?', type: 'gratitude' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?', type: 'yesno-text' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', type: 'yesno-text' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', type: 'yesno-text' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', type: 'yesno-text' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', type: 'yesno-text' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', type: 'yesno-text' },
+  { id: 'unkind', question: 'Were You Unkind or Unloving? Could You Have Done Better?', type: 'yesno-text' },
+  { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'What emotions did you feel most strongly today?', type: 'text' },
-  { id: 'challenged', question: 'What challenged you today?', type: 'text' },
-  { id: 'well', question: 'What did you do well today?', type: 'text' },
-  { id: 'alignment', question: 'Did you act out of alignment with your values? If so, explain.', type: 'yesno-text' },
-  { id: 'avoided', question: 'Did you avoid anything important today?', type: 'yesno-text' },
-  { id: 'joy', question: 'Who or what brought you joy today?', type: 'text' },
-  { id: 'gratitude', question: 'What are you grateful for today?', type: 'gratitude' }
+  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly Today?', type: 'text' },
+  { id: 'challenged', question: 'What Challenged You Today?', type: 'text' },
+  { id: 'well', question: 'What Did You Do Well Today?', type: 'text' },
+  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values? If So, Explain.', type: 'yesno-text' },
+  { id: 'avoided', question: 'Did You Avoid Anything Important Today?', type: 'yesno-text' },
+  { id: 'joy', question: 'Who or What Brought You Joy Today?', type: 'text' },
+  { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
 ];
 
 export default function Inventory() {

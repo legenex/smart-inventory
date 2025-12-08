@@ -9,22 +9,22 @@ import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Resentful or angry' },
+  { id: 'resentful', question: 'Resentful or Angry' },
   { id: 'dishonest', question: 'Dishonest' },
-  { id: 'selfish', question: 'Selfish or self-centered' },
-  { id: 'fearful', question: 'Fearful or anxious' },
-  { id: 'harmful', question: 'Harmed anyone' },
-  { id: 'secret', question: 'Kept a secret' },
-  { id: 'unkind', question: 'Unkind or unloving' },
+  { id: 'selfish', question: 'Selfish or Self-Centered' },
+  { id: 'fearful', question: 'Fearful or Anxious' },
+  { id: 'harmful', question: 'Harmed Anyone' },
+  { id: 'secret', question: 'Kept a Secret' },
+  { id: 'unkind', question: 'Unkind or Unloving' },
   { id: 'gratitude', question: 'Gratitude' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'Strong emotions' },
+  { id: 'emotions', question: 'Strong Emotions' },
   { id: 'challenged', question: 'Challenged' },
-  { id: 'well', question: 'Did well' },
-  { id: 'alignment', question: 'Out of alignment' },
-  { id: 'avoided', question: 'Avoided something' },
+  { id: 'well', question: 'Did Well' },
+  { id: 'alignment', question: 'Out of Alignment' },
+  { id: 'avoided', question: 'Avoided Something' },
   { id: 'joy', question: 'Joy' },
   { id: 'gratitude', question: 'Gratitude' }
 ];

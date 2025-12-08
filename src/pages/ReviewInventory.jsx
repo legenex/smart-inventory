@@ -9,24 +9,24 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Were We Resentful?' },
-  { id: 'dishonest', question: 'Were We Dishonest?' },
-  { id: 'selfish', question: 'Were We Selfish?' },
-  { id: 'fearful', question: 'Were We Fearful Or Afraid?' },
-  { id: 'harmful', question: 'Did We Harm Anyone?' },
-  { id: 'secret', question: 'Secrets:' },
-  { id: 'unkind', question: 'Could I Have Done Better?' },
-  { id: 'gratitude', question: 'Gratitude:' }
+  { id: 'resentful', question: 'Were You Resentful or Angry?' },
+  { id: 'dishonest', question: 'Were You Dishonest?' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered?' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious?' },
+  { id: 'harmful', question: 'Did You Harm Anyone?' },
+  { id: 'secret', question: 'Did You Keep a Secret?' },
+  { id: 'unkind', question: 'Were You Unkind or Unloving?' },
+  { id: 'gratitude', question: 'What Are You Grateful For?' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'Strong Emotions:' },
-  { id: 'challenged', question: 'Challenged:' },
-  { id: 'well', question: 'What I Did Well:' },
-  { id: 'alignment', question: 'Out of Alignment:' },
-  { id: 'avoided', question: 'Avoided:' },
-  { id: 'joy', question: 'Joy:' },
-  { id: 'gratitude', question: 'Gratitude:' }
+  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly?' },
+  { id: 'challenged', question: 'What Challenged You?' },
+  { id: 'well', question: 'What Did You Do Well?' },
+  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values?' },
+  { id: 'avoided', question: 'Did You Avoid Anything Important?' },
+  { id: 'joy', question: 'Who or What Brought You Joy?' },
+  { id: 'gratitude', question: 'What Are You Grateful For?' }
 ];
 
 export default function ReviewInventory() {
