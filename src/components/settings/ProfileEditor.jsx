@@ -28,12 +28,18 @@ export default function ProfileEditor({ user, onUpdate }) {
     setUploading(false);
   };
 
+  const toTitleCase = (str) => {
+    return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+  };
+
   const handleSaveName = async () => {
     if (!name.trim()) return;
     
     setSaving(true);
     try {
-      await base44.auth.updateMe({ full_name: name });
+      const titleCaseName = toTitleCase(name.trim());
+      await base44.auth.updateMe({ full_name: titleCaseName });
+      setName(titleCaseName);
       setIsEditing(false);
       onUpdate();
     } catch (err) {

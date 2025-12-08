@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ThemeSelector from '@/components/settings/ThemeSelector';
 import ProfileEditor from '@/components/settings/ProfileEditor';
+import BackgroundSelector from '@/components/settings/BackgroundSelector';
 import useTheme from '@/components/theme/useTheme';
 
 export default function Settings() {
@@ -20,7 +21,8 @@ export default function Settings() {
     recovery_status: 'general',
     reminder_enabled: true,
     reminder_time: '21:00',
-    theme: 'light'
+    theme: 'light',
+    background: null
   });
   const navigate = useNavigate();
   
@@ -40,7 +42,8 @@ export default function Settings() {
         recovery_status: userData.recovery_status || 'general',
         reminder_enabled: userData.reminder_enabled !== false,
         reminder_time: userData.reminder_time || '21:00',
-        theme_color: userData.theme_color || 'purple'
+        theme_color: userData.theme_color || 'purple',
+        background: userData.background || null
       });
     } catch (err) {
       navigate(createPageUrl('Onboarding'));
@@ -169,6 +172,20 @@ export default function Settings() {
           />
         </motion.div>
         
+        {/* Background */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
+        >
+          <h3 className="font-semibold text-[#1F2C46] mb-4">Background</h3>
+          <BackgroundSelector
+            currentBackground={settings.background}
+            onBackgroundChange={(bg) => handleSave({ ...settings, background: bg })}
+          />
+        </motion.div>
+        
         {/* Reminders */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -199,19 +216,34 @@ export default function Settings() {
                 onValueChange={(value) => handleSave({ ...settings, reminder_time: value })}
               >
                 <SelectTrigger className="w-full rounded-xl">
-                  <SelectValue />
+                 <SelectValue>
+                   {(() => {
+                     const time = settings.reminder_time;
+                     const [hours] = time.split(':');
+                     const hour = parseInt(hours);
+                     if (hour === 12) return '12:00 PM';
+                     if (hour === 0) return '12:00 AM';
+                     if (hour > 12) return `${hour - 12}:00 PM`;
+                     return `${hour}:00 AM`;
+                   })()}
+                 </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {timeOptions.map(time => (
-                    <SelectItem key={time} value={time}>
-                      {time.replace(':00', ':00 PM').replace(/^0/, '').replace(/^([0-9]):/, '$1:').replace(/^([0-9]{2}):/, (m, h) => {
-                        const hour = parseInt(h);
-                        if (hour === 12) return '12:00 PM';
-                        if (hour > 12) return `${hour - 12}:00 PM`;
-                        return `${hour}:00 AM`;
-                      })}
-                    </SelectItem>
-                  ))}
+                 {timeOptions.map(time => {
+                   const [hours] = time.split(':');
+                   const hour = parseInt(hours);
+                   let display;
+                   if (hour === 12) display = '12:00 PM';
+                   else if (hour === 0) display = '12:00 AM';
+                   else if (hour > 12) display = `${hour - 12}:00 PM`;
+                   else display = `${hour}:00 AM`;
+
+                   return (
+                     <SelectItem key={time} value={time}>
+                       {display}
+                     </SelectItem>
+                   );
+                 })}
                 </SelectContent>
               </Select>
             </motion.div>
