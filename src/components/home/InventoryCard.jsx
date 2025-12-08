@@ -5,6 +5,7 @@ import { ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
+import useTheme from '../theme/useTheme';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function InventoryCard({ entry, index, onDelete }) {
+  const { colors } = useTheme();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -50,8 +52,8 @@ export default function InventoryCard({ entry, index, onDelete }) {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#7667E5]/10 to-[#A48FFF]/10 rounded-2xl flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-[#7667E5]" />
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colors.bgLight}`}>
+                <Calendar className={`w-5 h-5 ${colors.textClass}`} />
               </div>
               <div className="flex-1">
                 <p className="font-semibold text-[#1F2C46]">
@@ -73,7 +75,7 @@ export default function InventoryCard({ entry, index, onDelete }) {
               >
                 <Trash2 className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
               </button>
-              <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-[#7667E5] transition-colors" />
+              <ChevronRight className={`w-5 h-5 text-gray-400 transition-colors`} style={{ '--hover-color': colors.primary }} />
             </div>
           </div>
         </Link>

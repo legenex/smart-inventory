@@ -10,8 +10,10 @@ import { format, isToday, differenceInDays, parseISO } from 'date-fns';
 import StreakCounter from '@/components/home/StreakCounter';
 import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
+import useTheme from '@/components/theme/useTheme';
 
 export default function Home() {
+  const { colors } = useTheme();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   
@@ -126,7 +128,12 @@ export default function Home() {
           <Link to={createPageUrl('Inventory')}>
             <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-[#7667E5] to-[#A48FFF] rounded-2xl flex items-center justify-center shadow-lg shadow-purple-200/50 group-hover:scale-105 transition-transform">
+                <div 
+                  className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${colors.shadow} group-hover:scale-105 transition-transform`}
+                  style={{
+                    background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
+                  }}
+                >
                   <PenLine className="w-8 h-8 text-white" />
                 </div>
                 <div className="flex-1">
@@ -137,7 +144,12 @@ export default function Home() {
                     {todayEntry ? 'You already reflected today' : format(new Date(), 'EEEE, MMMM d')}
                   </p>
                 </div>
-                <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-[#7667E5] transition-colors" />
+                <ChevronRight 
+                  className="w-6 h-6 text-gray-400 transition-colors"
+                  style={{ color: 'var(--hover-color, #9ca3af)' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = colors.primary}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
+                />
               </div>
             </div>
           </Link>

@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import useTheme from '../theme/useTheme';
 
 export default function ProgressBar({ current, total }) {
+  const { colors } = useTheme();
   const progress = (current / total) * 100;
   
   return (
@@ -12,7 +14,10 @@ export default function ProgressBar({ current, total }) {
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-gradient-to-r from-[#7667E5] to-[#A48FFF] rounded-full"
+          className="h-full rounded-full"
+          style={{
+            background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+          }}
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}

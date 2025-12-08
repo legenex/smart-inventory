@@ -1,7 +1,10 @@
 import React from 'react';
 import { BookOpen } from 'lucide-react';
+import useTheme from '../theme/useTheme';
 
 export default function Logo({ size = 'md', showText = false, className = '' }) {
+  const { colors } = useTheme();
+  
   const sizes = {
     sm: { icon: 'w-5 h-5', container: 'w-10 h-10', text: 'text-base' },
     md: { icon: 'w-7 h-7', container: 'w-14 h-14', text: 'text-lg' },
@@ -12,7 +15,12 @@ export default function Logo({ size = 'md', showText = false, className = '' }) 
   
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div className={`${s.container} bg-gradient-to-br from-[#6BC2CE] to-[#7667E5] rounded-[22px] flex items-center justify-center shadow-lg shadow-blue-200/50`}>
+      <div 
+        className={`${s.container} rounded-[22px] flex items-center justify-center shadow-lg ${colors.shadow}`}
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.accent}, ${colors.primary})`
+        }}
+      >
         <BookOpen className={`${s.icon} text-white`} strokeWidth={2.5} />
       </div>
       {showText && (
