@@ -98,7 +98,7 @@ export default function QuestionCard({
               transition={{ duration: 0.3 }}
             >
               <Textarea
-                placeholder={isTextOnly ? "Share your thoughts..." : "Tell us more about what happened..."}
+                placeholder="Please describe with as much detail as possible"
                 value={isTextOnly ? value || '' : details || ''}
                 onChange={(e) => isTextOnly ? onValueChange(e.target.value) : onDetailsChange(e.target.value)}
                 className="w-full min-h-[120px] rounded-2xl border-2 border-gray-200 focus:border-[#7667E5] p-4 text-[#1F2C46] resize-none transition-colors"
