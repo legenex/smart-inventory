@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ThemeSelector from '@/components/settings/ThemeSelector';
+import ProfileEditor from '@/components/settings/ProfileEditor';
 
 export default function Settings() {
   const [user, setUser] = useState(null);
@@ -97,15 +98,7 @@ export default function Settings() {
           transition={{ delay: 0.1 }}
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#7667E5] to-[#A48FFF] rounded-2xl flex items-center justify-center text-white text-2xl font-bold">
-              {user.full_name?.[0] || user.email?.[0] || 'U'}
-            </div>
-            <div>
-              <h2 className="font-semibold text-[#1F2C46] text-lg">{user.full_name || 'User'}</h2>
-              <p className="text-gray-500 text-sm">{user.email}</p>
-            </div>
-          </div>
+          <ProfileEditor user={user} onUpdate={loadUser} />
         </motion.div>
         
         {/* Inventory Type */}
