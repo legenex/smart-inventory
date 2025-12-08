@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Heart, Sun } from 'lucide-react';
+import { Heart, Sun } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import Logo from '@/components/brand/Logo';
 
 export default function Onboarding() {
   const [step, setStep] = useState(0);
@@ -60,9 +61,9 @@ export default function Onboarding() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring" }}
-              className="w-24 h-24 bg-gradient-to-br from-[#7667E5] to-[#A48FFF] rounded-[28px] mx-auto mb-8 flex items-center justify-center shadow-lg shadow-purple-200"
+              className="mx-auto mb-8"
             >
-              <Sparkles className="w-12 h-12 text-white" />
+              <Logo size="lg" />
             </motion.div>
             
             <h1 className="text-3xl font-bold text-[#1F2C46] mb-4">

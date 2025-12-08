@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Bell, Moon, Sun, Heart, Sparkles, LogOut, User } from 'lucide-react';
+import { ArrowLeft, Bell, Heart, Sparkles, LogOut, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import ThemeSelector from '@/components/settings/ThemeSelector';
 
 export default function Settings() {
   const [user, setUser] = useState(null);
@@ -36,7 +37,7 @@ export default function Settings() {
         recovery_status: userData.recovery_status || 'general',
         reminder_enabled: userData.reminder_enabled !== false,
         reminder_time: userData.reminder_time || '21:00',
-        theme: userData.theme || 'light'
+        theme_color: userData.theme_color || 'purple'
       });
     } catch (err) {
       navigate(createPageUrl('Onboarding'));
@@ -153,11 +154,28 @@ export default function Settings() {
           </div>
         </motion.div>
         
-        {/* Reminders */}
+        {/* Theme Color */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
+          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <Palette className="w-5 h-5 text-[#7667E5]" />
+            <h3 className="font-semibold text-[#1F2C46]">Theme Color</h3>
+          </div>
+          <ThemeSelector 
+            currentTheme={settings.theme_color} 
+            onThemeChange={(color) => handleSave({ ...settings, theme_color: color })}
+          />
+        </motion.div>
+        
+        {/* Reminders */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
           <div className="flex items-center justify-between mb-4">
@@ -206,7 +224,7 @@ export default function Settings() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
         >
           <Button
             onClick={handleLogout}
@@ -222,7 +240,7 @@ export default function Settings() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
           className="text-center mt-8"
         >
           <p className="text-gray-400 text-sm">Smart-Inventory v1.0</p>
