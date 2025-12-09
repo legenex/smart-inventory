@@ -86,8 +86,8 @@ export default function Home() {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F5F7] via-white to-[#E1E1E5]">
-      <div className="max-w-lg mx-auto px-6 py-8 pb-24">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

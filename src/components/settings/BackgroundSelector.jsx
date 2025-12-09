@@ -6,73 +6,63 @@ import { base44 } from '@/api/base44Client';
 const BACKGROUND_OPTIONS = [
   {
     id: 'purple-1',
-    name: 'Purple Nebula',
+    name: 'Purple Galaxy',
     theme: 'purple',
-    gradient: 'radial-gradient(circle at 20% 50%, rgba(118, 103, 229, 0.8) 0%, rgba(164, 143, 255, 0.6) 25%, rgba(107, 194, 206, 0.4) 50%, rgba(31, 44, 70, 0.95) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?w=1920&q=80'
   },
   {
     id: 'purple-2',
-    name: 'Purple Galaxy',
+    name: 'Purple Nebula',
     theme: 'purple',
-    gradient: 'radial-gradient(ellipse at 30% 30%, rgba(164, 143, 255, 0.7) 0%, rgba(118, 103, 229, 0.5) 30%, rgba(107, 194, 206, 0.3) 60%, rgba(15, 23, 42, 0.98) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1920&q=80'
   },
   {
     id: 'blue-1',
-    name: 'Blue Nebula',
+    name: 'Blue Galaxy',
     theme: 'blue',
-    gradient: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.8) 0%, rgba(96, 165, 250, 0.6) 25%, rgba(14, 165, 233, 0.4) 50%, rgba(31, 44, 70, 0.95) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1504333638930-c8787321eee0?w=1920&q=80'
   },
   {
     id: 'blue-2',
-    name: 'Blue Galaxy',
+    name: 'Blue Nebula',
     theme: 'blue',
-    gradient: 'radial-gradient(ellipse at 30% 30%, rgba(96, 165, 250, 0.7) 0%, rgba(59, 130, 246, 0.5) 30%, rgba(14, 165, 233, 0.3) 60%, rgba(15, 23, 42, 0.98) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=1920&q=80'
   },
   {
     id: 'green-1',
-    name: 'Green Nebula',
+    name: 'Green Galaxy',
     theme: 'green',
-    gradient: 'radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.8) 0%, rgba(52, 211, 153, 0.6) 25%, rgba(20, 184, 166, 0.4) 50%, rgba(31, 44, 70, 0.95) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1505506874110-6a7a69069a08?w=1920&q=80'
   },
   {
     id: 'green-2',
-    name: 'Green Galaxy',
+    name: 'Emerald Nebula',
     theme: 'green',
-    gradient: 'radial-gradient(ellipse at 30% 30%, rgba(52, 211, 153, 0.7) 0%, rgba(16, 185, 129, 0.5) 30%, rgba(20, 184, 166, 0.3) 60%, rgba(15, 23, 42, 0.98) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=1920&q=80'
   },
   {
     id: 'red-1',
-    name: 'Red Nebula',
+    name: 'Red Galaxy',
     theme: 'red',
-    gradient: 'radial-gradient(circle at 20% 50%, rgba(248, 113, 113, 0.8) 0%, rgba(252, 165, 165, 0.6) 25%, rgba(251, 146, 60, 0.4) 50%, rgba(31, 44, 70, 0.95) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1462332420958-a05d1e002413?w=1920&q=80'
   },
   {
     id: 'red-2',
-    name: 'Red Galaxy',
+    name: 'Red Nebula',
     theme: 'red',
-    gradient: 'radial-gradient(ellipse at 30% 30%, rgba(252, 165, 165, 0.7) 0%, rgba(248, 113, 113, 0.5) 30%, rgba(251, 146, 60, 0.3) 60%, rgba(15, 23, 42, 0.98) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1920&q=80'
   },
   {
     id: 'orange-1',
-    name: 'Orange Nebula',
+    name: 'Orange Galaxy',
     theme: 'orange',
-    gradient: 'radial-gradient(circle at 20% 50%, rgba(249, 115, 22, 0.8) 0%, rgba(251, 146, 60, 0.6) 25%, rgba(251, 191, 36, 0.4) 50%, rgba(31, 44, 70, 0.95) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1506443432602-ac2fcd6f54e0?w=1920&q=80'
   },
   {
     id: 'orange-2',
-    name: 'Orange Galaxy',
+    name: 'Cosmic Orange',
     theme: 'orange',
-    gradient: 'radial-gradient(ellipse at 30% 30%, rgba(251, 146, 60, 0.7) 0%, rgba(249, 115, 22, 0.5) 30%, rgba(251, 191, 36, 0.3) 60%, rgba(15, 23, 42, 0.98) 100%)',
-    stars: true
+    image: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&q=80'
   }
 ];
 
@@ -99,6 +89,19 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
 
   return (
     <div className="space-y-4">
+      {/* None Option */}
+      <button
+        onClick={() => onBackgroundChange(null)}
+        className={`w-full h-16 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${
+          !currentBackground
+            ? 'border-[#7667E5] bg-[#7667E5]/5 text-[#7667E5]'
+            : 'border-gray-200 hover:border-gray-300 text-gray-600'
+        }`}
+      >
+        {!currentBackground && <Check className="w-5 h-5" />}
+        <span className="font-medium">No Background</span>
+      </button>
+
       <div className="grid grid-cols-2 gap-3">
         {BACKGROUND_OPTIONS.map((option) => (
           <button
@@ -110,28 +113,11 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >
-            <div 
-              className="absolute inset-0"
-              style={{ background: option.gradient }}
-            >
-              {option.stars && (
-                <div className="absolute inset-0" style={{
-                  backgroundImage: `
-                    radial-gradient(1px 1px at 20% 30%, white, transparent),
-                    radial-gradient(1px 1px at 60% 70%, white, transparent),
-                    radial-gradient(1px 1px at 50% 50%, white, transparent),
-                    radial-gradient(1px 1px at 80% 10%, white, transparent),
-                    radial-gradient(1px 1px at 90% 60%, white, transparent),
-                    radial-gradient(1px 1px at 33% 85%, white, transparent),
-                    radial-gradient(1px 1px at 15% 75%, white, transparent),
-                    radial-gradient(1px 1px at 70% 40%, white, transparent)
-                  `,
-                  backgroundSize: '200% 200%, 150% 150%, 180% 180%, 220% 220%, 190% 190%, 210% 210%, 170% 170%, 160% 160%',
-                  backgroundPosition: '50% 50%',
-                  opacity: 0.6
-                }} />
-              )}
-            </div>
+            <img 
+              src={option.image} 
+              alt={option.name}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
             {isSelected(option) && (
               <div className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center">
                 <Check className="w-4 h-4 text-[#7667E5]" />
