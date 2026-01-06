@@ -14,7 +14,7 @@ import BackgroundSelector from '@/components/settings/BackgroundSelector';
 import useTheme from '@/components/theme/useTheme';
 
 export default function Settings() {
-  const { updateTheme } = useTheme();
+  const { updateTheme, colors } = useTheme();
   const [user, setUser] = useState(null);
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
