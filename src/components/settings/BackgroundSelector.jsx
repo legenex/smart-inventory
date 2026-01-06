@@ -8,61 +8,61 @@ const BACKGROUND_OPTIONS = [
     id: 'purple-1',
     name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?w=1920&q=80'
   },
   {
     id: 'purple-2',
-    name: 'Lavender Flow',
+    name: 'Lavender Mist',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1636955779321-0908be4d1115?w=1920&q=80'
   },
   {
     id: 'blue-1',
     name: 'Soft Blue',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1557672199-6ba31d354c63?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1635776063043-ab23b4c226f6?w=1920&q=80'
   },
   {
     id: 'blue-2',
-    name: 'Ocean Wave',
+    name: 'Sky Whisper',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1618556450994-a6a128ef0d9d?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1636955816868-fcb881e57954?w=1920&q=80'
   },
   {
     id: 'green-1',
-    name: 'Mint Wave',
+    name: 'Mint Whisper',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1618172193763-c511deb635ca?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1635776062127-d379bfcba9f8?w=1920&q=80&sat=-100&hue=90'
   },
   {
     id: 'green-2',
     name: 'Soft Sage',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1636955779321-0908be4d1115?w=1920&q=80&sat=-100&hue=90'
   },
   {
     id: 'red-1',
-    name: 'Blush Pink',
+    name: 'Rose Whisper',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1618556660370-d3605f5e107f?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1635776062360-af423602aff3?w=1920&q=80'
   },
   {
     id: 'red-2',
-    name: 'Rose Flow',
+    name: 'Blush Flow',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1636955840493-f43a02bfa064?w=1920&q=80'
   },
   {
     id: 'orange-1',
-    name: 'Peach Wave',
+    name: 'Peach Glow',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1620121478247-ec786b9be2fa?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1635776062043-223faf322554?w=1920&q=80'
   },
   {
     id: 'orange-2',
-    name: 'Warm Glow',
+    name: 'Warm Mist',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1618005198920-f0cb6201c115?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1636955779321-0908be4d1115?w=1920&q=80&sat=-50&hue=30'
   }
 ];
 
