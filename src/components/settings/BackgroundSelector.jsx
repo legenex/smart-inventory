@@ -6,63 +6,63 @@ import { base44 } from '@/api/base44Client';
 const BACKGROUND_OPTIONS = [
   {
     id: 'purple-1',
-    name: 'Purple Galaxy',
+    name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1464802686167-b939a6910659?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1730780897906-14c86766f584?w=1920&q=80'
   },
   {
     id: 'purple-2',
-    name: 'Purple Nebula',
+    name: 'Lavender Dream',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1564951434112-64d74cc2a2d7?w=1920&q=80'
   },
   {
     id: 'blue-1',
-    name: 'Blue Galaxy',
+    name: 'Pastel Blue',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1504333638930-c8787321eee0?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1730780883153-b3c046b001c1?w=1920&q=80'
   },
   {
     id: 'blue-2',
-    name: 'Blue Nebula',
+    name: 'Sky Flow',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1516339901601-2e1b62dc0c45?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1601408993947-6ef9e7a1ed97?w=1920&q=80'
   },
   {
     id: 'green-1',
-    name: 'Green Galaxy',
+    name: 'Mint Abstract',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1505506874110-6a7a69069a08?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1764345713176-3fd77a47bfd9?w=1920&q=80'
   },
   {
     id: 'green-2',
-    name: 'Emerald Nebula',
+    name: 'Soft Green',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1538370965046-79c0d6907d47?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618172193622-ae2d025f4032?w=1920&q=80'
   },
   {
     id: 'red-1',
-    name: 'Red Galaxy',
+    name: 'Rose Blush',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1462332420958-a05d1e002413?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1580508271385-40f3683cf893?w=1920&q=80'
   },
   {
     id: 'red-2',
-    name: 'Red Nebula',
+    name: 'Coral Wave',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1920&q=80'
   },
   {
     id: 'orange-1',
-    name: 'Orange Galaxy',
+    name: 'Peach Abstract',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1506443432602-ac2fcd6f54e0?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1730473360570-881f4bd1b2e3?w=1920&q=80'
   },
   {
     id: 'orange-2',
-    name: 'Cosmic Orange',
+    name: 'Warm Shapes',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1746563947278-64005fe02020?w=1920&q=80'
   }
 ];
 
