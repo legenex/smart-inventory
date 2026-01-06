@@ -8,61 +8,61 @@ const BACKGROUND_OPTIONS = [
     id: 'purple-1',
     name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1730780897906-14c86766f584?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1920&q=80'
   },
   {
     id: 'purple-2',
-    name: 'Lavender Dream',
+    name: 'Lavender Flow',
     theme: 'purple',
-    image: 'https://images.unsplash.com/photo-1564951434112-64d74cc2a2d7?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1920&q=80'
   },
   {
     id: 'blue-1',
-    name: 'Pastel Blue',
+    name: 'Soft Blue',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1730780883153-b3c046b001c1?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1557672199-6ba31d354c63?w=1920&q=80'
   },
   {
     id: 'blue-2',
-    name: 'Sky Flow',
+    name: 'Ocean Wave',
     theme: 'blue',
-    image: 'https://images.unsplash.com/photo-1601408993947-6ef9e7a1ed97?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618556450994-a6a128ef0d9d?w=1920&q=80'
   },
   {
     id: 'green-1',
-    name: 'Mint Abstract',
+    name: 'Mint Wave',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1764345713176-3fd77a47bfd9?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618172193763-c511deb635ca?w=1920&q=80'
   },
   {
     id: 'green-2',
-    name: 'Soft Green',
+    name: 'Soft Sage',
     theme: 'green',
-    image: 'https://images.unsplash.com/photo-1618172193622-ae2d025f4032?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1620121692029-d088224ddc74?w=1920&q=80'
   },
   {
     id: 'red-1',
-    name: 'Rose Blush',
+    name: 'Blush Pink',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1580508271385-40f3683cf893?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618556660370-d3605f5e107f?w=1920&q=80'
   },
   {
     id: 'red-2',
-    name: 'Coral Wave',
+    name: 'Rose Flow',
     theme: 'red',
-    image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=1920&q=80'
   },
   {
     id: 'orange-1',
-    name: 'Peach Abstract',
+    name: 'Peach Wave',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1730473360570-881f4bd1b2e3?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1620121478247-ec786b9be2fa?w=1920&q=80'
   },
   {
     id: 'orange-2',
-    name: 'Warm Shapes',
+    name: 'Warm Glow',
     theme: 'orange',
-    image: 'https://images.unsplash.com/photo-1746563947278-64005fe02020?w=1920&q=80'
+    image: 'https://images.unsplash.com/photo-1618005198920-f0cb6201c115?w=1920&q=80'
   }
 ];
 
@@ -92,14 +92,16 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
       {/* None Option */}
       <button
         onClick={() => onBackgroundChange(null)}
-        className={`w-full h-16 rounded-xl border-2 transition-all flex items-center justify-center gap-2 ${
-          !currentBackground
-            ? 'border-[#7667E5] bg-[#7667E5]/5 text-[#7667E5]'
-            : 'border-gray-200 hover:border-gray-300 text-gray-600'
-        }`}
+        className={`w-full h-16 rounded-xl transition-all flex items-center justify-center gap-2`}
+        style={{
+          borderWidth: '2px',
+          borderColor: !currentBackground ? '#7667E5' : '#e5e7eb',
+          backgroundColor: !currentBackground ? 'rgba(118, 103, 229, 0.05)' : 'transparent',
+          color: !currentBackground ? '#7667E5' : '#4b5563'
+        }}
       >
         {!currentBackground && <Check className="w-5 h-5" />}
-        <span className="font-medium">No Background</span>
+        <span className="font-medium">No Background (Theme Default)</span>
       </button>
 
       <div className="grid grid-cols-2 gap-3">
@@ -107,11 +109,12 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
           <button
             key={option.id}
             onClick={() => onBackgroundChange({ type: 'preset', id: option.id })}
-            className={`relative h-24 rounded-xl overflow-hidden border-2 transition-all ${
-              isSelected(option)
-                ? 'border-[#7667E5] ring-2 ring-[#7667E5]/20'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
+            className={`relative h-24 rounded-xl overflow-hidden transition-all`}
+            style={{
+              borderWidth: '2px',
+              borderColor: isSelected(option) ? '#7667E5' : '#e5e7eb',
+              boxShadow: isSelected(option) ? '0 0 0 2px rgba(118, 103, 229, 0.2)' : 'none'
+            }}
           >
             <img 
               src={option.image} 

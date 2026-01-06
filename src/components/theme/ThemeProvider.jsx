@@ -13,7 +13,8 @@ const THEME_COLORS = {
     textClass: 'text-[#7667E5]',
     bgLight: 'bg-[#7667E5]/10',
     borderClass: 'border-[#7667E5]',
-    hoverBorder: 'hover:border-[#7667E5]/30'
+    hoverBorder: 'hover:border-[#7667E5]/30',
+    borderColor: '#7667E5'
   },
   blue: {
     primary: '#3B82F6',
@@ -26,7 +27,8 @@ const THEME_COLORS = {
     textClass: 'text-[#3B82F6]',
     bgLight: 'bg-[#3B82F6]/10',
     borderClass: 'border-[#3B82F6]',
-    hoverBorder: 'hover:border-[#3B82F6]/30'
+    hoverBorder: 'hover:border-[#3B82F6]/30',
+    borderColor: '#3B82F6'
   },
   green: {
     primary: '#10B981',
@@ -39,7 +41,8 @@ const THEME_COLORS = {
     textClass: 'text-[#10B981]',
     bgLight: 'bg-[#10B981]/10',
     borderClass: 'border-[#10B981]',
-    hoverBorder: 'hover:border-[#10B981]/30'
+    hoverBorder: 'hover:border-[#10B981]/30',
+    borderColor: '#10B981'
   },
   red: {
     primary: '#F87171',
@@ -52,7 +55,8 @@ const THEME_COLORS = {
     textClass: 'text-[#F87171]',
     bgLight: 'bg-[#F87171]/10',
     borderClass: 'border-[#F87171]',
-    hoverBorder: 'hover:border-[#F87171]/30'
+    hoverBorder: 'hover:border-[#F87171]/30',
+    borderColor: '#F87171'
   },
   orange: {
     primary: '#F97316',
@@ -65,7 +69,8 @@ const THEME_COLORS = {
     textClass: 'text-[#F97316]',
     bgLight: 'bg-[#F97316]/10',
     borderClass: 'border-[#F97316]',
-    hoverBorder: 'hover:border-[#F97316]/30'
+    hoverBorder: 'hover:border-[#F97316]/30',
+    borderColor: '#F97316'
   }
 };
 

@@ -117,35 +117,37 @@ export default function Settings() {
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
           <h3 className="font-semibold text-[#1F2C46] mb-4">Inventory Type</h3>
-          
+
           <div className="space-y-3">
             <button
               onClick={() => handleSave({ ...settings, recovery_status: 'aa' })}
-              className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
-                settings.recovery_status === 'aa'
-                  ? 'border-[#7667E5] bg-[#7667E5]/5'
-                  : 'border-gray-200 hover:border-[#7667E5]/30'
-              }`}
+              className={`w-full p-4 rounded-xl transition-all text-left`}
+              style={{
+                borderWidth: '2px',
+                borderColor: settings.recovery_status === 'aa' ? colors.borderColor : '#e5e7eb',
+                backgroundColor: settings.recovery_status === 'aa' ? `${colors.primary}0D` : 'transparent'
+              }}
             >
               <div className="flex items-center gap-3">
-                <Heart className={`w-5 h-5 ${settings.recovery_status === 'aa' ? 'text-[#7667E5]' : 'text-gray-400'}`} />
+                <Heart className={`w-5 h-5`} style={{ color: settings.recovery_status === 'aa' ? colors.primary : '#9ca3af' }} />
                 <div>
                   <p className="font-medium text-[#1F2C46]">Recovery (AA)</p>
                   <p className="text-sm text-gray-500">Step 10-style inventory</p>
                 </div>
               </div>
             </button>
-            
+
             <button
               onClick={() => handleSave({ ...settings, recovery_status: 'general' })}
-              className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
-                settings.recovery_status === 'general'
-                  ? 'border-[#6BC2CE] bg-[#6BC2CE]/5'
-                  : 'border-gray-200 hover:border-[#6BC2CE]/30'
-              }`}
+              className={`w-full p-4 rounded-xl transition-all text-left`}
+              style={{
+                borderWidth: '2px',
+                borderColor: settings.recovery_status === 'general' ? colors.borderColor : '#e5e7eb',
+                backgroundColor: settings.recovery_status === 'general' ? `${colors.primary}0D` : 'transparent'
+              }}
             >
               <div className="flex items-center gap-3">
-                <Sparkles className={`w-5 h-5 ${settings.recovery_status === 'general' ? 'text-[#6BC2CE]' : 'text-gray-400'}`} />
+                <Sparkles className={`w-5 h-5`} style={{ color: settings.recovery_status === 'general' ? colors.primary : '#9ca3af' }} />
                 <div>
                   <p className="font-medium text-[#1F2C46]">General Reflection</p>
                   <p className="text-sm text-gray-500">Personal growth focused</p>
@@ -163,7 +165,7 @@ export default function Settings() {
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
           <div className="flex items-center gap-3 mb-4">
-            <Palette className="w-5 h-5 text-[#7667E5]" />
+            <Palette className="w-5 h-5" style={{ color: colors.primary }} />
             <h3 className="font-semibold text-[#1F2C46]">Theme Color</h3>
           </div>
           <ThemeSelector 
@@ -195,7 +197,7 @@ export default function Settings() {
         >
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-[#7667E5]" />
+              <Bell className="w-5 h-5" style={{ color: colors.primary }} />
               <h3 className="font-semibold text-[#1F2C46]">Daily Reminder</h3>
             </div>
             <Switch
