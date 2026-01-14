@@ -8,13 +8,13 @@ const BACKGROUND_OPTIONS = [
     id: 'purple-1',
     name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1920&q=80'
   },
   {
     id: 'purple-2',
     name: 'Lavender Mist',
     theme: 'purple',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?w=1920&q=80'
   },
   {
     id: 'blue-1',
@@ -26,7 +26,7 @@ const BACKGROUND_OPTIONS = [
     id: 'blue-2',
     name: 'Sky Whisper',
     theme: 'blue',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/d38207128_image.png'
+    image: 'https://images.unsplash.com/photo-1557682268-e3955ed5d83f?w=1920&q=80'
   },
   {
     id: 'green-1',
@@ -38,35 +38,36 @@ const BACKGROUND_OPTIONS = [
     id: 'green-2',
     name: 'Soft Sage',
     theme: 'green',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/28f7d547e_image.png'
+    image: 'https://images.unsplash.com/photo-1557682260-96773eb01377?w=1920&q=80'
   },
   {
     id: 'red-1',
     name: 'Rose Whisper',
     theme: 'red',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682233-43e671455dfa?w=1920&q=80'
   },
   {
     id: 'red-2',
     name: 'Blush Flow',
     theme: 'red',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682250-33bd709cbe85?w=1920&q=80&hue=350'
   },
   {
     id: 'orange-1',
     name: 'Peach Glow',
     theme: 'orange',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?w=1920&q=80&hue=30'
   },
   {
     id: 'orange-2',
     name: 'Warm Mist',
     theme: 'orange',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/11c4b6b52_image.png'
+    image: 'https://images.unsplash.com/photo-1557682268-e3955ed5d83f?w=1920&q=80&hue=40'
   }
 ];
 
 export default function BackgroundSelector({ currentBackground, onBackgroundChange }) {
+  const { colors } = useTheme();
   const [uploading, setUploading] = useState(false);
 
   const handleFileUpload = async (e) => {
@@ -95,9 +96,9 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
         className={`w-full h-16 rounded-xl transition-all flex items-center justify-center gap-2`}
         style={{
           borderWidth: '2px',
-          borderColor: !currentBackground ? '#7667E5' : '#e5e7eb',
-          backgroundColor: !currentBackground ? 'rgba(118, 103, 229, 0.05)' : 'transparent',
-          color: !currentBackground ? '#7667E5' : '#4b5563'
+          borderColor: !currentBackground ? colors.borderColor : '#e5e7eb',
+          backgroundColor: !currentBackground ? `${colors.primary}0D` : 'transparent',
+          color: !currentBackground ? colors.primary : '#4b5563'
         }}
       >
         {!currentBackground && <Check className="w-5 h-5" />}
@@ -112,8 +113,8 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
             className={`relative h-24 rounded-xl overflow-hidden transition-all`}
             style={{
               borderWidth: '2px',
-              borderColor: isSelected(option) ? '#7667E5' : '#e5e7eb',
-              boxShadow: isSelected(option) ? '0 0 0 2px rgba(118, 103, 229, 0.2)' : 'none'
+              borderColor: isSelected(option) ? colors.borderColor : '#e5e7eb',
+              boxShadow: isSelected(option) ? `0 0 0 2px ${colors.primary}33` : 'none'
             }}
           >
             <img 
@@ -123,7 +124,7 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
             />
             {isSelected(option) && (
               <div className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center">
-                <Check className="w-4 h-4 text-[#7667E5]" />
+                <Check className="w-4 h-4" style={{ color: colors.primary }} />
               </div>
             )}
             <div className="absolute bottom-2 left-2 right-2">
