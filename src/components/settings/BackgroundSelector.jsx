@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Upload } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import useTheme from '../theme/useTheme';
 
 const BACKGROUND_OPTIONS = [
   {
@@ -146,21 +147,27 @@ export default function BackgroundSelector({ currentBackground, onBackgroundChan
         />
         <label
           htmlFor="background-upload"
-          className={`flex items-center justify-center gap-3 w-full h-24 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
-            uploading 
-              ? 'border-gray-300 bg-gray-50' 
+          className={`flex items-center justify-center gap-3 w-full h-24 rounded-xl border-2 border-dashed transition-all cursor-pointer`}
+          style={{
+            borderColor: uploading 
+              ? '#d1d5db' 
               : currentBackground?.type === 'custom'
-                ? 'border-[#7667E5] bg-[#7667E5]/5'
-                : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
-          }`}
+                ? colors.borderColor
+                : '#d1d5db',
+            backgroundColor: uploading
+              ? '#f9fafb'
+              : currentBackground?.type === 'custom'
+                ? `${colors.primary}0D`
+                : 'transparent'
+          }}
         >
           {uploading ? (
-            <div className="w-6 h-6 border-2 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: colors.primary, borderTopColor: 'transparent' }} />
           ) : (
             <>
-              <Upload className={`w-6 h-6 ${currentBackground?.type === 'custom' ? 'text-[#7667E5]' : 'text-gray-400'}`} />
+              <Upload className="w-6 h-6" style={{ color: currentBackground?.type === 'custom' ? colors.primary : '#9ca3af' }} />
               <div>
-                <p className={`font-medium ${currentBackground?.type === 'custom' ? 'text-[#7667E5]' : 'text-gray-600'}`}>
+                <p className="font-medium" style={{ color: currentBackground?.type === 'custom' ? colors.primary : '#4b5563' }}>
                   {currentBackground?.type === 'custom' ? 'Custom Background Set' : 'Upload Custom Background'}
                 </p>
                 <p className="text-xs text-gray-400">Click to change image</p>
