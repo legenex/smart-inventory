@@ -9,61 +9,61 @@ const BACKGROUND_OPTIONS = [
     id: 'purple-1',
     name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/10c441774_image.png'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/603743a5f_purple_watercolour_background_corners.jpg'
   },
   {
     id: 'purple-2',
     name: 'Lavender Mist',
     theme: 'purple',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/3dafe83eb_purple_watercolour_background_corners.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/2740f0bdb_4fac6a19-7f87-431d-838d-46ba0a12a094.jpg'
   },
   {
     id: 'blue-1',
     name: 'Soft Blue',
     theme: 'blue',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/1a6dd056a_image.png'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/1801c54a3_job297-ploy-07a-blue-01.jpg'
   },
   {
     id: 'blue-2',
     name: 'Sky Whisper',
     theme: 'blue',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/838993906_job297-ploy-07a-blue-01.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/98acce72e_abstract-blue-background-with-smooth-shining-lines.jpg'
   },
   {
     id: 'green-1',
     name: 'Mint Whisper',
     theme: 'green',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/47a6a4432_rm222batch5-mind-21.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/ccc105c1d_rm222batch5-mind-21.jpg'
   },
   {
     id: 'green-2',
     name: 'Soft Sage',
     theme: 'green',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/14ea596ae_0745aa7f-ba6a-4716-8792-d9032e1882be.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/b238ae16c_0745aa7f-ba6a-4716-8792-d9032e1882be.jpg'
   },
   {
     id: 'red-1',
     name: 'Rose Whisper',
     theme: 'red',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/dfa9f1aa6_9517697.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/86da7d987_9517697.jpg'
   },
   {
     id: 'red-2',
     name: 'Blush Flow',
     theme: 'red',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/7f028342b_9df4e803-d75c-4574-b02a-1d8635c6a0d3.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/882d511c7_9df4e803-d75c-4574-b02a-1d8635c6a0d3.jpg'
   },
   {
     id: 'orange-1',
     name: 'Peach Glow',
     theme: 'orange',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/295b0cc41_background41.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/6e775870d_background41.jpg'
   },
   {
     id: 'orange-2',
     name: 'Warm Mist',
     theme: 'orange',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/98b01b0db_5595248.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/a4a3b387e_5595248.jpg'
   }
 ];
 
