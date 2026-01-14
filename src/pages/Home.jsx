@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { PenLine, Settings, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, isToday, differenceInDays, parseISO } from 'date-fns';
 import StreakCounter from '@/components/home/StreakCounter';
@@ -12,14 +12,20 @@ import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
 import useTheme from '@/components/theme/useTheme';
 
+const toTitleCase = (str) => {
+  if (!str) return '';
+  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+};
+
 export default function Home() {
   const { colors } = useTheme();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [location]);
   
   const loadUser = async () => {
     try {
@@ -97,7 +103,7 @@ export default function Home() {
           <div>
             <p className="text-gray-500 text-sm">Welcome back,</p>
             <h1 className="text-2xl font-bold text-[#1F2C46]">
-              {user.full_name?.split(' ')[0] || 'Friend'}
+              {toTitleCase(user.full_name)?.split(' ')[0] || 'Friend'}
             </h1>
           </div>
           <Link
