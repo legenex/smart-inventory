@@ -9,7 +9,7 @@ const BACKGROUND_OPTIONS = [
     id: 'purple-1',
     name: 'Soft Purple',
     theme: 'purple',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/8439f507e_image.png'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/10c441774_image.png'
   },
   {
     id: 'purple-2',
@@ -21,13 +21,13 @@ const BACKGROUND_OPTIONS = [
     id: 'blue-1',
     name: 'Soft Blue',
     theme: 'blue',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/009215635_4fac6a19-7f87-431d-838d-46ba0a12a094.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/1a6dd056a_image.png'
   },
   {
     id: 'blue-2',
     name: 'Sky Whisper',
     theme: 'blue',
-    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/67d5e3bb1_abstract-blue-background-with-smooth-shining-lines.jpg'
+    image: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/838993906_job297-ploy-07a-blue-01.jpg'
   },
   {
     id: 'green-1',
