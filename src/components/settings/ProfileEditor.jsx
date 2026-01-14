@@ -6,17 +6,17 @@ import { Input } from '@/components/ui/input';
 import { base44 } from '@/api/base44Client';
 import useTheme from '../theme/useTheme';
 
+const toTitleCase = (str) => {
+  if (!str) return '';
+  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+};
+
 export default function ProfileEditor({ user, onUpdate }) {
   const { colors } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(toTitleCase(user.full_name || ''));
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const toTitleCase = (str) => {
-    if (!str) return '';
-    return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
