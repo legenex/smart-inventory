@@ -17,7 +17,7 @@ const AA_QUESTIONS = [
   { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
   { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
   { id: 'unkind', question: 'Is There Anything That You Could You Have Done Better Today?' },
-  { id: 'gratitude', question: 'What Are You Grateful for Today?' }
+  { id: 'gratitude', question: 'Gratitudes' }
 ];
 
 const GENERAL_QUESTIONS = [
@@ -27,7 +27,7 @@ const GENERAL_QUESTIONS = [
   { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values? If So, Explain.' },
   { id: 'avoided', question: 'Did You Avoid Anything Important Today?' },
   { id: 'joy', question: 'Who or What Brought You Joy Today?' },
-  { id: 'gratitude', question: 'What Are You Grateful for Today?' }
+  { id: 'gratitude', question: 'Gratitudes' }
 ];
 
 export default function HistoryDetail() {
@@ -118,27 +118,24 @@ export default function HistoryDetail() {
               return (
                 <div key={q.id} className="pb-4 border-b border-gray-100 last:border-0">
                   <div className="flex items-start gap-3 mb-2">
-                    {!isText && (
-                      <div 
-                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{
-                          backgroundColor: response?.value ? `${colors.primary}15` : `${colors.primary}15`,
-                          color: colors.primary
-                        }}
-                      >
-                        {response?.value ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                      </div>
-                    )}
+                    <div 
+                      className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold"
+                      style={{
+                        backgroundColor: `${colors.primary}15`,
+                        color: colors.primary
+                      }}
+                    >
+                      Q{index + 1}
+                    </div>
                     <div className="flex-1">
                       <p className="font-semibold text-[#1F2C46]">
-                        Q{index + 1}. {q.question}
+                        {q.question}
                       </p>
                     </div>
                   </div>
-                  <div className="ml-9">
+                  <div className="ml-11">
                     {isGratitude ? (
                       <div>
-                        <p className="font-medium text-gray-700 mb-2" style={{ color: colors.primary }}>Gratitudes</p>
                         {Array.isArray(response?.value) ? (
                           <ul className="space-y-1">
                             {response.value.map((item, i) => (
