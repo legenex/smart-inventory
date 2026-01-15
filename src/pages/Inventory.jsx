@@ -20,14 +20,15 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Were You Resentful or Angry Today?', type: 'yesno-text' },
-  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', type: 'yesno-text' },
-  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', type: 'yesno-text' },
-  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', type: 'yesno-text' },
-  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', type: 'yesno-text' },
-  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', type: 'yesno-text' },
-  { id: 'unkind', question: 'Is There Anything That You Could You Have Done Better Today?', type: 'yesno-text' },
-  { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?', description: 'Notice any people, situations, or thoughts you replayed in your mind that disturbed your peace or kept you emotionally stuck.', type: 'yesno-text' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', description: 'Look at what you said, what you avoided saying, and how you may have presented yourself in a way that was not fully truthful.', type: 'yesno-text' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', description: 'Reflect on where you put your comfort, control, image, or personal agenda ahead of honesty, fairness, or connection.', type: 'yesno-text' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', description: 'Reflect on where fear or anxiety showed up today, particularly around rejection, abandonment, failure, loss of control, security, or not being enough, and how those fears influenced your thoughts, emotions, or actions.', type: 'yesno-text' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', description: 'Consider whether your words, actions, or omissions caused harm, discomfort, or confusion for someone else.', type: 'yesno-text' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', description: 'Since keeping secrets builds shame and isolation, reflect on any secrets, shame, rationalizations, or justifications that you had throughout the day.', type: 'yesno-text' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?', description: 'Observe moments where you were impatient, irritable, dismissive, cold, selfish or emotionally unavailable.', type: 'yesno-text' },
+  { id: 'better', question: 'Is There Anything That You Could Have Done Better Today?', description: 'Reflect on whether you could have handled something better today to see if there was room for growth or a better choice.', type: 'yesno-text' },
+  { id: 'gratitude', question: 'Gratitudes', type: 'gratitude' }
 ];
 
 const GENERAL_QUESTIONS = [
@@ -202,6 +203,7 @@ export default function Inventory() {
           <QuestionCard
             key={currentQ.id}
             question={currentQ.question}
+            description={currentQ.description}
             questionNumber={currentQuestion + 1}
             type={currentQ.type}
             value={responses[currentQ.id]?.value}
