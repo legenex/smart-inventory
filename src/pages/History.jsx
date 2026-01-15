@@ -47,7 +47,7 @@ export default function History() {
   }
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F5F7] via-white to-[#E1E1E5]">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
         <motion.div
