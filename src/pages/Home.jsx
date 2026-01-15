@@ -189,10 +189,13 @@ export default function Home() {
             <h3 className="text-lg font-semibold text-[#1F2C46]">Saved Inventories</h3>
             <Link 
               to={createPageUrl('History')}
-              className="text-sm font-medium hover:underline"
-              style={{ color: colors.primary }}
+              className="text-xs px-3 py-1.5 rounded-full font-medium hover:opacity-80 transition-opacity"
+              style={{
+                backgroundColor: `${colors.primary}20`,
+                color: colors.primary
+              }}
             >
-              View All Saved Inventories
+              View All Inventories
             </Link>
           </div>
           
