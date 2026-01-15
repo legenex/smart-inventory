@@ -10,7 +10,8 @@ import {
   Bell, 
   Lock,
   Menu,
-  X
+  X,
+  PenLine
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
@@ -57,32 +58,32 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <div className="text-2xl font-bold bg-gradient-to-r from-[#7667E5] to-[#5B9FED] bg-clip-text text-transparent">
               Smart Inventory
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center gap-8">
-              <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
+              <button onClick={() => scrollToSection('home')} className="text-gray-700 hover:text-[#7667E5] font-medium transition-colors">
                 Home
               </button>
-              <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
+              <button onClick={() => scrollToSection('about')} className="text-gray-700 hover:text-[#7667E5] font-medium transition-colors">
                 About
               </button>
-              <button onClick={() => scrollToSection('what-it-is')} className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
+              <button onClick={() => scrollToSection('what-it-is')} className="text-gray-700 hover:text-[#7667E5] font-medium transition-colors">
                 What It Is
               </button>
               <ContactDialog>
-                <button className="text-gray-700 hover:text-purple-600 font-medium transition-colors">
+                <button className="text-gray-700 hover:text-[#7667E5] font-medium transition-colors">
                   Contact
                 </button>
               </ContactDialog>
               
               {user ? (
                 <button onClick={() => navigate(createPageUrl('Dashboard'))}>
-                  <Avatar className="w-10 h-10 ring-2 ring-purple-500">
+                  <Avatar className="w-10 h-10 ring-2 ring-[#7667E5]">
                     <AvatarImage src={user.profile_picture} alt={user.display_name || user.full_name} />
-                    <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                    <AvatarFallback className="bg-gradient-to-br from-[#7667E5] to-[#5B9FED] text-white">
                       {(user.display_name || user.full_name)?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
@@ -112,17 +113,17 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               className="md:hidden pt-4 pb-2 space-y-3"
             >
-              <button onClick={() => scrollToSection('home')} className="block w-full text-left text-gray-700 hover:text-purple-600 font-medium py-2">
+              <button onClick={() => scrollToSection('home')} className="block w-full text-left text-gray-700 hover:text-[#7667E5] font-medium py-2">
                 Home
               </button>
-              <button onClick={() => scrollToSection('about')} className="block w-full text-left text-gray-700 hover:text-purple-600 font-medium py-2">
+              <button onClick={() => scrollToSection('about')} className="block w-full text-left text-gray-700 hover:text-[#7667E5] font-medium py-2">
                 About
               </button>
-              <button onClick={() => scrollToSection('what-it-is')} className="block w-full text-left text-gray-700 hover:text-purple-600 font-medium py-2">
+              <button onClick={() => scrollToSection('what-it-is')} className="block w-full text-left text-gray-700 hover:text-[#7667E5] font-medium py-2">
                 What It Is
               </button>
               <ContactDialog>
-                <button className="block w-full text-left text-gray-700 hover:text-purple-600 font-medium py-2">
+                <button className="block w-full text-left text-gray-700 hover:text-[#7667E5] font-medium py-2">
                   Contact
                 </button>
               </ContactDialog>
@@ -132,7 +133,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section id="home" className="pt-24 pb-12 md:pt-32 md:pb-20 px-6 overflow-hidden">
+      <section id="home" className="pt-24 pb-12 md:pt-32 md:pb-20 px-6 overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
@@ -146,9 +147,9 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full"
+                className="inline-block mb-4 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
               >
-                <span className="text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="text-sm font-semibold bg-gradient-to-r from-[#7667E5] to-[#5B9FED] bg-clip-text text-transparent">
                   ✨ Your Daily Reflection Companion
                 </span>
               </motion.div>
@@ -160,7 +161,7 @@ export default function Home() {
                 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6 leading-tight"
               >
                 Know Yourself.{' '}
-                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] bg-clip-text text-transparent">
                   Daily.
                 </span>
               </motion.h1>
@@ -169,7 +170,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed"
+                className="text-lg md:text-xl text-gray-700 mb-8 leading-relaxed"
               >
                 Smart Inventory is a private journaling and reflection app that helps you take a daily or nightly inventory, track your personal growth, and gain clarity through AI-powered insights.
               </motion.p>
@@ -183,7 +184,7 @@ export default function Home() {
                 <Button 
                   onClick={handleCTA}
                   size="lg" 
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] hover:from-[#6557D5] hover:to-[#4A8FDD] text-white px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all"
                 >
                   Start Your Free Inventory
                 </Button>
@@ -191,7 +192,7 @@ export default function Home() {
                   onClick={handleCTA}
                   size="lg" 
                   variant="outline" 
-                  className="px-8 py-6 text-lg rounded-xl border-2 hover:bg-gray-50"
+                  className="px-8 py-6 text-lg rounded-xl border-2 bg-white/50 backdrop-blur-sm hover:bg-white"
                 >
                   Create My Account
                 </Button>
@@ -201,13 +202,13 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="text-sm text-gray-500"
+                className="text-sm text-gray-600"
               >
                 🔒 Trusted by people serious about self-awareness, growth, and emotional clarity.
               </motion.p>
             </motion.div>
 
-            {/* Right Column - Abstract Image */}
+            {/* Right Column - Abstract Illustration */}
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -225,7 +226,7 @@ export default function Home() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute -top-10 -right-10 w-64 h-64 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20"
+                className="absolute -top-10 -right-10 w-72 h-72 bg-gradient-to-br from-[#7667E5] to-[#5B9FED] rounded-full blur-3xl opacity-20"
               />
               <motion.div 
                 animate={{ 
@@ -237,10 +238,10 @@ export default function Home() {
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
-                className="absolute -bottom-10 -left-10 w-64 h-64 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full blur-3xl opacity-20"
+                className="absolute -bottom-10 -left-10 w-72 h-72 bg-gradient-to-br from-[#5B9FED] to-[#7ECFEC] rounded-full blur-3xl opacity-20"
               />
 
-              {/* Main Image Container */}
+              {/* Abstract Illustration Container */}
               <motion.div
                 animate={{ 
                   y: [0, -10, 0]
@@ -252,14 +253,69 @@ export default function Home() {
                 }}
                 className="relative z-10"
               >
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                  <img 
-                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6936a138c3177c75bb95a5bf/8faae26ab_image.png"
-                    alt="Smart Inventory Abstract"
-                    className="w-full h-auto"
-                  />
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/20 to-pink-600/20 mix-blend-overlay" />
+                {/* Abstract Shapes Representing Journaling/Reflection */}
+                <div className="relative w-full h-[400px] md:h-[500px]">
+                  {/* Main Card Shape */}
+                  <motion.div
+                    animate={{
+                      rotateY: [0, 5, 0],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute top-10 left-10 right-10 h-80 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-white/50"
+                  >
+                    {/* Simulated Journal Lines */}
+                    <div className="space-y-4">
+                      <div className="h-3 bg-gradient-to-r from-[#7667E5] to-transparent rounded-full w-3/4" />
+                      <div className="h-3 bg-gradient-to-r from-[#5B9FED] to-transparent rounded-full w-full" />
+                      <div className="h-3 bg-gradient-to-r from-[#7ECFEC] to-transparent rounded-full w-5/6" />
+                      <div className="h-3 bg-gradient-to-r from-[#7667E5] to-transparent rounded-full w-2/3 mt-8" />
+                      <div className="h-3 bg-gradient-to-r from-[#5B9FED] to-transparent rounded-full w-4/5" />
+                      <div className="h-3 bg-gradient-to-r from-[#7ECFEC] to-transparent rounded-full w-3/4" />
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                      className="absolute top-6 right-6 w-12 h-12 bg-gradient-to-br from-[#7667E5] to-[#5B9FED] rounded-xl opacity-20"
+                    />
+                  </motion.div>
+
+                  {/* Floating Icon Elements */}
+                  <motion.div
+                    animate={{
+                      y: [0, -15, 0],
+                      rotate: [0, 10, 0]
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#7667E5] to-[#5B9FED] rounded-2xl shadow-xl flex items-center justify-center"
+                  >
+                    <Sparkles className="w-10 h-10 text-white" />
+                  </motion.div>
+
+                  <motion.div
+                    animate={{
+                      y: [0, 15, 0],
+                      rotate: [0, -10, 0]
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.5
+                    }}
+                    className="absolute bottom-20 left-0 w-16 h-16 bg-gradient-to-br from-[#5B9FED] to-[#7ECFEC] rounded-2xl shadow-xl flex items-center justify-center"
+                  >
+                    <PenLine className="w-8 h-8 text-white" />
+                  </motion.div>
                 </div>
 
                 {/* Floating Stats Cards */}
@@ -270,7 +326,7 @@ export default function Home() {
                   className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-100"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#7667E5] to-[#5B9FED] rounded-xl flex items-center justify-center">
                       <TrendingUp className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -284,15 +340,15 @@ export default function Home() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.2 }}
-                  className="absolute -top-6 -right-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-100"
+                  className="absolute top-20 -right-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-100"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-                      <Sparkles className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 bg-gradient-to-br from-[#5B9FED] to-[#7ECFEC] rounded-xl flex items-center justify-center">
+                      <CheckCircle2 className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">AI</p>
-                      <p className="text-sm text-gray-500">Insights</p>
+                      <p className="text-2xl font-bold text-gray-900">Daily</p>
+                      <p className="text-sm text-gray-500">Reflection</p>
                     </div>
                   </div>
                 </motion.div>
@@ -314,7 +370,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               About Smart Inventory
             </h2>
-            <p className="text-2xl text-purple-600 font-semibold mb-8">
+            <p className="text-2xl text-[#7667E5] font-semibold mb-8">
               Reflection With Structure. Insight With Purpose.
             </p>
           </motion.div>
@@ -358,7 +414,7 @@ export default function Home() {
             <p className="text-2xl text-gray-700 font-semibold mb-4">
               A Simple Daily Practice.
             </p>
-            <p className="text-2xl text-purple-600 font-semibold mb-8">
+            <p className="text-2xl text-[#7667E5] font-semibold mb-8">
               Powerful Long-Term Insight.
             </p>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -378,7 +434,7 @@ export default function Home() {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg"
+              className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] hover:from-[#6557D5] hover:to-[#4A8FDD] text-white px-8 py-6 text-lg rounded-xl shadow-lg"
             >
               Create Your Free Account
             </Button>
@@ -433,7 +489,7 @@ export default function Home() {
                 transition={{ delay: index * 0.1 }}
                 className="text-center"
               >
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-16 h-16 bg-gradient-to-br from-[#7667E5] to-[#5B9FED] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <item.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{item.step}. {item.title}</h3>
@@ -451,7 +507,7 @@ export default function Home() {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg"
+              className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] hover:from-[#6557D5] hover:to-[#4A8FDD] text-white px-8 py-6 text-lg rounded-xl shadow-lg"
             >
               Start My First Inventory
             </Button>
@@ -512,7 +568,7 @@ export default function Home() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
               >
-                <feature.icon className="w-10 h-10 text-purple-600 mb-4" />
+                <feature.icon className="w-10 h-10 text-[#7667E5] mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </motion.div>
@@ -528,7 +584,7 @@ export default function Home() {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg"
+              className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] hover:from-[#6557D5] hover:to-[#4A8FDD] text-white px-8 py-6 text-lg rounded-xl shadow-lg"
             >
               Sign Up Free
             </Button>
@@ -573,7 +629,7 @@ export default function Home() {
                   transition={{ delay: index * 0.1 }}
                   className="flex items-center gap-3 text-lg text-gray-700"
                 >
-                  <CheckCircle2 className="w-6 h-6 text-purple-600 flex-shrink-0" />
+                  <CheckCircle2 className="w-6 h-6 text-[#7667E5] flex-shrink-0" />
                   {item}
                 </motion.li>
               ))}
@@ -607,7 +663,7 @@ export default function Home() {
               Most journaling apps give you a blank page.<br />
               Smart Inventory gives you direction, insight, and momentum.
             </p>
-            <p className="text-2xl font-bold text-purple-600">
+            <p className="text-2xl font-bold text-[#7667E5]">
               This isn't about writing more.<br />
               It's about seeing yourself more clearly.
             </p>
@@ -621,7 +677,7 @@ export default function Home() {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg"
+              className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] hover:from-[#6557D5] hover:to-[#4A8FDD] text-white px-8 py-6 text-lg rounded-xl shadow-lg"
             >
               Create My Account
             </Button>
@@ -630,7 +686,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-6 bg-gradient-to-br from-purple-600 to-pink-600">
+      <section className="py-20 px-6 bg-gradient-to-br from-[#7667E5] to-[#5B9FED]">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -661,7 +717,7 @@ export default function Home() {
             <Button 
               onClick={handleCTA}
               size="lg" 
-              className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-6 text-lg rounded-xl shadow-lg"
+              className="bg-white text-[#7667E5] hover:bg-gray-100 px-8 py-6 text-lg rounded-xl shadow-lg"
             >
               Start Free Now
             </Button>
