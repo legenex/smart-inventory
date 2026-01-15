@@ -200,7 +200,7 @@ export default function Home() {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-lg font-semibold text-[#1F2C46]">
-                    {todayEntry ? "View Today's Reflection" : "Start Today's Inventory"}
+                    {todayEntry ? "View Today's Inventory" : "Start Today's Inventory"}
                   </h2>
                   <p className="text-gray-500 text-sm">
                     {todayEntry ? 'You already reflected today' : format(new Date(), 'EEEE, MMMM d')}
