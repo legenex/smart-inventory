@@ -236,7 +236,7 @@ export default function Home() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-[#1F2C46]">Draft</h3>
+                          <h3 className="font-semibold text-[#1F2C46]">{format(new Date(), 'EEEE, MMMM d')}</h3>
                           <span 
                             className="text-xs px-2 py-0.5 rounded-full font-medium"
                             style={{
@@ -244,7 +244,7 @@ export default function Home() {
                               color: colors.primary
                             }}
                           >
-                            In Progress
+                            Draft
                           </span>
                         </div>
                         <p className="text-sm text-gray-500">Continue your inventory</p>
