@@ -37,12 +37,19 @@ export default function ReviewInventory() {
   const [inventoryType, setInventoryType] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState(null);
-  const [shareText, setShareText] = useState('');
+  const [summary, setSummary] = useState('');
+  const [prompts, setPrompts] = useState('');
   const navigate = useNavigate();
   
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (responses && inventoryType) {
+      generateAIContent();
+    }
+  }, [responses, inventoryType]);
   
   const loadData = async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -107,14 +114,13 @@ export default function ReviewInventory() {
     }
   };
 
-  const handleContinue = async () => {
+  const generateAIContent = async () => {
     setProcessing(true);
     localStorage.removeItem('inventory_draft');
     
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     
     try {
-      // Generate AI summary
       const formattedResponses = questions.map(q => {
         const r = responses[q.id];
         if (q.id === 'gratitude') {
@@ -130,13 +136,11 @@ export default function ReviewInventory() {
       const prompt = inventoryType === 'aa'
         ? `You are an AA aligned nightly inventory interpreter. Analyze the user's Step 10 inventory answers and return:
 
-1. <h4>Reflective Summary</h4>
-<p>One paragraph synthesizing the emotional and spiritual themes.</p>
+1. Reflective Summary
+One paragraph synthesizing the emotional and spiritual themes.
 
-2. <h4>Reflective Journalling Prompts</h4>
-<ul>
-<li>Five personalised prompts, compassionate, specific, and tied directly to the user's answers.</li>
-</ul>
+2. Reflective Journalling Prompts
+Five personalised prompts, compassionate, specific, and tied directly to the user's answers.
 
 Do not mention AA explicitly unless the user's answers do. Keep tone compassionate and growth-oriented.
 
@@ -144,13 +148,11 @@ User's inventory:
 ${formattedResponses}`
         : `You are a personal growth and emotional awareness coach. Analyze the user's daily reflection answers and return:
 
-1. <h4>Reflective Summary</h4>
-<p>One paragraph summarizing the user's emotional, mental and behavioral patterns.</p>
+1. Reflective Summary
+One paragraph summarizing the user's emotional, mental and behavioral patterns.
 
-2. <h4>Reflective Journalling Prompts</h4>
-<ul>
-<li>Five personalised prompts supporting clarity, emotional regulation, and personal growth.</li>
-</ul>
+2. Reflective Journalling Prompts
+Five personalised prompts supporting clarity, emotional regulation, and personal growth.
 
 Do not reference AA or addiction recovery in this flow.
 
@@ -168,46 +170,55 @@ ${formattedResponses}`;
         }
       });
       
-      // Create share text with zero-width space before numbers
-      const today = format(new Date(), 'd MMMM yyyy');
-      const zws = '\u200B'; // zero-width space
-      let shareText = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+      setSummary(aiResponse.reflective_summary);
+      setPrompts(aiResponse.journaling_prompts);
+      setProcessing(false);
+    } catch (err) {
+      console.error(err);
+      setProcessing(false);
+    }
+  };
+
+  const handleSave = async () => {
+    const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
+    const today = format(new Date(), 'd MMMM yyyy');
+    const zws = '\u200B';
+    let shareText = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    questions.forEach((q, i) => {
+      const r = responses[q.id];
+      shareText += `${zws}${i + 1}. ${q.question}\n`;
       
-      questions.forEach((q, i) => {
-        const r = responses[q.id];
-        shareText += `${zws}${i + 1}. ${q.question}\n`;
-        
-        if (q.id === 'gratitude') {
-          const gratList = Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered');
-          shareText += `${gratList}\n\n`;
-        } else if (typeof r?.value === 'string') {
-          shareText += `${r.value}\n\n`;
-        } else {
-          shareText += `${r?.value ? 'Yes' : 'No'}`;
-          if (r?.details) {
-            const cleanDetails = r.details.replace(/^(yes|no)[,\s]*/i, '');
-            shareText += `, ${cleanDetails}`;
-          }
-          shareText += '\n\n';
+      if (q.id === 'gratitude') {
+        const gratList = Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered');
+        shareText += `${gratList}\n\n`;
+      } else if (typeof r?.value === 'string') {
+        shareText += `${r.value}\n\n`;
+      } else {
+        shareText += `${r?.value ? 'Yes' : 'No'}`;
+        if (r?.details) {
+          const cleanDetails = r.details.replace(/^(yes|no)[,\s]*/i, '');
+          shareText += `, ${cleanDetails}`;
         }
-      });
-      
-      shareText += `━━━━━━━━━━━━━━━━━━━\n📝 Reflective Summary:\n\n${aiResponse.reflective_summary}\n\n━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
-      
-      // Save entry
+        shareText += '\n\n';
+      }
+    });
+    
+    shareText += `━━━━━━━━━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
+    
+    try {
       const entry = await base44.entities.InventoryEntry.create({
         date: format(new Date(), 'yyyy-MM-dd'),
         inventory_type: inventoryType,
         responses,
-        reflective_summary: aiResponse.reflective_summary,
-        journaling_prompts: aiResponse.journaling_prompts,
+        reflective_summary: summary,
+        journaling_prompts: prompts,
         share_text: shareText
       });
       
-      navigate(createPageUrl(`Summary?id=${entry.id}`));
+      navigate(createPageUrl('Home'));
     } catch (err) {
       console.error(err);
-      setProcessing(false);
     }
   };
   
@@ -246,8 +257,8 @@ ${formattedResponses}`;
   const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F5F7] via-white to-[#E1E1E5]">
-      <div className="max-w-2xl mx-auto px-6 py-8 pb-24">
+    <div className="min-h-screen">
+      <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -271,96 +282,139 @@ ${formattedResponses}`;
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br rounded-[30px] p-8 mb-8 border-2"
-          style={{
-            background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)`,
-            borderColor: `${colors.primary}30`
-          }}
+          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
-          <div className="bg-white rounded-[25px] p-6 shadow-sm">
-            <div className="space-y-6">
-              {questions.map((q, index) => {
-                const r = responses[q.id];
-                const isGratitude = q.id === 'gratitude';
-                const isText = typeof r?.value === 'string' && !Array.isArray(r?.value);
-                
-                return (
-                  <div key={q.id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
-                    <h3 className="font-semibold text-[#1F2C46] text-lg mb-2">
-                      {index + 1}. {q.question}
-                    </h3>
-                    {isGratitude ? (
-                      <p className="text-gray-700">
-                        {Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered')}
-                      </p>
-                    ) : isText ? (
-                      <p className="text-gray-700">{r?.value}</p>
-                    ) : (
-                     <div>
-                       <span className={`font-medium`} style={{ color: colors.primary }}>
-                         {r?.value ? 'Yes' : 'No'}
-                       </span>
-                       {r?.details && (
-                         <span className="text-gray-600">, {r.details.replace(/^(yes|no)[,\s]*/i, '')}</span>
-                       )}
-                     </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          <h3 className="text-lg font-semibold text-[#1F2C46] mb-6">Your Responses</h3>
+          <div className="space-y-5">
+            {questions.map((q, index) => {
+              const r = responses[q.id];
+              const isGratitude = q.id === 'gratitude';
+              const isText = typeof r?.value === 'string' && !Array.isArray(r?.value);
+              
+              return (
+                <div key={q.id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
+                  <h3 className="font-semibold text-[#1F2C46] text-base mb-2">
+                    {index + 1}. {q.question}
+                  </h3>
+                  {isGratitude ? (
+                    <p className="text-gray-600">
+                      {Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered')}
+                    </p>
+                  ) : isText ? (
+                    <p className="text-gray-600 italic">"{r?.value}"</p>
+                  ) : (
+                   <div>
+                     <span className={`font-medium`} style={{ color: colors.primary }}>
+                       {r?.value ? 'Yes' : 'No'}
+                     </span>
+                     {r?.details && (
+                       <span className="text-gray-600">, {r.details.replace(/^(yes|no)[,\s]*/i, '')}</span>
+                     )}
+                   </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </motion.div>
 
+        {/* Reflective Summary */}
+        {!processing && summary && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
+          >
+            <h3 className="text-lg font-bold mb-4" style={{ color: colors.primary }}>
+              Reflective Summary
+            </h3>
+            <p className="text-gray-600 leading-relaxed">{summary}</p>
+          </motion.div>
+        )}
+
+        {/* Journaling Prompts */}
+        {!processing && prompts && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-8"
+          >
+            <h3 className="text-lg font-bold mb-4" style={{ color: colors.primary }}>
+              Reflective Journalling Prompts
+            </h3>
+            <div 
+              className="prose prose-slate max-w-none
+                [&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 [&_ul]:mb-0
+                [&_li]:p-4 [&_li]:rounded-xl [&_li]:text-gray-700 [&_li]:leading-relaxed"
+              ref={(el) => {
+                if (el) {
+                  el.querySelectorAll('li').forEach((li, index) => {
+                    li.style.background = `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`;
+                    if (!li.textContent.match(/^\d+\./)) {
+                      const number = `${index + 1}.`;
+                      const text = li.textContent;
+                      li.innerHTML = `<span style="color: ${colors.primary}; font-weight: bold;">${number}</span> ${text}`;
+                    }
+                  });
+                }
+              }}
+              dangerouslySetInnerHTML={{ __html: prompts }}
+            />
+          </motion.div>
+        )}
+
         {/* Share Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Button
-            onClick={handleShare}
-            className="w-full py-6 rounded-2xl border-2 text-lg font-medium hover:opacity-90 transition-opacity mb-4"
-            variant="outline"
-            style={{
-              borderColor: colors.primary,
-              color: colors.primary
-            }}
+        {!processing && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
           >
-            <Share2 className="w-5 h-5 mr-2" />
-            Share
-          </Button>
-        </motion.div>
+            <Button
+              onClick={handleShare}
+              className="w-full py-6 rounded-2xl border-2 text-lg font-medium hover:opacity-90 transition-opacity mb-4"
+              variant="outline"
+              style={{
+                borderColor: colors.primary,
+                color: colors.primary
+              }}
+            >
+              <Share2 className="w-5 h-5 mr-2" />
+              Share
+            </Button>
+          </motion.div>
+        )}
         
-        {/* Continue Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Button
-            onClick={handleContinue}
-            className="w-full py-6 rounded-2xl text-white text-lg font-medium hover:opacity-90 transition-opacity"
-            style={{
-              background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
-            }}
+        {/* Save and Exit Button */}
+        {!processing && summary && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
           >
-            Continue to Reflection
-          </Button>
-        </motion.div>
+            <Button
+              onClick={handleSave}
+              className="w-full py-6 rounded-2xl text-white text-lg font-medium hover:opacity-90 transition-opacity"
+              style={{
+                background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+              }}
+            >
+              Save & Return to Home
+            </Button>
+          </motion.div>
+        )}
         
         {/* Back Button */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.6 }}
           className="mt-4"
         >
           <button
-            onClick={() => {
-              // Go back to inventory but keep draft
-              navigate(createPageUrl('Inventory'));
-            }}
+            onClick={() => navigate(createPageUrl('Inventory'))}
             className="w-full py-6 rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
           >
             Back to Edit
