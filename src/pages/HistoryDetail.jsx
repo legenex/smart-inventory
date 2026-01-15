@@ -7,29 +7,31 @@ import { ArrowLeft, Check, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
+import useTheme from '@/components/theme/useTheme';
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Resentful or Angry' },
-  { id: 'dishonest', question: 'Dishonest' },
-  { id: 'selfish', question: 'Selfish or Self-Centered' },
-  { id: 'fearful', question: 'Fearful or Anxious' },
-  { id: 'harmful', question: 'Harmed Anyone' },
-  { id: 'secret', question: 'Kept a Secret' },
-  { id: 'unkind', question: 'Unkind or Unloving' },
-  { id: 'gratitude', question: 'Gratitude' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
+  { id: 'unkind', question: 'Is There Anything That You Could You Have Done Better Today?' },
+  { id: 'gratitude', question: 'What Are You Grateful for Today?' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'Strong Emotions' },
-  { id: 'challenged', question: 'Challenged' },
-  { id: 'well', question: 'Did Well' },
-  { id: 'alignment', question: 'Out of Alignment' },
-  { id: 'avoided', question: 'Avoided Something' },
-  { id: 'joy', question: 'Joy' },
-  { id: 'gratitude', question: 'Gratitude' }
+  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly Today?' },
+  { id: 'challenged', question: 'What Challenged You Today?' },
+  { id: 'well', question: 'What Did You Do Well Today?' },
+  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values? If So, Explain.' },
+  { id: 'avoided', question: 'Did You Avoid Anything Important Today?' },
+  { id: 'joy', question: 'Who or What Brought You Joy Today?' },
+  { id: 'gratitude', question: 'What Are You Grateful for Today?' }
 ];
 
 export default function HistoryDetail() {
+  const { colors } = useTheme();
   const [entry, setEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -62,11 +64,7 @@ export default function HistoryDetail() {
   };
   
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return null;
   }
   
   if (!entry) return null;
@@ -103,29 +101,66 @@ export default function HistoryDetail() {
           transition={{ delay: 0.1 }}
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
-          <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Your Responses</h3>
-          <div className="space-y-3">
-            {questions.map((q) => {
+          <h3 className="text-lg font-semibold text-[#1F2C46] mb-6">Your Responses</h3>
+          <div className="space-y-5">
+            {questions.map((q, index) => {
               const response = entry.responses?.[q.id];
-              const isText = q.id === 'gratitude' || q.id === 'emotions' || q.id === 'well' || q.id === 'joy';
+              const isGratitude = q.id === 'gratitude';
+              const isText = isGratitude || q.id === 'emotions' || q.id === 'well' || q.id === 'joy' || q.id === 'challenged';
+              
+              // Format answer by removing duplicate Yes/yes
+              let formattedDetails = response?.details || '';
+              if (formattedDetails && response?.value === true) {
+                // Remove "Yes, " or "yes, " from the beginning
+                formattedDetails = formattedDetails.replace(/^(Yes|yes),?\s*/i, '');
+              }
               
               return (
-                <div key={q.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
-                  {!isText && (
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                      response?.value 
-                        ? 'bg-[#7667E5]/10 text-[#7667E5]' 
-                        : 'bg-[#6BC2CE]/10 text-[#6BC2CE]'
-                    }`}>
-                      {response?.value ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                <div key={q.id} className="pb-4 border-b border-gray-100 last:border-0">
+                  <div className="flex items-start gap-3 mb-2">
+                    {!isText && (
+                      <div 
+                        className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{
+                          backgroundColor: response?.value ? `${colors.primary}15` : `${colors.primary}15`,
+                          color: colors.primary
+                        }}
+                      >
+                        {response?.value ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <p className="font-semibold text-[#1F2C46]">
+                        Q{index + 1}. {q.question}
+                      </p>
                     </div>
-                  )}
-                  <div className="flex-1">
-                    <p className="font-medium text-[#1F2C46] text-sm">{q.question}</p>
-                    {isText ? (
-                      <p className="text-gray-600 text-sm mt-1">{response?.value || 'Not answered'}</p>
-                    ) : response?.details && (
-                      <p className="text-gray-500 text-sm mt-1 italic">"{response.details}"</p>
+                  </div>
+                  <div className="ml-9">
+                    {isGratitude ? (
+                      <div>
+                        <p className="font-medium text-gray-700 mb-2" style={{ color: colors.primary }}>Gratitudes</p>
+                        {Array.isArray(response?.value) ? (
+                          <ul className="space-y-1">
+                            {response.value.map((item, i) => (
+                              <li key={i} className="flex items-start gap-2">
+                                <span style={{ color: colors.primary }}>•</span>
+                                <span className="text-gray-600">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-600">{response?.value || 'Not answered'}</p>
+                        )}
+                      </div>
+                    ) : isText ? (
+                      <p className="text-gray-600 italic">"{response?.value || 'Not answered'}"</p>
+                    ) : (
+                      <p className="text-gray-600">
+                        <span style={{ color: colors.primary }} className="font-medium">
+                          {response?.value ? 'Yes' : 'No'}
+                        </span>
+                        {formattedDetails && <span>, {formattedDetails}</span>}
+                      </p>
                     )}
                   </div>
                 </div>
@@ -141,9 +176,11 @@ export default function HistoryDetail() {
           transition={{ delay: 0.2 }}
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
+          <h3 className="text-lg font-bold mb-4" style={{ color: colors.primary }}>
+            Inventory Summary
+          </h3>
           <div 
             className="prose prose-slate max-w-none
-              [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-[#1F2C46] [&_h4]:mb-3 [&_h4]:mt-0
               [&_p]:text-gray-600 [&_p]:leading-relaxed [&_p]:mb-0"
             dangerouslySetInnerHTML={{ __html: entry.reflective_summary }}
           />
@@ -156,12 +193,24 @@ export default function HistoryDetail() {
           transition={{ delay: 0.3 }}
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-8"
         >
+          <h3 className="text-lg font-bold mb-4" style={{ color: colors.primary }}>
+            Reflective Journalling Prompts
+          </h3>
           <div 
             className="prose prose-slate max-w-none
-              [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-[#1F2C46] [&_h4]:mb-4 [&_h4]:mt-0
               [&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 [&_ul]:mb-0
-              [&_li]:bg-gradient-to-r [&_li]:from-[#7667E5]/5 [&_li]:to-[#A48FFF]/5 
               [&_li]:p-4 [&_li]:rounded-xl [&_li]:text-gray-700 [&_li]:leading-relaxed"
+            ref={(el) => {
+              if (el) {
+                el.querySelectorAll('li').forEach((li, index) => {
+                  li.style.background = `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`;
+                  // Add number prefix
+                  if (!li.textContent.match(/^\d+\./)) {
+                    li.textContent = `${index + 1}. ${li.textContent}`;
+                  }
+                });
+              }
+            }}
             dangerouslySetInnerHTML={{ __html: entry.journaling_prompts }}
           />
         </motion.div>
