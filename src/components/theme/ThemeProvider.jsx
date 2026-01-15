@@ -77,7 +77,7 @@ const THEME_COLORS = {
 export const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [themeColor, setThemeColor] = useState('purple');
+  const [themeColor, setThemeColor] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,10 +98,12 @@ export function ThemeProvider({ children }) {
     setThemeColor(newTheme);
   };
 
+  const colors = themeColor ? THEME_COLORS[themeColor] : THEME_COLORS.purple;
+
   return (
     <ThemeContext.Provider value={{
-      colors: THEME_COLORS[themeColor],
-      themeColor,
+      colors,
+      themeColor: themeColor || 'purple',
       loading,
       updateTheme
     }}>
