@@ -42,12 +42,15 @@ export default function ProfileEditor({ user, onUpdate }) {
     try {
       const fullName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
       await base44.auth.updateMe({ full_name: fullName });
-      await onUpdate();
       setIsEditing(false);
+      // Wait a bit then reload to ensure backend has processed the update
+      setTimeout(async () => {
+        await onUpdate();
+      }, 300);
     } catch (err) {
       console.error(err);
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   return (
