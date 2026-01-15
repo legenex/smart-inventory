@@ -185,14 +185,14 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <div className="mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#1F2C46]">Saved Inventories</h3>
             <Link 
               to={createPageUrl('History')}
-              className="text-lg font-semibold text-[#1F2C46] hover:underline inline-block transition-colors"
-              onMouseEnter={(e) => e.currentTarget.style.color = colors.primary}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#1F2C46'}
+              className="text-sm font-medium hover:underline"
+              style={{ color: colors.primary }}
             >
-              Saved Inventories
+              View All Saved Inventories
             </Link>
           </div>
           
