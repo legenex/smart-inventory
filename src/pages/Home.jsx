@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown } from 'lucide-react';
+import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -137,21 +138,25 @@ export default function Home() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 bg-white rounded-2xl shadow-sm px-3 py-2 hover:shadow-md transition-shadow">
-                <Avatar className="w-10 h-10 ring-2" style={{ ringColor: colors.primary }}>
-                  <AvatarImage src={user.profile_picture_url || user.avatar_url} alt={user.full_name} />
-                  <AvatarFallback className="text-sm font-medium" style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`, color: 'white' }}>
-                    {user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="w-10 h-10 ring-2" style={{ borderColor: colors.primary, borderWidth: '2px' }}>
+                    <AvatarImage src={user.profile_picture} alt={user.full_name} />
+                    <AvatarFallback className="text-sm font-medium" style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`, color: 'white' }}>
+                      {user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
                 <span className="text-sm font-medium text-[#1F2C46]">{toTitleCase(user.full_name)?.split(' ')[0]}</span>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => navigate(createPageUrl('Settings'))}>
+                <SettingsIcon className="w-4 h-4 mr-2" />
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => base44.auth.logout()}>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => base44.auth.logout()} className="text-red-600 focus:text-red-600">
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </DropdownMenuItem>
