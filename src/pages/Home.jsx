@@ -178,7 +178,7 @@ export default function Home() {
           transition={{ delay: 0.4 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-[#1F2C46]">Previous Reflections</h3>
+            <h3 className="text-lg font-semibold text-[#1F2C46]">Saved Inventories</h3>
             {entries.length > 5 && (
               <Link 
                 to={createPageUrl('History')}
