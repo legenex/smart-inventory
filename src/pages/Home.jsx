@@ -54,6 +54,12 @@ export default function Home() {
       navigate(createPageUrl('Onboarding'));
     }
   };
+
+  // Reload user data every 2 seconds to keep it fresh
+  useEffect(() => {
+    const interval = setInterval(loadUser, 2000);
+    return () => clearInterval(interval);
+  }, []);
   
   const { data: entries = [], isLoading, refetch } = useQuery({
     queryKey: ['inventoryEntries'],
