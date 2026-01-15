@@ -21,7 +21,7 @@ export default function QuestionCard({
   isLast
 }) {
   const { colors } = useTheme();
-  const showDetails = type === 'yesno-text' && value === true;
+  const showDetails = (type === 'yesno-text' && value === true) || (type === 'yesno-text-no' && value === false);
   const isTextOnly = type === 'text';
   const isGratitude = type === 'gratitude';
   
