@@ -187,14 +187,13 @@ export default function Home() {
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[#1F2C46]">Saved Inventories</h3>
-            {entries.length > 5 && (
-              <Link 
-                to={createPageUrl('History')}
-                className="text-[#7667E5] text-sm font-medium hover:underline"
-              >
-                See All
-              </Link>
-            )}
+            <Link 
+              to={createPageUrl('History')}
+              className="text-sm font-medium hover:underline"
+              style={{ color: colors.primary }}
+            >
+              View All Saved Inventories
+            </Link>
           </div>
           
           {isLoading ? (
