@@ -156,7 +156,8 @@ export default function HistoryDetail() {
                         <span style={{ color: colors.primary }} className="font-medium">
                           {response?.value ? 'Yes' : 'No'}
                         </span>
-                        {formattedDetails && <span>, {formattedDetails}</span>}
+                        {formattedDetails && <span style={{ color: colors.primary }}>,</span>}
+                        {formattedDetails && <span> {formattedDetails}</span>}
                       </p>
                     )}
                   </div>
@@ -201,9 +202,11 @@ export default function HistoryDetail() {
               if (el) {
                 el.querySelectorAll('li').forEach((li, index) => {
                   li.style.background = `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`;
-                  // Add number prefix
+                  // Add number prefix with bold styling and theme color
                   if (!li.textContent.match(/^\d+\./)) {
-                    li.textContent = `${index + 1}. ${li.textContent}`;
+                    const number = `${index + 1}.`;
+                    const text = li.textContent;
+                    li.innerHTML = `<span style="color: ${colors.primary}; font-weight: bold;">${number}</span> ${text}`;
                   }
                 });
               }
