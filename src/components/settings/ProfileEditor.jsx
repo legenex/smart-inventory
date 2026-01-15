@@ -40,8 +40,8 @@ export default function ProfileEditor({ user, onUpdate }) {
     
     setSaving(true);
     try {
-      const fullName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
-      await base44.auth.updateMe({ full_name: fullName });
+      const displayName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
+      await base44.auth.updateMe({ display_name: displayName });
       // Force reload user data
       await onUpdate();
       setIsEditing(false);
