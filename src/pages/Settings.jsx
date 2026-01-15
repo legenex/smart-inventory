@@ -54,10 +54,12 @@ export default function Settings() {
     setSaving(true);
     try {
       await base44.auth.updateMe(newSettings);
-      setSettings(newSettings);
+      setSettings(prev => ({ ...prev, ...newSettings }));
       if (newSettings.theme_color) {
         updateTheme(newSettings.theme_color);
       }
+      // Reload user to ensure everything is in sync
+      await loadUser();
     } catch (err) {
       console.error(err);
     }
