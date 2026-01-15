@@ -93,7 +93,7 @@ export default function Settings() {
           className="flex items-center gap-4 mb-8"
         >
           <Link
-            to={createPageUrl('Home')}
+            to={createPageUrl('Dashboard')}
             className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />

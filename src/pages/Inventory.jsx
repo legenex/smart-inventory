@@ -162,7 +162,7 @@ export default function Inventory() {
     if (Object.keys(responses).length > 0) {
       setShowExitDialog(true);
     } else {
-      navigate(createPageUrl('Home'));
+      navigate(createPageUrl('Dashboard'));
     }
   };
 

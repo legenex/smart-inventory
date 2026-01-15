@@ -32,7 +32,7 @@ const getTimeBasedGreeting = () => {
   return 'Good Evening';
 };
 
-export default function Home() {
+export default function Dashboard() {
   const { colors } = useTheme();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();

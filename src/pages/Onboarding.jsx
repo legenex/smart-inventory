@@ -35,7 +35,7 @@ export default function Onboarding() {
         reminder_time: '21:00',
         streak: 0
       });
-      navigate(createPageUrl('Home'));
+      navigate(createPageUrl('Dashboard'));
     } catch (err) {
       console.error(err);
     }
