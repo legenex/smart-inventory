@@ -1,8 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
+import useTheme from '../theme/useTheme';
 
 export default function ShareButton({ shareText }) {
+  const { colors } = useTheme();
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -24,10 +26,13 @@ export default function ShareButton({ shareText }) {
   return (
     <Button
       onClick={handleShare}
-      className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#6BC2CE] to-[#7667E5] text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+      className="w-full py-6 rounded-2xl text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+      style={{
+        background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+      }}
     >
       <Share2 className="w-5 h-5" />
-      Share Your Reflection
+      Share Your Inventory
     </Button>
   );
 }
