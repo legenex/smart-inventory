@@ -199,7 +199,7 @@ export default function Home() {
               className="text-xs px-3 py-1.5 rounded-full font-medium hover:opacity-80 transition-opacity"
               style={{
                 backgroundColor: `${colors.primary}20`,
-                color: colors.primary
+                color: '#000'
               }}
             >
               View All Inventories
