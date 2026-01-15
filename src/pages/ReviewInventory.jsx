@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Check, X } from 'lucide-react';
+import { ArrowLeft, Check, X, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import useTheme from '@/components/theme/useTheme';
 
 const AA_QUESTIONS = [
   { id: 'resentful', question: 'Were You Resentful or Angry?' },
@@ -30,10 +31,12 @@ const GENERAL_QUESTIONS = [
 ];
 
 export default function ReviewInventory() {
+  const { colors } = useTheme();
   const [responses, setResponses] = useState(null);
   const [inventoryType, setInventoryType] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [user, setUser] = useState(null);
+  const [shareText, setShareText] = useState('');
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -60,8 +63,52 @@ export default function ReviewInventory() {
     }
   };
   
+  const generateShareText = () => {
+    const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
+    const today = format(new Date(), 'd MMMM yyyy');
+    const zws = '\u200B';
+    let text = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    
+    questions.forEach((q, i) => {
+      const r = responses[q.id];
+      text += `${zws}${i + 1}. ${q.question}\n`;
+      
+      if (q.id === 'gratitude') {
+        const gratList = Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered');
+        text += `${gratList}\n\n`;
+      } else if (typeof r?.value === 'string') {
+        text += `${r.value}\n\n`;
+      } else {
+        text += `${r?.value ? 'Yes' : 'No'}`;
+        if (r?.details) {
+          text += `, ${r.details}`;
+        }
+        text += '\n\n';
+      }
+    });
+    
+    text += `━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
+    return text;
+  };
+
+  const handleShare = async () => {
+    const text = generateShareText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch (err) {
+        console.error('Share failed', err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(text);
+      alert('Copied to clipboard!');
+    }
+  };
+
   const handleContinue = async () => {
     setProcessing(true);
+    localStorage.removeItem('inventory_draft');
     
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     
@@ -181,8 +228,12 @@ ${formattedResponses}`;
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="w-20 h-20 mx-auto mb-6 rounded-full border-4 border-[#7667E5]/20 border-t-[#7667E5]"
-          />
+            className="w-20 h-20 mx-auto mb-6 rounded-full border-4"
+            style={{
+              borderColor: `${colors.primary}20`,
+              borderTopColor: colors.primary
+            }}
+            />
           <h2 className="text-xl font-semibold text-[#1F2C46] mb-2">Reflecting on your day...</h2>
           <p className="text-gray-500">Creating your personalized insights</p>
         </motion.div>
@@ -201,12 +252,12 @@ ${formattedResponses}`;
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-4 mb-8"
         >
-          <Link
-            to={createPageUrl('Inventory')}
+          <button
+            onClick={() => navigate(createPageUrl('Inventory'))}
             className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-lg font-semibold text-[#1F2C46]">Your Nightly Inventory</h1>
             <p className="text-sm text-gray-500">Review your full reflection before continuing</p>
@@ -218,7 +269,11 @@ ${formattedResponses}`;
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-br from-[#6BC2CE]/10 to-[#7667E5]/10 rounded-[30px] p-8 mb-8 border-2 border-[#7667E5]/20"
+          className="bg-gradient-to-br rounded-[30px] p-8 mb-8 border-2"
+          style={{
+            background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)`,
+            borderColor: `${colors.primary}30`
+          }}
         >
           <div className="bg-white rounded-[25px] p-6 shadow-sm">
             <div className="space-y-6">
@@ -239,14 +294,14 @@ ${formattedResponses}`;
                     ) : isText ? (
                       <p className="text-gray-700">{r?.value}</p>
                     ) : (
-                      <div className="flex items-start gap-2">
-                        <span className={`font-medium ${r?.value ? 'text-[#7667E5]' : 'text-[#6BC2CE]'}`}>
-                          {r?.value ? 'Yes' : 'No'}
-                        </span>
-                        {r?.details && (
-                          <span className="text-gray-600">, {r.details}</span>
-                        )}
-                      </div>
+                     <div>
+                       <span className={`font-medium`} style={{ color: colors.primary }}>
+                         {r?.value ? 'Yes' : 'No'}
+                       </span>
+                       {r?.details && (
+                         <span className="text-gray-600">, {r.details}</span>
+                       )}
+                     </div>
                     )}
                   </div>
                 );
@@ -254,18 +309,41 @@ ${formattedResponses}`;
             </div>
           </div>
         </motion.div>
-        
-        {/* Continue Button */}
+
+        {/* Share Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
           <Button
-            onClick={handleContinue}
-            className="w-full py-6 rounded-2xl bg-gradient-to-r from-[#7667E5] to-[#A48FFF] text-white text-lg font-medium hover:opacity-90 transition-opacity"
+            onClick={handleShare}
+            className="w-full py-6 rounded-2xl border-2 text-lg font-medium hover:opacity-90 transition-opacity mb-4"
+            variant="outline"
+            style={{
+              borderColor: colors.primary,
+              color: colors.primary
+            }}
           >
-            Continue to Summary
+            <Share2 className="w-5 h-5 mr-2" />
+            Share with Sponsor
+          </Button>
+        </motion.div>
+        
+        {/* Continue Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Button
+            onClick={handleContinue}
+            className="w-full py-6 rounded-2xl text-white text-lg font-medium hover:opacity-90 transition-opacity"
+            style={{
+              background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+            }}
+          >
+            Continue to Reflection
           </Button>
         </motion.div>
         
@@ -273,17 +351,18 @@ ${formattedResponses}`;
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="mt-4"
         >
-          <Link to={createPageUrl('Inventory')}>
-            <Button
-              variant="outline"
-              className="w-full py-6 rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50"
-            >
-              Back to Edit
-            </Button>
-          </Link>
+          <button
+            onClick={() => {
+              // Go back to inventory but keep draft
+              navigate(createPageUrl('Inventory'));
+            }}
+            className="w-full py-6 rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            Back to Edit
+          </button>
         </motion.div>
       </div>
     </div>

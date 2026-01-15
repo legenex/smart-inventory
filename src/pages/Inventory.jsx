@@ -4,11 +4,20 @@ import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { format, isToday, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import ProgressBar from '@/components/inventory/ProgressBar';
 import QuestionCard from '@/components/inventory/QuestionCard';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const AA_QUESTIONS = [
   { id: 'resentful', question: 'Were You Resentful or Angry Today?', type: 'yesno-text' },
@@ -17,7 +26,7 @@ const AA_QUESTIONS = [
   { id: 'fearful', question: 'Were You Fearful or Anxious Today?', type: 'yesno-text' },
   { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', type: 'yesno-text' },
   { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', type: 'yesno-text' },
-  { id: 'unkind', question: 'Were You Unkind or Unloving? Could You Have Done Better?', type: 'yesno-text' },
+  { id: 'unkind', question: 'Is There Anything That You Could You Have Done Better Today?', type: 'yesno-text' },
   { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
 ];
 
@@ -36,10 +45,22 @@ export default function Inventory() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [responses, setResponses] = useState({});
   const [processing, setProcessing] = useState(false);
+  const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
     loadUser();
+    // Load draft if exists
+    const draft = localStorage.getItem('inventory_draft');
+    if (draft) {
+      try {
+        const { responses: draftResponses, question } = JSON.parse(draft);
+        setResponses(draftResponses);
+        setCurrentQuestion(question);
+      } catch (err) {
+        console.error('Failed to load draft', err);
+      }
+    }
   }, []);
   
   const loadUser = async () => {
@@ -69,41 +90,56 @@ export default function Inventory() {
   }, [entries]);
   
   if (!user) {
-    return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return null;
   }
   
   const questions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   const currentQ = questions[currentQuestion];
   
   const handleValueChange = (value) => {
-    setResponses(prev => ({
-      ...prev,
+    const newResponses = {
+      ...responses,
       [currentQ.id]: {
-        ...prev[currentQ.id],
+        ...responses[currentQ.id],
         value
       }
+    };
+    setResponses(newResponses);
+    // Save draft
+    localStorage.setItem('inventory_draft', JSON.stringify({
+      responses: newResponses,
+      question: currentQuestion
     }));
   };
   
   const handleDetailsChange = (details) => {
-    setResponses(prev => ({
-      ...prev,
+    const newResponses = {
+      ...responses,
       [currentQ.id]: {
-        ...prev[currentQ.id],
+        ...responses[currentQ.id],
         details
       }
+    };
+    setResponses(newResponses);
+    // Save draft
+    localStorage.setItem('inventory_draft', JSON.stringify({
+      responses: newResponses,
+      question: currentQuestion
     }));
   };
   
   const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
-      setCurrentQuestion(prev => prev + 1);
+      const nextQuestion = currentQuestion + 1;
+      setCurrentQuestion(nextQuestion);
+      // Update draft with new question
+      localStorage.setItem('inventory_draft', JSON.stringify({
+        responses,
+        question: nextQuestion
+      }));
     } else {
-      // Go to review page
+      // Clear draft and go to review page
+      localStorage.removeItem('inventory_draft');
       navigate(createPageUrl(`ReviewInventory?responses=${encodeURIComponent(JSON.stringify(responses))}&type=${user.recovery_status}`));
     }
   };
@@ -111,8 +147,32 @@ export default function Inventory() {
   
   const handleBack = () => {
     if (currentQuestion > 0) {
-      setCurrentQuestion(prev => prev - 1);
+      const prevQuestion = currentQuestion - 1;
+      setCurrentQuestion(prevQuestion);
+      // Update draft with new question
+      localStorage.setItem('inventory_draft', JSON.stringify({
+        responses,
+        question: prevQuestion
+      }));
     }
+  };
+
+  const handleExit = () => {
+    if (Object.keys(responses).length > 0) {
+      setShowExitDialog(true);
+    } else {
+      navigate(createPageUrl('Home'));
+    }
+  };
+
+  const confirmExit = () => {
+    // Keep draft saved
+    navigate(createPageUrl('Home'));
+  };
+
+  const discardAndExit = () => {
+    localStorage.removeItem('inventory_draft');
+    navigate(createPageUrl('Home'));
   };
   
 
@@ -122,12 +182,12 @@ export default function Inventory() {
       <div className="max-w-lg mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-6">
-          <Link
-            to={createPageUrl('Home')}
+          <button
+            onClick={handleExit}
             className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
+          </button>
           <div>
             <h1 className="text-lg font-semibold text-[#1F2C46]">
               {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
@@ -154,6 +214,22 @@ export default function Inventory() {
             isLast={currentQuestion === questions.length - 1}
           />
         </AnimatePresence>
+
+        {/* Exit Confirmation Dialog */}
+        <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Save your progress?</AlertDialogTitle>
+              <AlertDialogDescription>
+                You have unsaved responses. Would you like to save them as a draft to continue later?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={discardAndExit}>Discard</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmExit}>Save Draft</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

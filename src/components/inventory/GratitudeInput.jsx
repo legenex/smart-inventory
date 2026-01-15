@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
+import useTheme from '../theme/useTheme';
 
 export default function GratitudeInput({ values = [], onChange }) {
+  const { colors } = useTheme();
   const [inputs, setInputs] = useState(values.length > 0 ? values : ['']);
   
   const handleInputChange = (index, value) => {
@@ -45,11 +47,17 @@ export default function GratitudeInput({ values = [], onChange }) {
           >
             <Input
               id={`gratitude-${index}`}
-              placeholder={`${index + 1}. What are you grateful for?`}
+              placeholder={`I am grateful for...`}
               value={value}
               onChange={(e) => handleInputChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
-              className="rounded-2xl border-2 border-gray-200 focus:border-[#7667E5] p-4 text-[#1F2C46] transition-colors"
+              className="rounded-2xl border-2 p-4 text-[#1F2C46] transition-colors"
+              style={{
+                borderColor: '#e5e7eb',
+                backgroundColor: `${colors.primary}08`
+              }}
+              onFocus={(e) => e.target.style.borderColor = colors.primary}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </motion.div>
         ))}

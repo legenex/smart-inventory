@@ -49,7 +49,7 @@ export default function QuestionCard({
           {question}
         </h2>
         
-        {!isTextOnly && (
+        {!isTextOnly && !isGratitude && (
           <div className="flex gap-4 mb-6">
             <button
               onClick={() => onValueChange(true)}
@@ -64,11 +64,18 @@ export default function QuestionCard({
             </button>
             <button
               onClick={() => onValueChange(false)}
-              className={`flex-1 py-4 px-6 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center gap-3 ${
-                value === false 
-                  ? 'border-[#6BC2CE] bg-[#6BC2CE]/10 text-[#6BC2CE]' 
-                  : 'border-gray-200 hover:border-[#6BC2CE]/50 text-gray-600'
-              }`}
+              className={`flex-1 py-4 px-6 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center gap-3`}
+              style={{
+                borderColor: value === false ? colors.primary : '#e5e7eb',
+                backgroundColor: value === false ? `${colors.primary}15` : 'transparent',
+                color: value === false ? colors.primary : '#4b5563'
+              }}
+              onMouseEnter={(e) => {
+                if (value !== false) e.currentTarget.style.borderColor = `${colors.primary}80`;
+              }}
+              onMouseLeave={(e) => {
+                if (value !== false) e.currentTarget.style.borderColor = '#e5e7eb';
+              }}
             >
               <X className="w-5 h-5" />
               <span className="font-medium">No</span>
@@ -84,6 +91,7 @@ export default function QuestionCard({
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
+              <p className="text-gray-500 text-sm mb-4">List 5 things you were grateful for today</p>
               <GratitudeInput
                 values={Array.isArray(value) ? value : []}
                 onChange={onValueChange}

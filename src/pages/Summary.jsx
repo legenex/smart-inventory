@@ -8,8 +8,10 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import ShareButton from '@/components/summary/ShareButton';
+import useTheme from '@/components/theme/useTheme';
 
 export default function Summary() {
+  const { colors } = useTheme();
   const [entry, setEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -42,11 +44,7 @@ export default function Summary() {
   };
   
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return null;
   }
   
   if (!entry) return null;
@@ -77,7 +75,10 @@ export default function Summary() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-gradient-to-r from-[#7667E5] to-[#A48FFF] rounded-[25px] p-6 mb-6 text-white text-center"
+          className="rounded-[25px] p-6 mb-6 text-white text-center"
+          style={{
+            background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+          }}
         >
           <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">
             <Sparkles className="w-8 h-8" />
@@ -99,8 +100,17 @@ export default function Summary() {
               [&_p]:text-gray-600 [&_p]:leading-relaxed [&_p]:mb-0
               [&_ul]:mt-4 [&_ul]:space-y-3 [&_ul]:list-none [&_ul]:pl-0
               [&_li]:flex [&_li]:items-start [&_li]:gap-3 [&_li]:text-gray-600
-              [&_li]:before:content-['→'] [&_li]:before:text-[#7667E5] [&_li]:before:font-bold"
+              [&_li]:before:content-['→'] [&_li]:before:font-bold"
             dangerouslySetInnerHTML={{ __html: entry.reflective_summary }}
+            style={{
+              '--arrow-color': colors.primary
+            }}
+            onLoad={(e) => {
+              const arrows = e.currentTarget.querySelectorAll('li::before');
+              arrows.forEach(arrow => {
+                arrow.style.color = colors.primary;
+              });
+            }}
           />
         </motion.div>
         
@@ -115,9 +125,19 @@ export default function Summary() {
             className="prose prose-slate max-w-none
               [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-[#1F2C46] [&_h4]:mb-4 [&_h4]:mt-0
               [&_ul]:space-y-4 [&_ul]:list-none [&_ul]:pl-0 [&_ul]:mb-0
-              [&_li]:bg-gradient-to-r [&_li]:from-[#7667E5]/5 [&_li]:to-[#A48FFF]/5 
               [&_li]:p-4 [&_li]:rounded-xl [&_li]:text-gray-700 [&_li]:leading-relaxed"
             dangerouslySetInnerHTML={{ __html: entry.journaling_prompts }}
+            style={{
+              '--prompt-gradient-from': `${colors.primary}08`,
+              '--prompt-gradient-to': `${colors.secondary}08`
+            }}
+            ref={(el) => {
+              if (el) {
+                el.querySelectorAll('li').forEach(li => {
+                  li.style.background = `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`;
+                });
+              }
+            }}
           />
         </motion.div>
         

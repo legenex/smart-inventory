@@ -27,11 +27,7 @@ export default function Layout({ children, currentPageName }) {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#F5F5F7] via-white to-[#E1E1E5] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
+    return null;
   }
 
   return (
