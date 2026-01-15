@@ -14,7 +14,9 @@ const toTitleCase = (str) => {
 export default function ProfileEditor({ user, onUpdate }) {
   const { colors } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(toTitleCase(user.full_name || ''));
+  const nameParts = (user.full_name || '').trim().split(' ');
+  const [firstName, setFirstName] = useState(toTitleCase(nameParts[0] || ''));
+  const [lastName, setLastName] = useState(toTitleCase(nameParts.slice(1).join(' ') || ''));
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -34,12 +36,12 @@ export default function ProfileEditor({ user, onUpdate }) {
   };
 
   const handleSaveName = async () => {
-    if (!name.trim()) return;
+    if (!firstName.trim() && !lastName.trim()) return;
     
     setSaving(true);
     try {
-      const titleCaseName = toTitleCase(name.trim());
-      await base44.auth.updateMe({ full_name: titleCaseName });
+      const fullName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
+      await base44.auth.updateMe({ full_name: fullName });
       await onUpdate();
       setIsEditing(false);
     } catch (err) {
@@ -87,36 +89,50 @@ export default function ProfileEditor({ user, onUpdate }) {
       
       <div className="flex-1">
         {isEditing ? (
-          <div className="flex items-center gap-2">
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className="flex-1 rounded-xl"
-              autoFocus
-            />
-            <button
-              onClick={handleSaveName}
-              disabled={!name.trim() || saving}
-              className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
-                name.trim() ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400'
-              }`}
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Check className="w-4 h-4" />
-              )}
-            </button>
-            <button
-              onClick={() => {
-                setName(toTitleCase(user.full_name || ''));
-                setIsEditing(false);
-              }}
-              className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First Name"
+                className="rounded-xl"
+                autoFocus
+              />
+              <Input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last Name"
+                className="rounded-xl"
+              />
+            </div>
+            <div className="flex items-center gap-2 justify-end">
+              <button
+                onClick={handleSaveName}
+                disabled={(!firstName.trim() && !lastName.trim()) || saving}
+                className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                  (firstName.trim() || lastName.trim()) ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400'
+                }`}
+              >
+                {saving ? (
+                  <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">Save</span>
+              </button>
+              <button
+                onClick={() => {
+                  const nameParts = (user.full_name || '').trim().split(' ');
+                  setFirstName(toTitleCase(nameParts[0] || ''));
+                  setLastName(toTitleCase(nameParts.slice(1).join(' ') || ''));
+                  setIsEditing(false);
+                }}
+                className="px-4 py-2 bg-gray-100 rounded-lg flex items-center gap-2 text-gray-600 hover:bg-gray-200 transition-colors"
+              >
+                <X className="w-4 h-4" />
+                <span className="text-sm font-medium">Cancel</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-2">
