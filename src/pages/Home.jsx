@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PenLine, ChevronRight, Trash2, LogOut } from 'lucide-react';
+import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,13 @@ import useTheme from '@/components/theme/useTheme';
 const toTitleCase = (str) => {
   if (!str) return '';
   return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+};
+
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 18) return 'Good Afternoon';
+  return 'Good Evening';
 };
 
 export default function Home() {
@@ -123,21 +130,21 @@ export default function Home() {
           className="flex items-center justify-between mb-8"
         >
           <div>
-            <p className="text-gray-500 text-sm">Welcome back,</p>
-            <h1 className="text-2xl font-bold text-[#1F2C46]">
-              {toTitleCase(user.full_name)?.split(' ')[0] || 'Friend'}
+            <h1 className="text-3xl font-extrabold text-[#1F2C46] leading-tight">
+              {getTimeBasedGreeting()}, {toTitleCase(user.full_name)?.split(' ')[0] || 'Friend'}
             </h1>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 bg-white rounded-2xl shadow-sm px-3 py-2 hover:shadow-md transition-shadow">
-                <Avatar className="w-8 h-8">
-                  <AvatarImage src={user.avatar_url} alt={user.full_name} />
+                <Avatar className="w-10 h-10 ring-2" style={{ ringColor: colors.primary }}>
+                  <AvatarImage src={user.profile_picture_url || user.avatar_url} alt={user.full_name} />
                   <AvatarFallback className="text-sm font-medium" style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`, color: 'white' }}>
                     {user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <span className="text-sm font-medium text-[#1F2C46]">{toTitleCase(user.full_name)?.split(' ')[0]}</span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
