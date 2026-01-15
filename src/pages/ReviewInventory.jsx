@@ -16,8 +16,9 @@ const AA_QUESTIONS = [
   { id: 'fearful', question: 'Were You Fearful or Anxious?' },
   { id: 'harmful', question: 'Did You Harm Anyone?' },
   { id: 'secret', question: 'Did You Keep a Secret?' },
-  { id: 'unkind', question: 'Were You Unkind or Unloving?' },
-  { id: 'gratitude', question: 'What Are You Grateful For?' }
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All?' },
+  { id: 'better', question: 'Could You Have Done Better?' },
+  { id: 'gratitude', question: 'Gratitudes' }
 ];
 
 const GENERAL_QUESTIONS = [
@@ -184,7 +185,8 @@ ${formattedResponses}`;
         } else {
           shareText += `${r?.value ? 'Yes' : 'No'}`;
           if (r?.details) {
-            shareText += `, ${r.details}`;
+            const cleanDetails = r.details.replace(/^(yes|no)[,\s]*/i, '');
+            shareText += `, ${cleanDetails}`;
           }
           shareText += '\n\n';
         }
@@ -299,7 +301,7 @@ ${formattedResponses}`;
                          {r?.value ? 'Yes' : 'No'}
                        </span>
                        {r?.details && (
-                         <span className="text-gray-600">, {r.details}</span>
+                         <span className="text-gray-600">, {r.details.replace(/^(yes|no)[,\s]*/i, '')}</span>
                        )}
                      </div>
                     )}
@@ -326,7 +328,7 @@ ${formattedResponses}`;
             }}
           >
             <Share2 className="w-5 h-5 mr-2" />
-            Share with Sponsor
+            Share
           </Button>
         </motion.div>
         

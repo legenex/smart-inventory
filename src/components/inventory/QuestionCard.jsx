@@ -7,7 +7,8 @@ import GratitudeInput from './GratitudeInput';
 import useTheme from '../theme/useTheme';
 
 export default function QuestionCard({ 
-  question, 
+  question,
+  description,
   questionNumber,
   type, // 'yesno', 'text', 'yesno-text', 'gratitude'
   value,
@@ -45,9 +46,13 @@ export default function QuestionCard({
           Question {questionNumber}
         </span>
         
-        <h2 className="text-xl md:text-2xl font-semibold text-[#1F2C46] mb-8 leading-relaxed">
+        <h2 className="text-xl md:text-2xl font-semibold text-[#1F2C46] mb-3 leading-relaxed">
           {question}
         </h2>
+        
+        {description && (
+          <p className="text-sm text-gray-600 mb-8 leading-relaxed">{description}</p>
+        )}
         
         {!isTextOnly && !isGratitude && (
           <div className="flex gap-4 mb-6">
