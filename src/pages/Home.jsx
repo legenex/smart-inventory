@@ -46,6 +46,14 @@ export default function Home() {
     enabled: !!user
   });
 
+  // Check for draft
+  const [draftExists, setDraftExists] = useState(false);
+  
+  useEffect(() => {
+    const draft = localStorage.getItem('inventory_draft');
+    setDraftExists(!!draft);
+  }, [location]);
+
   const handleDeleteEntry = (deletedId) => {
     refetch();
   };
@@ -209,6 +217,43 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-3">
+              {draftExists && (
+                <Link to={createPageUrl('Inventory')}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-[20px] p-5 shadow-sm border-2 border-dashed hover:shadow-md transition-all duration-300"
+                    style={{ borderColor: colors.primary }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div 
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                        style={{
+                          background: `linear-gradient(to bottom right, ${colors.primary}20, ${colors.secondary}20)`
+                        }}
+                      >
+                        <PenLine className="w-5 h-5" style={{ color: colors.primary }} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold text-[#1F2C46]">Draft</h3>
+                          <span 
+                            className="text-xs px-2 py-0.5 rounded-full font-medium"
+                            style={{
+                              backgroundColor: `${colors.primary}20`,
+                              color: colors.primary
+                            }}
+                          >
+                            In Progress
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-500">Continue your inventory</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </motion.div>
+                </Link>
+              )}
               {entries.slice(0, 5).map((entry, index) => (
                 <InventoryCard key={entry.id} entry={entry} index={index} onDelete={handleDeleteEntry} />
               ))}
