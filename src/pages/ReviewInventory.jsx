@@ -153,10 +153,10 @@ export default function ReviewInventory() {
         ? `You are an AA aligned nightly inventory interpreter. Analyze the user's Step 10 inventory answers and return:
 
 1. Reflective Summary
-One paragraph synthesizing the emotional and spiritual themes.
+One paragraph synthesizing the emotional and spiritual themes. IMPORTANT: If the user provided only brief "Yes" or "No" answers without elaborating, gently acknowledge this and encourage them to explore deeper in their journaling.
 
 2. Reflective Journalling Prompts
-Five personalised prompts, compassionate, specific, and tied directly to the user's answers.
+Five personalised prompts, compassionate, specific, and tied directly to the user's answers. For answers that were brief or yes/no only, ask "why" questions to encourage deeper reflection (e.g., "What led to...", "Why do you think...", "What feelings were behind...").
 
 Do not mention AA explicitly unless the user's answers do. Keep tone compassionate and growth-oriented.
 
@@ -165,10 +165,10 @@ ${formattedResponses}`
         : `You are a personal growth and emotional awareness coach. Analyze the user's daily reflection answers and return:
 
 1. Reflective Summary
-One paragraph summarizing the user's emotional, mental and behavioral patterns.
+One paragraph summarizing the user's emotional, mental and behavioral patterns. IMPORTANT: If the user provided only brief "Yes" or "No" answers without elaborating, gently acknowledge this and encourage them to explore deeper in their journaling.
 
 2. Reflective Journalling Prompts
-Five personalised prompts supporting clarity, emotional regulation, and personal growth.
+Five personalised prompts supporting clarity, emotional regulation, and personal growth. For answers that were brief or yes/no only, ask "why" questions to encourage deeper reflection (e.g., "What led to...", "Why do you think...", "What feelings were behind...").
 
 Do not reference AA or addiction recovery in this flow.
 
@@ -196,13 +196,53 @@ ${formattedResponses}`;
   };
 
   const handleSave = async () => {
+    // Fix spelling in responses
+    const correctedResponses = { ...responses };
+    for (const key in correctedResponses) {
+      const r = correctedResponses[key];
+      if (r?.details && typeof r.details === 'string') {
+        try {
+          const corrected = await base44.integrations.Core.InvokeLLM({
+            prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${r.details}"`,
+          });
+          correctedResponses[key] = { ...r, details: corrected.trim() };
+        } catch (err) {
+          // Keep original if correction fails
+        }
+      }
+      if (typeof r?.value === 'string' && key !== 'gratitude') {
+        try {
+          const corrected = await base44.integrations.Core.InvokeLLM({
+            prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${r.value}"`,
+          });
+          correctedResponses[key] = { ...r, value: corrected.trim() };
+        } catch (err) {
+          // Keep original if correction fails
+        }
+      }
+      if (Array.isArray(r?.value)) {
+        const correctedList = [];
+        for (const item of r.value) {
+          try {
+            const corrected = await base44.integrations.Core.InvokeLLM({
+              prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${item}"`,
+            });
+            correctedList.push(corrected.trim());
+          } catch (err) {
+            correctedList.push(item);
+          }
+        }
+        correctedResponses[key] = { ...r, value: correctedList };
+      }
+    }
+
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const today = format(new Date(), 'd MMMM yyyy');
     const zws = '\u200B';
     let shareText = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
     
     questions.forEach((q, i) => {
-      const r = responses[q.id];
+      const r = correctedResponses[q.id];
       shareText += `${zws}${i + 1}. ${q.question}\n`;
       
       if (q.id === 'gratitude') {
@@ -226,7 +266,7 @@ ${formattedResponses}`;
       const entry = await base44.entities.InventoryEntry.create({
         date: format(new Date(), 'yyyy-MM-dd'),
         inventory_type: inventoryType,
-        responses,
+        responses: correctedResponses,
         reflective_summary: summary,
         journaling_prompts: prompts,
         share_text: shareText
@@ -367,7 +407,7 @@ ${formattedResponses}`;
               ref={(el) => {
                 if (el) {
                   el.querySelectorAll('li').forEach((li, index) => {
-                    li.style.background = `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`;
+                    li.style.background = `linear-gradient(to right, ${colors.primary}18, ${colors.secondary}18)`;
                     if (!li.textContent.match(/^\d+\./)) {
                       const number = `${index + 1}.`;
                       const text = li.textContent;

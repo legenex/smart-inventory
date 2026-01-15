@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PenLine, Settings, ChevronRight, Trash2 } from 'lucide-react';
+import { PenLine, ChevronRight, Trash2, LogOut } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
@@ -121,12 +128,28 @@ export default function Home() {
               {toTitleCase(user.full_name)?.split(' ')[0] || 'Friend'}
             </h1>
           </div>
-          <Link
-            to={createPageUrl('Settings')}
-            className="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-          >
-            <Settings className="w-5 h-5 text-gray-600" />
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 bg-white rounded-2xl shadow-sm px-3 py-2 hover:shadow-md transition-shadow">
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={user.avatar_url} alt={user.full_name} />
+                  <AvatarFallback className="text-sm font-medium" style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`, color: 'white' }}>
+                    {user.full_name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium text-[#1F2C46]">{toTitleCase(user.full_name)?.split(' ')[0]}</span>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate(createPageUrl('Settings'))}>
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => base44.auth.logout()}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </motion.div>
         
         {/* Streak Counter */}
