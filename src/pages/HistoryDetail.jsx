@@ -16,7 +16,8 @@ const AA_QUESTIONS = [
   { id: 'fearful', question: 'Were You Fearful or Anxious Today?' },
   { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
   { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
-  { id: 'unkind', question: 'Is There Anything That You Could You Have Done Better Today?' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?' },
+  { id: 'better', question: 'Is There Anything That You Could Have Done Better Today?' },
   { id: 'gratitude', question: 'Gratitudes' }
 ];
 
@@ -175,7 +176,7 @@ export default function HistoryDetail() {
           className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
         >
           <h3 className="text-lg font-bold mb-4" style={{ color: colors.primary }}>
-            Inventory Summary
+            Reflective Summary
           </h3>
           <div 
             className="prose prose-slate max-w-none
