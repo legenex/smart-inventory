@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Calendar } from 'lucide-react';
+import { ArrowLeft, Calendar, PenLine, ChevronRight } from 'lucide-react';
 import InventoryCard from '@/components/home/InventoryCard';
+import { format } from 'date-fns';
+import useTheme from '@/components/theme/useTheme';
 
 export default function History() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const { colors } = useTheme();
   
   useEffect(() => {
     loadUser();
@@ -33,6 +37,14 @@ export default function History() {
     queryFn: () => base44.entities.InventoryEntry.list('-date', 100),
     enabled: !!user
   });
+
+  // Check for draft
+  const [draftExists, setDraftExists] = useState(false);
+  
+  useEffect(() => {
+    const draft = localStorage.getItem('inventory_draft');
+    setDraftExists(!!draft);
+  }, [location]);
 
   const handleDeleteEntry = (deletedId) => {
     refetch();
@@ -62,7 +74,7 @@ export default function History() {
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </Link>
           <div>
-            <h1 className="text-xl font-semibold text-[#1F2C46]">All Reflections</h1>
+            <h1 className="text-xl font-semibold text-[#1F2C46]">All Inventories</h1>
             <p className="text-sm text-gray-500">{entries.length} entries</p>
           </div>
         </motion.div>
@@ -101,6 +113,43 @@ export default function History() {
           </motion.div>
         ) : (
           <div className="space-y-3">
+            {draftExists && (
+              <Link to={createPageUrl('Inventory')}>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-[20px] p-5 shadow-sm border-2 border-dashed hover:shadow-md transition-all duration-300"
+                  style={{ borderColor: colors.primary }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div 
+                      className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: `linear-gradient(to bottom right, ${colors.primary}20, ${colors.secondary}20)`
+                      }}
+                    >
+                      <PenLine className="w-5 h-5" style={{ color: colors.primary }} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-[#1F2C46]">{format(new Date(), 'EEEE, MMMM d')}</h3>
+                        <span 
+                          className="text-xs px-2 py-0.5 rounded-full font-medium"
+                          style={{
+                            backgroundColor: `${colors.primary}20`,
+                            color: colors.primary
+                          }}
+                        >
+                          Draft
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500">Continue your inventory</p>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  </div>
+                </motion.div>
+              </Link>
+            )}
             {entries.map((entry, index) => (
               <InventoryCard key={entry.id} entry={entry} index={index} onDelete={handleDeleteEntry} />
             ))}
