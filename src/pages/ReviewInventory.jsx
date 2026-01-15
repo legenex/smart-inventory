@@ -106,6 +106,11 @@ export default function ReviewInventory() {
       }
     });
     
+    // Add reflective summary
+    if (summary) {
+      text += `━━━━━━━━━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n`;
+    }
+    
     text += `━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
     return text;
   };
@@ -412,7 +417,7 @@ ${formattedResponses}`;
                 background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
               }}
             >
-              Save & Return to Home
+              Return To Dashboard
             </Button>
           </motion.div>
         )}
