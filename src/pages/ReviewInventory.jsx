@@ -7,6 +7,16 @@ import { ArrowLeft, Check, X, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import useTheme from '@/components/theme/useTheme';
 
 const AA_QUESTIONS = [
@@ -39,6 +49,7 @@ export default function ReviewInventory() {
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState('');
   const [prompts, setPrompts] = useState('');
+  const [showBackDialog, setShowBackDialog] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -414,12 +425,35 @@ ${formattedResponses}`;
           className="mt-4"
         >
           <button
-            onClick={() => navigate(createPageUrl('Inventory'))}
+            onClick={() => setShowBackDialog(true)}
             className="w-full py-6 rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
           >
             Back to Edit
           </button>
         </motion.div>
+
+        {/* Back Confirmation Dialog */}
+        <AlertDialog open={showBackDialog} onOpenChange={setShowBackDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Save as draft?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Do you want to save your progress to continue later, or discard and start fresh?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => {
+                localStorage.removeItem('inventory_draft');
+                navigate(createPageUrl('Inventory'));
+              }}>
+                Discard
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={() => navigate(createPageUrl('Inventory'))}>
+                Save Draft
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
