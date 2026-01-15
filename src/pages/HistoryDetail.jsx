@@ -87,7 +87,7 @@ export default function HistoryDetail() {
             <ArrowLeft className="w-5 h-5 text-gray-600" />
           </Link>
           <div>
-            <h1 className="text-lg font-semibold text-[#1F2C46]">
+            <h1 className="text-lg font-semibold" style={{ color: colors.primary }}>
               {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
             </h1>
             <p className="text-sm text-gray-500">{format(new Date(entry.date), 'EEEE, MMMM d, yyyy')}</p>
