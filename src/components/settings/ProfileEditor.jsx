@@ -14,7 +14,8 @@ const toTitleCase = (str) => {
 export default function ProfileEditor({ user, onUpdate }) {
   const { colors } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
-  const nameParts = (user.full_name || '').trim().split(' ');
+  const displayName = user.display_name || user.full_name || '';
+  const nameParts = displayName.trim().split(' ');
   const [firstName, setFirstName] = useState(toTitleCase(nameParts[0] || ''));
   const [lastName, setLastName] = useState(toTitleCase(nameParts.slice(1).join(' ') || ''));
   const [uploading, setUploading] = useState(false);
@@ -65,9 +66,9 @@ export default function ProfileEditor({ user, onUpdate }) {
           }}
         >
           {user.profile_picture ? (
-            <img src={user.profile_picture} alt={user.full_name} className="w-full h-full object-cover" />
+            <img src={user.profile_picture} alt={user.display_name || user.full_name} className="w-full h-full object-cover" />
           ) : (
-            user.full_name?.[0] || user.email?.[0] || 'U'
+            (user.display_name || user.full_name)?.[0] || user.email?.[0] || 'U'
           )}
         </div>
         <input
@@ -125,7 +126,8 @@ export default function ProfileEditor({ user, onUpdate }) {
               </button>
               <button
                 onClick={() => {
-                  const nameParts = (user.full_name || '').trim().split(' ');
+                  const displayName = user.display_name || user.full_name || '';
+                  const nameParts = displayName.trim().split(' ');
                   setFirstName(toTitleCase(nameParts[0] || ''));
                   setLastName(toTitleCase(nameParts.slice(1).join(' ') || ''));
                   setIsEditing(false);
@@ -140,7 +142,7 @@ export default function ProfileEditor({ user, onUpdate }) {
         ) : (
           <div className="flex items-center gap-2">
             <div className="flex-1">
-              <h2 className="font-semibold text-[#1F2C46] text-lg">{toTitleCase(user.full_name) || 'User'}</h2>
+              <h2 className="font-semibold text-[#1F2C46] text-lg">{toTitleCase(user.display_name || user.full_name) || 'User'}</h2>
               <p className="text-gray-500 text-sm">{user.email}</p>
             </div>
             <button
