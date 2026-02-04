@@ -52,13 +52,13 @@ import History from './pages/History';
 import HistoryDetail from './pages/HistoryDetail';
 import Home from './pages/Home';
 import Inventory from './pages/Inventory';
+import Journaling from './pages/Journaling';
 import Onboarding from './pages/Onboarding';
+import Reading from './pages/Reading';
 import ReviewInventory from './pages/ReviewInventory';
 import Settings from './pages/Settings';
 import Summary from './pages/Summary';
 import TodayReadings from './pages/TodayReadings';
-import Reading from './pages/Reading';
-import Journaling from './pages/Journaling';
 import __Layout from './Layout.jsx';
 
 
@@ -68,17 +68,17 @@ export const PAGES = {
     "HistoryDetail": HistoryDetail,
     "Home": Home,
     "Inventory": Inventory,
+    "Journaling": Journaling,
     "Onboarding": Onboarding,
+    "Reading": Reading,
     "ReviewInventory": ReviewInventory,
     "Settings": Settings,
     "Summary": Summary,
     "TodayReadings": TodayReadings,
-    "Reading": Reading,
-    "Journaling": Journaling,
 }
 
 export const pagesConfig = {
-    mainPage: "History",
+    mainPage: "Dashboard",
     Pages: PAGES,
     Layout: __Layout,
 };
