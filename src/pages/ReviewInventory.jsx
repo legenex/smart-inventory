@@ -137,6 +137,10 @@ export default function ReviewInventory() {
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     
     try {
+      // Set a timeout to handle stuck requests
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timeout')), 45000)
+      );
       const formattedResponses = questions.map(q => {
         const r = responses[q.id];
         if (q.id === 'gratitude') {
@@ -175,7 +179,7 @@ Do not reference AA or addiction recovery in this flow.
 User's reflection:
 ${formattedResponses}`;
       
-      const aiResponse = await base44.integrations.Core.InvokeLLM({
+      const llmPromise = base44.integrations.Core.InvokeLLM({
         prompt,
         response_json_schema: {
           type: 'object',
@@ -186,55 +190,24 @@ ${formattedResponses}`;
         }
       });
       
+      const aiResponse = await Promise.race([llmPromise, timeoutPromise]);
+      
       setSummary(aiResponse.reflective_summary);
       setPrompts(aiResponse.journaling_prompts);
       setProcessing(false);
     } catch (err) {
       console.error(err);
       setProcessing(false);
+      setSummary('Unable to generate AI insights at this time. Your responses have been saved.');
+      setPrompts('<ul><li>What patterns do you notice in today\'s reflection?</li><li>What would you like to explore more deeply?</li><li>What action can you take tomorrow based on today\'s insights?</li></ul>');
     }
   };
 
   const handleSave = async () => {
-    // Fix spelling in responses
+    setProcessing(true);
+    
+    // Use original responses - skip spell check to avoid timeouts
     const correctedResponses = { ...responses };
-    for (const key in correctedResponses) {
-      const r = correctedResponses[key];
-      if (r?.details && typeof r.details === 'string') {
-        try {
-          const corrected = await base44.integrations.Core.InvokeLLM({
-            prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${r.details}"`,
-          });
-          correctedResponses[key] = { ...r, details: corrected.trim() };
-        } catch (err) {
-          // Keep original if correction fails
-        }
-      }
-      if (typeof r?.value === 'string' && key !== 'gratitude') {
-        try {
-          const corrected = await base44.integrations.Core.InvokeLLM({
-            prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${r.value}"`,
-          });
-          correctedResponses[key] = { ...r, value: corrected.trim() };
-        } catch (err) {
-          // Keep original if correction fails
-        }
-      }
-      if (Array.isArray(r?.value)) {
-        const correctedList = [];
-        for (const item of r.value) {
-          try {
-            const corrected = await base44.integrations.Core.InvokeLLM({
-              prompt: `Fix any spelling mistakes in this text. Return ONLY the corrected text, nothing else: "${item}"`,
-            });
-            correctedList.push(corrected.trim());
-          } catch (err) {
-            correctedList.push(item);
-          }
-        }
-        correctedResponses[key] = { ...r, value: correctedList };
-      }
-    }
 
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const today = format(new Date(), 'd MMMM yyyy');
@@ -272,9 +245,12 @@ ${formattedResponses}`;
         share_text: shareText
       });
       
-      navigate(createPageUrl('Home'));
+      setProcessing(false);
+      navigate(createPageUrl('Dashboard'));
     } catch (err) {
       console.error(err);
+      setProcessing(false);
+      alert('Failed to save inventory. Please try again.');
     }
   };
   
@@ -452,12 +428,13 @@ ${formattedResponses}`;
           >
             <Button
               onClick={handleSave}
-              className="w-full py-6 rounded-2xl text-white text-lg font-medium hover:opacity-90 transition-opacity"
+              disabled={processing}
+              className="w-full py-6 rounded-2xl text-white text-lg font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
               style={{
                 background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
               }}
             >
-              Return To Dashboard
+              {processing ? 'Saving...' : 'Return To Dashboard'}
             </Button>
           </motion.div>
         )}
