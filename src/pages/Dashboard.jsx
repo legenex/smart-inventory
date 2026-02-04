@@ -81,6 +81,12 @@ export default function Dashboard() {
     enabled: !!user
   });
 
+  const { data: journalEntries = [] } = useQuery({
+    queryKey: ['journalEntries'],
+    queryFn: () => base44.entities.JournalEntry.list('-date', 5),
+    enabled: !!user
+  });
+
   // Check for draft
   const [draftExists, setDraftExists] = useState(false);
   
@@ -348,6 +354,56 @@ export default function Dashboard() {
             </div>
           )}
         </motion.div>
+
+        {/* Journaling History */}
+        {journalEntries.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-[#1F2C46]">Journaling History</h3>
+            </div>
+            
+            <div className="space-y-3">
+              {journalEntries.map((journal, index) => (
+                <motion.div
+                  key={journal.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
+                >
+                  <Link 
+                    to={createPageUrl(`HistoryDetail?id=${journal.inventory_id}`)}
+                    className="block bg-white rounded-[20px] p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div 
+                          className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                          style={{
+                            background: `linear-gradient(to bottom right, ${colors.primary}20, ${colors.secondary}20)`
+                          }}
+                        >
+                          <PenLine className="w-5 h-5" style={{ color: colors.primary }} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-[#1F2C46]">{format(new Date(journal.date), 'EEEE, MMMM d')}</p>
+                          <p className="text-sm text-gray-500">
+                            {journal.emotional_analysis?.overall_mood || 'Journal entry'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       <MoodCheckIn 

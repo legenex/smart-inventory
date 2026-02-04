@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Menu } from 'lucide-react';
+import NavigationMenu from '@/components/home/NavigationMenu';
 import { format, isToday, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import ProgressBar from '@/components/inventory/ProgressBar';
@@ -182,19 +183,22 @@ export default function Inventory() {
     <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={handleExit}
-            className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-          <div>
-            <h1 className="text-lg font-semibold text-[#1F2C46]">
-              {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
-            </h1>
-            <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, MMMM d')}</p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleExit}
+              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="text-lg font-semibold text-[#1F2C46]">
+                {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
+              </h1>
+              <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, MMMM d')}</p>
+            </div>
           </div>
+          <NavigationMenu />
         </div>
         
         <ProgressBar current={currentQuestion + 1} total={questions.length} />

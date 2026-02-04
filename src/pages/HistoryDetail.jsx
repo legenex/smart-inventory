@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Check, X, PenLine } from 'lucide-react';
+import { ArrowLeft, Check, X, PenLine, Edit } from 'lucide-react';
+import NavigationMenu from '@/components/home/NavigationMenu';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
@@ -35,6 +36,7 @@ const GENERAL_QUESTIONS = [
 export default function HistoryDetail() {
   const { colors } = useTheme();
   const [entry, setEntry] = useState(null);
+  const [journalEntry, setJournalEntry] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   
@@ -55,6 +57,12 @@ export default function HistoryDetail() {
       const entries = await base44.entities.InventoryEntry.filter({ id });
       if (entries.length > 0) {
         setEntry(entries[0]);
+        
+        // Check for journal entry
+        const journals = await base44.entities.JournalEntry.filter({ inventory_id: id });
+        if (journals.length > 0) {
+          setJournalEntry(journals[0]);
+        }
       } else {
         navigate(createPageUrl('History'));
       }
@@ -80,20 +88,23 @@ export default function HistoryDetail() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-8"
+          className="flex items-center justify-between mb-8"
         >
-          <Link
-            to={createPageUrl('History')}
-            className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-lg font-semibold" style={{ color: colors.primary }}>
-              {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
-            </h1>
-            <p className="text-sm text-gray-500">{format(new Date(entry.date), 'EEEE, MMMM d, yyyy')}</p>
+          <div className="flex items-center gap-4">
+            <Link
+              to={createPageUrl('History')}
+              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Link>
+            <div>
+              <h1 className="text-lg font-semibold" style={{ color: colors.primary }}>
+                {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
+              </h1>
+              <p className="text-sm text-gray-500">{format(new Date(entry.date), 'EEEE, MMMM d, yyyy')}</p>
+            </div>
           </div>
+          <NavigationMenu />
         </motion.div>
         
         {/* Responses Overview */}
@@ -216,22 +227,46 @@ export default function HistoryDetail() {
             dangerouslySetInnerHTML={{ __html: entry.journaling_prompts }}
           />
           
-          <Button
-            onClick={() => {
-              const promptsList = entry.journaling_prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
-                p.replace(/<\/?[^>]+(>|$)/g, '').trim()
-              );
-              navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${entry.id}`));
-            }}
-            className="w-full py-4 rounded-2xl text-lg font-medium mt-6"
-            style={{
-              background: `linear-gradient(to right, ${colors.secondary}, ${colors.primary})`,
-              color: 'white'
-            }}
-          >
-            <PenLine className="w-5 h-5 mr-2" />
-            Start Journaling
-          </Button>
+          {journalEntry ? (
+            <div className="mt-6 p-4 rounded-2xl bg-green-50 border border-green-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Check className="w-5 h-5 text-green-600" />
+                <p className="font-medium text-green-900">Journal Entry Completed</p>
+              </div>
+              <p className="text-sm text-green-700 mb-3">You've already journaled on these prompts.</p>
+              <Button
+                onClick={() => {
+                  const promptsList = entry.journaling_prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
+                    p.replace(/<\/?[^>]+(>|$)/g, '').trim()
+                  );
+                  navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${entry.id}`));
+                }}
+                variant="outline"
+                className="w-full rounded-2xl"
+                style={{ borderColor: colors.primary, color: colors.primary }}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Journal Entry
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={() => {
+                const promptsList = entry.journaling_prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
+                  p.replace(/<\/?[^>]+(>|$)/g, '').trim()
+                );
+                navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${entry.id}`));
+              }}
+              className="w-full py-4 rounded-2xl text-lg font-medium mt-6"
+              style={{
+                background: `linear-gradient(to right, ${colors.secondary}, ${colors.primary})`,
+                color: 'white'
+              }}
+            >
+              <PenLine className="w-5 h-5 mr-2" />
+              Start Journaling
+            </Button>
+          )}
         </motion.div>
         
         {/* Share Button */}

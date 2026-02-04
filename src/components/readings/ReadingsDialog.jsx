@@ -66,7 +66,7 @@ export default function ReadingsDialog({ open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden rounded-3xl bg-white/95 backdrop-blur-md">
         <AnimatePresence mode="wait">
           {!selectedReading ? (
             <motion.div
@@ -140,10 +140,11 @@ export default function ReadingsDialog({ open, onClose }) {
                     <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : (
-                  <div 
-                    className="prose prose-slate max-w-none"
-                    dangerouslySetInnerHTML={{ __html: content }}
-                  />
+                  <div className="prose prose-slate max-w-none text-gray-700 leading-relaxed">
+                    {content.replace(/<[^>]*>/g, '').split('\n').map((para, i) => 
+                      para.trim() && <p key={i} className="mb-4">{para}</p>
+                    )}
+                  </div>
                 )}
               </div>
             </motion.div>
