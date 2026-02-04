@@ -324,6 +324,11 @@ export default function Dashboard() {
           )}
         </motion.div>
       </div>
+
+      <MoodCheckIn 
+        open={showMoodCheckIn} 
+        onClose={() => setShowMoodCheckIn(false)} 
+      />
     </div>
   );
 }

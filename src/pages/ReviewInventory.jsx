@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Check, X, Share2 } from 'lucide-react';
+import { ArrowLeft, Check, X, Share2, PenLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -397,26 +397,52 @@ ${formattedResponses}`;
           </motion.div>
         )}
 
-        {/* Share Button */}
+        {/* Action Buttons */}
         {!processing && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Button
-              onClick={handleShare}
-              className="w-full py-6 rounded-2xl border-2 text-lg font-medium hover:opacity-90 transition-opacity mb-4"
-              variant="outline"
-              style={{
-                borderColor: colors.primary,
-                color: colors.primary
-              }}
+          <>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
             >
-              <Share2 className="w-5 h-5 mr-2" />
-              Share
-            </Button>
-          </motion.div>
+              <Button
+                onClick={() => {
+                  const promptsList = prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
+                    p.replace(/<\/?[^>]+(>|$)/g, '').trim()
+                  );
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const invId = urlParams.get('inventoryId') || 'temp_' + Date.now();
+                  navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${invId}`));
+                }}
+                className="w-full py-6 rounded-2xl text-lg font-medium mb-4"
+                style={{
+                  background: `linear-gradient(to right, ${colors.secondary}, ${colors.primary})`
+                }}
+              >
+                <PenLine className="w-5 h-5 mr-2" />
+                Start Journaling
+              </Button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+            >
+              <Button
+                onClick={handleShare}
+                className="w-full py-6 rounded-2xl border-2 text-lg font-medium hover:opacity-90 transition-opacity mb-4"
+                variant="outline"
+                style={{
+                  borderColor: colors.primary,
+                  color: colors.primary
+                }}
+              >
+                <Share2 className="w-5 h-5 mr-2" />
+                Share
+              </Button>
+            </motion.div>
+          </>
         )}
         
         {/* Save and Exit Button */}

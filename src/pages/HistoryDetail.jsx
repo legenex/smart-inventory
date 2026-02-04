@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
 import useTheme from '@/components/theme/useTheme';
+import { Button } from '@/components/ui/button';
 
 const AA_QUESTIONS = [
   { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
