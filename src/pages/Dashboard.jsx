@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon } from 'lucide-react';
+import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon, BookOpen } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ import StreakCounter from '@/components/home/StreakCounter';
 import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
 import useTheme from '@/components/theme/useTheme';
+import MoodCheckIn from '@/components/home/MoodCheckIn';
 
 const toTitleCase = (str) => {
   if (!str) return '';
@@ -35,6 +36,7 @@ const getTimeBasedGreeting = () => {
 export default function Dashboard() {
   const { colors } = useTheme();
   const [user, setUser] = useState(null);
+  const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -60,6 +62,16 @@ export default function Dashboard() {
     const interval = setInterval(loadUser, 2000);
     return () => clearInterval(interval);
   }, []);
+
+  // Show mood check-in if enabled and not done today
+  useEffect(() => {
+    if (user && user.mood_check_enabled !== false) {
+      const today = new Date().toISOString().split('T')[0];
+      if (user.last_mood_check !== today) {
+        setTimeout(() => setShowMoodCheckIn(true), 1500);
+      }
+    }
+  }, [user]);
   
   const { data: entries = [], isLoading, refetch } = useQuery({
     queryKey: ['inventoryEntries'],
@@ -180,12 +192,12 @@ export default function Dashboard() {
           <StreakCounter streak={streak} />
         </motion.div>
         
-        {/* Main CTA */}
+        {/* Main CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+          className="mb-6 space-y-3"
         >
           <Link to={createPageUrl('Inventory')}>
             <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
@@ -212,6 +224,21 @@ export default function Dashboard() {
                   onMouseEnter={(e) => e.currentTarget.style.color = colors.primary}
                   onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
                 />
+              </div>
+            </div>
+          </Link>
+
+          <Link to={createPageUrl('TodayReadings')}>
+            <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg group-hover:scale-105 transition-transform">
+                  <BookOpen className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold text-[#1F2C46]">Today's Readings</h2>
+                  <p className="text-gray-500 text-sm">AA, NA, Hazelden & SLAA daily reflections</p>
+                </div>
+                <ChevronRight className="w-6 h-6 text-gray-400" />
               </div>
             </div>
           </Link>
