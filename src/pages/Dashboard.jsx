@@ -20,6 +20,7 @@ import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
 import useTheme from '@/components/theme/useTheme';
 import MoodCheckIn from '@/components/home/MoodCheckIn';
+import ReadingsDialog from '@/components/readings/ReadingsDialog';
 
 const toTitleCase = (str) => {
   if (!str) return '';
@@ -37,6 +38,7 @@ export default function Dashboard() {
   const { colors } = useTheme();
   const [user, setUser] = useState(null);
   const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
+  const [showReadings, setShowReadings] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -182,33 +184,49 @@ export default function Dashboard() {
           </DropdownMenu>
         </motion.div>
         
-        {/* Streak Counter */}
+        {/* Top Row: Streak + Readings */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6"
+          className="mb-3 grid grid-cols-1 md:grid-cols-2 gap-3"
         >
           <StreakCounter streak={streak} />
+          
+          <button 
+            onClick={() => setShowReadings(true)}
+            className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left h-full"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg group-hover:scale-105 transition-transform">
+                <BookOpen className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-[#1F2C46]">Today's Readings</h2>
+                <p className="text-gray-500 text-sm">AA, NA, Hazelden & SLAA daily reflections</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+          </button>
         </motion.div>
         
-        {/* Main CTAs */}
+        {/* Main CTA - Start Inventory */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-6 space-y-3"
+          className="mb-8"
         >
           <Link to={createPageUrl('Inventory')}>
             <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
               <div className="flex items-center gap-4">
                 <div 
-                  className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg ${colors.shadow} group-hover:scale-105 transition-transform`}
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
                   style={{
                     background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
                   }}
                 >
-                  <PenLine className="w-8 h-8 text-white" />
+                  <PenLine className="w-7 h-7 text-white" />
                 </div>
                 <div className="flex-1">
                   <h2 className="text-lg font-semibold text-[#1F2C46]">
@@ -218,27 +236,7 @@ export default function Dashboard() {
                     {todayEntry ? 'You already reflected today' : format(new Date(), 'EEEE, MMMM d')}
                   </p>
                 </div>
-                <ChevronRight 
-                  className="w-6 h-6 text-gray-400 transition-colors"
-                  style={{ color: 'var(--hover-color, #9ca3af)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = colors.primary}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
-                />
-              </div>
-            </div>
-          </Link>
-
-          <Link to={createPageUrl('TodayReadings')}>
-            <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg group-hover:scale-105 transition-transform">
-                  <BookOpen className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-[#1F2C46]">Today's Readings</h2>
-                  <p className="text-gray-500 text-sm">AA, NA, Hazelden & SLAA daily reflections</p>
-                </div>
-                <ChevronRight className="w-6 h-6 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400" />
               </div>
             </div>
           </Link>
@@ -355,6 +353,11 @@ export default function Dashboard() {
       <MoodCheckIn 
         open={showMoodCheckIn} 
         onClose={() => setShowMoodCheckIn(false)} 
+      />
+      
+      <ReadingsDialog
+        open={showReadings}
+        onClose={() => setShowReadings(false)}
       />
     </div>
   );
