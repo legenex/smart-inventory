@@ -4,7 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Calendar, PenLine, ChevronRight, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, PenLine, ChevronRight, Trash2, Menu } from 'lucide-react';
+import NavigationMenu from '@/components/home/NavigationMenu';
 import InventoryCard from '@/components/home/InventoryCard';
 import { format } from 'date-fns';
 import useTheme from '@/components/theme/useTheme';
@@ -72,18 +73,21 @@ export default function History() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-8"
+          className="flex items-center justify-between mb-8"
         >
-          <Link
-            to={createPageUrl('Dashboard')}
-            className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-semibold text-[#1F2C46]">All Inventories</h1>
-            <p className="text-sm text-gray-500">{entries.length} entries</p>
+          <div className="flex items-center gap-4">
+            <Link
+              to={createPageUrl('Dashboard')}
+              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </Link>
+            <div>
+              <h1 className="text-xl font-semibold text-[#1F2C46]">All Inventories</h1>
+              <p className="text-sm text-gray-500">{entries.length} entries</p>
+            </div>
           </div>
+          <NavigationMenu />
         </motion.div>
         
         {isLoading ? (

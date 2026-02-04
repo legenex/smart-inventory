@@ -296,18 +296,21 @@ ${formattedResponses}`;
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-8"
+          className="flex items-center justify-between mb-8"
         >
-          <button
-            onClick={() => navigate(createPageUrl('Inventory'))}
-            className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
-          >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </button>
-          <div>
-            <h1 className="text-lg font-semibold text-[#1F2C46]">Your Nightly Inventory</h1>
-            <p className="text-sm text-gray-500">Review your full reflection before continuing</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(createPageUrl('Inventory'))}
+              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <div>
+              <h1 className="text-lg font-semibold text-[#1F2C46]">Your Nightly Inventory</h1>
+              <p className="text-sm text-gray-500">Review your full reflection before continuing</p>
+            </div>
           </div>
+          <NavigationMenu />
         </motion.div>
         
         {/* Review Card */}
