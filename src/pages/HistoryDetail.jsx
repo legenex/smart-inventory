@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Check, X } from 'lucide-react';
+import { ArrowLeft, Check, X, PenLine } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
@@ -215,6 +215,23 @@ export default function HistoryDetail() {
             }}
             dangerouslySetInnerHTML={{ __html: entry.journaling_prompts }}
           />
+          
+          <Button
+            onClick={() => {
+              const promptsList = entry.journaling_prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
+                p.replace(/<\/?[^>]+(>|$)/g, '').trim()
+              );
+              navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${entry.id}`));
+            }}
+            className="w-full py-4 rounded-2xl text-lg font-medium mt-6"
+            style={{
+              background: `linear-gradient(to right, ${colors.secondary}, ${colors.primary})`,
+              color: 'white'
+            }}
+          >
+            <PenLine className="w-5 h-5 mr-2" />
+            Start Journaling
+          </Button>
         </motion.div>
         
         {/* Share Button */}
