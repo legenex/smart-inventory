@@ -56,6 +56,9 @@ import Onboarding from './pages/Onboarding';
 import ReviewInventory from './pages/ReviewInventory';
 import Settings from './pages/Settings';
 import Summary from './pages/Summary';
+import TodayReadings from './pages/TodayReadings';
+import Reading from './pages/Reading';
+import Journaling from './pages/Journaling';
 import __Layout from './Layout.jsx';
 
 
@@ -69,6 +72,9 @@ export const PAGES = {
     "ReviewInventory": ReviewInventory,
     "Settings": Settings,
     "Summary": Summary,
+    "TodayReadings": TodayReadings,
+    "Reading": Reading,
+    "Journaling": Journaling,
 }
 
 export const pagesConfig = {
