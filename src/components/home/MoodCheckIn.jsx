@@ -8,8 +8,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Smile, Meh, Frown, Heart, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import useTheme from '@/components/theme/useTheme';
 
 const MOODS = [
   { id: 'great', label: 'Great', icon: Heart, color: '#10B981' },
@@ -20,18 +22,18 @@ const MOODS = [
 ];
 
 export default function MoodCheckIn({ open, onClose }) {
+  const { colors } = useTheme();
   const [selectedMood, setSelectedMood] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [disableCheckin, setDisableCheckin] = useState(false);
 
   const handleSave = async () => {
     if (!selectedMood) return;
     
     setSaving(true);
     try {
-      const user = await base44.auth.me();
       const today = new Date().toISOString().split('T')[0];
       
-      // Save mood to user's daily log
       await base44.auth.updateMe({
         last_mood_check: today,
         last_mood: selectedMood
@@ -44,9 +46,22 @@ export default function MoodCheckIn({ open, onClose }) {
     setSaving(false);
   };
 
+  const handleSkip = async () => {
+    if (disableCheckin) {
+      try {
+        await base44.auth.updateMe({
+          mood_check_enabled: false
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    onClose();
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-3xl bg-white/95 backdrop-blur-md border-0">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">How are you feeling today?</DialogTitle>
           <DialogDescription className="text-center">
@@ -78,17 +93,36 @@ export default function MoodCheckIn({ open, onClose }) {
         <Button
           onClick={handleSave}
           disabled={!selectedMood || saving}
-          className="w-full bg-gradient-to-r from-[#7667E5] to-[#5B9FED]"
+          className="w-full py-6 rounded-2xl text-white"
+          style={{
+            background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+          }}
         >
           {saving ? 'Saving...' : 'Continue'}
         </Button>
         
-        <button
-          onClick={onClose}
-          className="text-sm text-gray-500 hover:text-gray-700 text-center"
-        >
-          Skip for now
-        </button>
+        <div className="space-y-3">
+          <div className="flex items-center justify-center gap-2">
+            <Checkbox
+              id="disable-checkin"
+              checked={disableCheckin}
+              onCheckedChange={setDisableCheckin}
+            />
+            <label
+              htmlFor="disable-checkin"
+              className="text-sm text-gray-600 cursor-pointer"
+            >
+              Don't ask me again
+            </label>
+          </div>
+          
+          <button
+            onClick={handleSkip}
+            className="w-full text-sm text-gray-500 hover:text-gray-700 text-center py-2"
+          >
+            Skip for now
+          </button>
+        </div>
       </DialogContent>
     </Dialog>
   );
