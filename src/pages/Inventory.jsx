@@ -116,7 +116,7 @@ export default function Inventory() {
   }, [entries]);
   
   // Fetch user question settings
-  const { data: questionSettings, isLoading: settingsLoading } = useQuery({
+  const { data: questionSettings } = useQuery({
     queryKey: ['questionSettings', user?.recovery_status],
     queryFn: async () => {
       const settings = await base44.entities.UserQuestionSettings.filter({ 
@@ -128,7 +128,7 @@ export default function Inventory() {
     enabled: !!user
   });
   
-  if (!user || settingsLoading) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
