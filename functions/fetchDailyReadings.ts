@@ -21,19 +21,34 @@ Deno.serve(async (req) => {
     let prompt = '';
     
     if (readingType === 'aa') {
-      prompt = `Fetch the AA (Alcoholics Anonymous) Daily Reflection for ${today}. Return the complete daily reflection including the quote, meditation, and reflection text. Format it nicely with HTML.`;
+      prompt = `Fetch the AA (Alcoholics Anonymous) Daily Reflection for ${today}. Return ONLY the reading content in plain text without any HTML tags, links, URLs, or website mentions. Remove all references to aa.org or other websites. Just the meditation text itself.`;
     } else if (readingType === 'na') {
-      prompt = `Fetch the NA (Narcotics Anonymous) "Just for Today" daily meditation for ${today}. Return the complete meditation text formatted with HTML.`;
+      prompt = `Fetch the NA (Narcotics Anonymous) "Just for Today" daily meditation for ${today}. Return ONLY the meditation content in plain text without any HTML tags, links, URLs, or website mentions. Remove all references to na.org or other websites. Just the meditation text and affirmation.`;
     } else if (readingType === 'hazelden') {
-      prompt = `Fetch the Hazelden daily meditation for ${today}. Return the complete meditation including any quotes and reflection. Format with HTML.`;
+      prompt = `Fetch the complete Hazelden "Twenty Four Hours a Day" reading for ${today}. Return in JSON format with three sections: thought (the Thought for the Day), meditation (the Meditation for the Day), and prayer (the Prayer for the Day). Return ONLY plain text content without HTML tags, links, URLs, or website mentions.`;
     } else if (readingType === 'slaa') {
-      prompt = `Fetch the SLAA (Sex and Love Addicts Anonymous) "State of Grace" daily reading for ${today}. Return the complete reading formatted with HTML.`;
+      prompt = `Fetch the SLAA (Sex and Love Addicts Anonymous) "State of Grace" daily reading for ${today}. Return ONLY the reading content in plain text without any HTML tags, links, URLs, or website mentions. Remove all references to slaa.org or other websites. Just the reading text itself.`;
     }
     
-    const reading = await base44.integrations.Core.InvokeLLM({
-      prompt: prompt,
-      add_context_from_internet: true
-    });
+    const config = readingType === 'hazelden' 
+      ? {
+          prompt: prompt,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              thought: { type: 'string' },
+              meditation: { type: 'string' },
+              prayer: { type: 'string' }
+            }
+          }
+        }
+      : {
+          prompt: prompt,
+          add_context_from_internet: true
+        };
+    
+    const reading = await base44.integrations.Core.InvokeLLM(config);
     
     return Response.json({ 
       content: reading,

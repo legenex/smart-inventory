@@ -21,7 +21,7 @@ const READINGS = [
   },
   {
     id: 'hazelden',
-    title: "Hazelden's Daily Meditations",
+    title: 'Hazelden Twenty Four Hours a Day Reading',
     description: 'Daily reflections for spiritual growth',
     icon: Sparkles,
     gradient: 'from-pink-500 to-orange-500'
@@ -38,6 +38,7 @@ const READINGS = [
 export default function ReadingsDialog({ open, onClose }) {
   const [selectedReading, setSelectedReading] = useState(null);
   const [content, setContent] = useState('');
+  const [readingDate, setReadingDate] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSelectReading = async (readingType) => {
@@ -45,14 +46,22 @@ export default function ReadingsDialog({ open, onClose }) {
     setLoading(true);
     
     try {
+      const today = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long',
+        month: 'long', 
+        day: 'numeric',
+        year: 'numeric'
+      });
+      
       const response = await base44.functions.invoke('fetchDailyReadings', {
         readingType: readingType,
         date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
       });
       setContent(response.data.content);
+      setReadingDate(today);
     } catch (error) {
       console.error(error);
-      setContent('<p>Unable to load today\'s reading. Please try again later.</p>');
+      setContent('Unable to load today\'s reading. Please try again later.');
     }
     setLoading(false);
   };
@@ -60,6 +69,7 @@ export default function ReadingsDialog({ open, onClose }) {
   const handleBack = () => {
     setSelectedReading(null);
     setContent('');
+    setReadingDate('');
   };
 
   const reading = READINGS.find(r => r.id === selectedReading);
@@ -130,7 +140,7 @@ export default function ReadingsDialog({ open, onClose }) {
                 </button>
                 <div>
                   <h2 className="text-lg font-bold text-gray-900">{reading?.title}</h2>
-                  <p className="text-xs text-gray-500">Today's reflection</p>
+                  <p className="text-xs text-gray-500">{readingDate}</p>
                 </div>
               </div>
 
@@ -139,11 +149,24 @@ export default function ReadingsDialog({ open, onClose }) {
                   <div className="flex items-center justify-center py-12">
                     <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   </div>
+                ) : selectedReading === 'hazelden' && typeof content === 'object' ? (
+                  <div className="space-y-6 text-gray-700 leading-relaxed">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Thought for the Day</h3>
+                      <p className="whitespace-pre-line">{content.thought}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Meditation for the Day</h3>
+                      <p className="whitespace-pre-line">{content.meditation}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Prayer for the Day</h3>
+                      <p className="whitespace-pre-line">{content.prayer}</p>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="prose prose-slate max-w-none text-gray-700 leading-relaxed">
-                    {content.replace(/<[^>]*>/g, '').split('\n').map((para, i) => 
-                      para.trim() && <p key={i} className="mb-4">{para}</p>
-                    )}
+                  <div className="text-gray-700 leading-relaxed">
+                    <p className="whitespace-pre-line">{typeof content === 'string' ? content : JSON.stringify(content)}</p>
                   </div>
                 )}
               </div>
