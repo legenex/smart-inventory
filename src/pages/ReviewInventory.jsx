@@ -92,7 +92,7 @@ export default function ReviewInventory() {
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let text = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    let text = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
     
     questions.forEach((q, i) => {
       const r = responses[q.id];
@@ -114,10 +114,10 @@ export default function ReviewInventory() {
     
     // Add reflective summary
     if (summary) {
-      text += `━━━━━━━━━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n`;
+      text += `━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n`;
     }
     
-    text += `━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
+    text += `━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
     return text;
   };
 
@@ -218,7 +218,7 @@ ${formattedResponses}`;
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let shareText = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    let shareText = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
     
     questions.forEach((q, i) => {
       const r = correctedResponses[q.id];
@@ -239,7 +239,7 @@ ${formattedResponses}`;
       }
     });
     
-    shareText += `━━━━━━━━━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n━━━━━━━━━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
+    shareText += `━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
     
     try {
       const entry = await base44.entities.InventoryEntry.create({
