@@ -62,7 +62,7 @@ export default function InsightsChart({ entries }) {
           dayLabel: format(date, 'EEE'),
           fullDate: date,
           hasEntry: false,
-          awareness: null,
+          awareness: 0,
           entryId: null
         };
       }
@@ -192,9 +192,7 @@ export default function InsightsChart({ entries }) {
                   stroke={colors.primary}
                   strokeWidth={2.5}
                   fill="url(#awarenessGradient)" 
-                  connectNulls
                   dot={<CustomDot />}
-                  strokeOpacity={(entry) => entry.hasEntry ? 1 : 0.3}
                 />
               </AreaChart>
             </ResponsiveContainer>
