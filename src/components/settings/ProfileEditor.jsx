@@ -327,14 +327,17 @@ export default function ProfileEditor({ user, onUpdate }) {
         </div>
       </div>
       
-      {/* Sign Out Button */}
-      <div className="pt-4 border-t border-gray-100">
-        <Button
-          variant="destructive"
+      {/* Sign Out Section */}
+      <div className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100">
+        <h3 className="text-lg font-semibold text-red-600 mb-2">Sign Out</h3>
+        <p className="text-sm text-gray-500 mb-4">
+          You'll need to log back in to access your account
+        </p>
+        <Button 
+          variant="destructive" 
           onClick={() => base44.auth.logout()}
           className="w-full rounded-xl"
         >
-          <LogOut className="w-4 h-4 mr-2" />
           Sign Out
         </Button>
       </div>

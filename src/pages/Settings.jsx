@@ -206,7 +206,6 @@ export default function Settings() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
             >
               <div className="bg-white rounded-[25px] p-6 shadow-sm">
                 <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Daily Reminder</h3>
@@ -254,20 +253,6 @@ export default function Settings() {
                   className="w-full mt-6"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </div>
-
-              <div className="bg-white rounded-[25px] p-6 shadow-sm">
-                <h3 className="text-lg font-semibold text-red-600 mb-2">Sign Out</h3>
-                <p className="text-sm text-gray-500 mb-4">
-                  You'll need to log back in to access your account
-                </p>
-                <Button 
-                  variant="destructive" 
-                  onClick={handleLogout}
-                  className="w-full"
-                >
-                  Sign Out
                 </Button>
               </div>
             </motion.div>
