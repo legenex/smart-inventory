@@ -45,49 +45,51 @@ export default function InventoryInsights({ entries }) {
   const recentEntries = entries.slice(0, 30); // Last 30 entries for better analysis
   const last30Days = recentEntries.slice(0, Math.min(30, recentEntries.length));
   
-  // Calculate Happiness Score (weighted heavily on negative indicators)
-  let positiveCount = 0;
-  let negativeCount = 0;
-  
-  recentEntries.forEach(entry => {
-    const gratitudes = entry.responses?.gratitude?.value || [];
-    const gratitudeCount = Array.isArray(gratitudes) ? gratitudes.length : 0;
+  // Calculate Awareness Score (based on consistency, depth, and emotional range)
+  const calculateAwarenessScore = () => {
+    if (recentEntries.length === 0) return 'Low';
     
-    // Positive indicators
-    if (entry.responses?.do_well?.value === 'yes' || entry.responses?.well?.value) {
-      positiveCount += 1;
-    }
-    if (entry.responses?.unkind?.value === 'no') {
-      positiveCount += 1;
-    }
-    if (gratitudeCount >= 3) {
-      positiveCount += 1;
-    }
+    let score = 0;
     
-    // Negative indicators (heavily weighted)
-    if (entry.responses?.resentful?.value === 'yes') {
-      negativeCount += 2;
-    }
-    if (entry.responses?.fearful?.value === 'yes') {
-      negativeCount += 2;
-    }
-    if (entry.responses?.dishonest?.value === 'yes') {
-      negativeCount += 2;
-    }
-    if (entry.responses?.selfish?.value === 'yes') {
-      negativeCount += 2;
-    }
-    if (entry.responses?.harmful?.value === 'yes') {
-      negativeCount += 2;
-    }
-  });
+    // Consistency factor (40%)
+    const consistencyRate = recentEntries.length / 30;
+    score += consistencyRate * 40;
+    
+    // Depth factor (30%) - checking if they're engaging with multiple questions
+    let depthScore = 0;
+    recentEntries.forEach(entry => {
+      const responses = entry.responses || {};
+      const answeredQuestions = Object.keys(responses).filter(key => {
+        const value = responses[key]?.value;
+        return value && value !== '' && (Array.isArray(value) ? value.length > 0 : true);
+      }).length;
+      depthScore += Math.min(answeredQuestions / 5, 1);
+    });
+    score += (depthScore / recentEntries.length) * 30;
+    
+    // Emotional range factor (30%) - engaging with difficult emotions
+    let emotionalEngagement = 0;
+    recentEntries.forEach(entry => {
+      if (entry.responses?.resentful?.value === 'yes') emotionalEngagement++;
+      if (entry.responses?.fearful?.value === 'yes') emotionalEngagement++;
+      if (entry.responses?.dishonest?.value === 'yes') emotionalEngagement++;
+    });
+    score += Math.min((emotionalEngagement / recentEntries.length) * 30, 30);
+    
+    if (score >= 70) return 'High';
+    if (score >= 40) return 'Moderate';
+    return 'Low';
+  };
   
-  const totalWeight = positiveCount + negativeCount;
-  const happinessPercentage = totalWeight > 0 
-    ? Math.max(0, Math.min(100, Math.round((positiveCount / totalWeight) * 100)))
-    : 0;
+  const awarenessScore = calculateAwarenessScore();
   
-  // Analyze patterns for insights
+  // Calculate last 7 days consistency
+  const last7DaysCount = recentEntries.filter(entry => {
+    const daysDiff = Math.floor((new Date() - new Date(entry.date)) / (1000 * 60 * 60 * 24));
+    return daysDiff < 7;
+  }).length;
+  
+  // Analyze patterns for recurring themes
   const patterns = {
     resentment: 0,
     fear: 0,
@@ -95,7 +97,8 @@ export default function InventoryInsights({ entries }) {
     selfishness: 0,
     kindness: 0,
     growth: 0,
-    service: 0
+    service: 0,
+    boundaries: 0
   };
   
   recentEntries.forEach(entry => {
@@ -103,67 +106,96 @@ export default function InventoryInsights({ entries }) {
     if (entry.responses?.fearful?.value === 'yes') patterns.fear++;
     if (entry.responses?.dishonest?.value === 'yes') patterns.dishonesty++;
     if (entry.responses?.selfish?.value === 'yes') patterns.selfishness++;
-    if (entry.responses?.unkind?.value === 'yes') patterns.kindness++;
+    if (entry.responses?.unkind?.value === 'no') patterns.kindness++;
     if (entry.responses?.do_well?.value === 'yes') patterns.growth++;
     if (entry.responses?.service?.value === 'yes') patterns.service++;
+    
+    // Check for boundary themes in text responses
+    const allText = JSON.stringify(entry.responses).toLowerCase();
+    if (allText.includes('boundary') || allText.includes('boundaries')) patterns.boundaries++;
   });
   
-  // Generate insights
-  const generateInsights = () => {
-    const insights = [];
+  // Generate recurring patterns (1-3 bullet points)
+  const generatePatterns = () => {
+    const patternList = [];
+    const total = recentEntries.length;
+    
+    if (patterns.resentment >= 3) {
+      patternList.push(`Resentment showed up in ${patterns.resentment} of your last ${total} inventories`);
+    }
+    if (patterns.fear >= 3) {
+      patternList.push('Fear and avoidance came up often this week');
+    }
+    if (patterns.boundaries >= 2) {
+      patternList.push('Boundaries were a recurring theme');
+    }
+    if (patterns.dishonesty >= 2) {
+      patternList.push('Struggled with honesty in several situations');
+    }
+    if (patterns.selfishness >= 3) {
+      patternList.push('Self-centeredness appeared frequently');
+    }
+    
+    return patternList.length > 0 
+      ? patternList.slice(0, 3) 
+      : ['No strong patterns yet—keep tracking'];
+  };
+  
+  // Generate what you're doing well (1-3 bullet points)
+  const generateStrengths = () => {
+    const strengths = [];
+    const total = recentEntries.length;
+    
+    if (last7DaysCount >= 5) {
+      strengths.push("You've been consistent with daily check-ins");
+    }
+    if (patterns.growth >= total * 0.5) {
+      strengths.push("You've been more honest and self-aware");
+    }
+    if (patterns.service >= 2) {
+      strengths.push('Showing up in service for others');
+    }
+    if (patterns.kindness >= total * 0.6) {
+      strengths.push("You're noticing when you're kind to others");
+    }
+    
+    if (strengths.length === 0 && recentEntries.length >= 3) {
+      strengths.push('You're showing up and doing the work');
+    }
+    
+    return strengths.length > 0 ? strengths.slice(0, 3) : ['Keep building your practice'];
+  };
+  
+  // Generate suggested focus (one actionable item)
+  const generateSuggestedFocus = () => {
+    if (recentEntries.length < 3) {
+      return "Focus on completing one inventory each day this week";
+    }
+    
     const total = recentEntries.length;
     
     if (patterns.resentment > total * 0.4) {
-      insights.push("Resentment appears frequently. Consider working through the 4th Step columns.");
+      return "Tomorrow, pause and ask: what's my part in this resentment?";
     }
     if (patterns.fear > total * 0.4) {
-      insights.push("Fear patterns detected. Explore what's driving your anxiety.");
+      return "Focus on letting go of control in one situation";
+    }
+    if (patterns.dishonesty > total * 0.3) {
+      return "Practice being rigorously honest in one conversation";
+    }
+    if (patterns.service === 0) {
+      return "Look for one small way to be of service";
     }
     if (patterns.kindness < total * 0.3) {
-      insights.push("Opportunities to practice more kindness and compassion.");
-    }
-    if (patterns.growth > total * 0.6) {
-      insights.push("Strong self-awareness and growth mindset showing through.");
-    }
-    if (patterns.service > 0) {
-      insights.push("Service work strengthens recovery. Keep showing up for others.");
+      return "Tomorrow, pause before reacting when irritation shows up";
     }
     
-    return insights.length > 0 ? insights.join(' ') : "Your reflections show honest self-examination. Keep tracking patterns.";
+    return "Continue showing up. One day at a time";
   };
   
-  const insights = generateInsights();
-  
-  // Current focus areas
-  const generateFocus = () => {
-    if (recentEntries.length < 3) {
-      return "Continue building your daily practice. The insights will deepen as you maintain consistency.";
-    }
-    
-    const focusAreas = [];
-    const total = recentEntries.length;
-    
-    if (patterns.resentment > total * 0.3) {
-      focusAreas.push("work on letting go of resentments");
-    }
-    if (patterns.fear > total * 0.3) {
-      focusAreas.push("address underlying fears");
-    }
-    if (patterns.dishonesty > total * 0.2) {
-      focusAreas.push("practice radical honesty");
-    }
-    if (patterns.kindness < total * 0.4) {
-      focusAreas.push("cultivate more kindness");
-    }
-    
-    if (focusAreas.length === 0) {
-      return "You're showing consistent growth and self-awareness. Keep focusing on your daily practice and gratitude.";
-    }
-    
-    return `Based on your recent inventories, consider focusing on: ${focusAreas.join(', ')}. These patterns offer opportunities for deeper healing.`;
-  };
-  
-  const focusText = generateFocus();
+  const recurringPatterns = generatePatterns();
+  const strengths = generateStrengths();
+  const suggestedFocus = generateSuggestedFocus();
   
   return (
     <motion.div
@@ -195,8 +227,9 @@ export default function InventoryInsights({ entries }) {
               background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)`
             }}
           >
-            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{happinessPercentage}%</div>
-            <div className="text-xs text-gray-600">Happiness Score</div>
+            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{awarenessScore}</div>
+            <div className="text-xs text-gray-600">Awareness Score</div>
+            <div className="text-[10px] text-gray-500 mt-1">Based on reflection depth and consistency</div>
           </div>
           
           <div 
@@ -205,34 +238,58 @@ export default function InventoryInsights({ entries }) {
               background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)`
             }}
           >
-            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{recentEntries.length}</div>
-            <div className="text-xs text-gray-600">Total Inventories</div>
+            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{last7DaysCount} of 7</div>
+            <div className="text-xs text-gray-600">Inventory Consistency</div>
+            <div className="text-[10px] text-gray-500 mt-1">Completed in the last 7 days</div>
           </div>
         </div>
 
-        {/* Insights */}
+        {/* Recurring Patterns */}
         <div 
           className="rounded-2xl p-4"
           style={{
             background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
           }}
         >
-          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Insights</h4>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {insights}
-          </p>
+          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Recurring Patterns</h4>
+          <div className="space-y-1.5">
+            {recurringPatterns.map((pattern, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                <p className="text-sm text-gray-600 leading-snug">{pattern}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Current Focus */}
+        {/* What You're Doing Well */}
         <div 
           className="rounded-2xl p-4"
           style={{
             background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
           }}
         >
-          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Current Focus</h4>
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {focusText}
+          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">What You're Doing Well</h4>
+          <div className="space-y-1.5">
+            {strengths.map((strength, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                <p className="text-sm text-gray-600 leading-snug">{strength}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Suggested Focus */}
+        <div 
+          className="rounded-2xl p-4"
+          style={{
+            background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
+          }}
+        >
+          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Suggested Focus</h4>
+          <p className="text-sm text-gray-600 leading-snug">
+            {suggestedFocus}
           </p>
         </div>
       </div>
