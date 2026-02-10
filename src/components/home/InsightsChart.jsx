@@ -164,7 +164,7 @@ export default function InsightsChart({ entries }) {
                   tickLine={false}
                   tick={{ fill: '#9CA3AF', fontSize: 11 }}
                 />
-                <YAxis hide domain={[0, 5]} />
+                <YAxis hide domain={[0, 5]} opacity={0.3} />
                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length && payload[0].payload.hasEntry) {
@@ -194,6 +194,12 @@ export default function InsightsChart({ entries }) {
                   fill="url(#awarenessGradient)" 
                   dot={<CustomDot />}
                 />
+              </AreaChart>
+            </ResponsiveContainer>
+            
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Dots indicate days you completed an inventory. Tap to view that entry.
+            </p>
               </AreaChart>
             </ResponsiveContainer>
           </div>
