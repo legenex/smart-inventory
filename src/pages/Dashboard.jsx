@@ -19,6 +19,7 @@ import { format, isToday, differenceInDays, parseISO } from 'date-fns';
 import StreakCounter from '@/components/home/StreakCounter';
 import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
+import InventoryInsights from '@/components/home/InventoryInsights';
 import useTheme from '@/components/theme/useTheme';
 import MoodCheckIn from '@/components/home/MoodCheckIn';
 import ReadingsDialog from '@/components/readings/ReadingsDialog';
@@ -223,7 +224,7 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-8"
+          className="mb-3"
         >
           <button
             onClick={() => {
@@ -257,7 +258,17 @@ export default function Dashboard() {
           </button>
         </motion.div>
         
-        {/* Weekly Insights */}
+        {/* Inventory Insights */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="mb-8"
+        >
+          <InventoryInsights entries={entries} />
+        </motion.div>
+        
+        {/* Inventory Trends */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
