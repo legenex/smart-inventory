@@ -1,11 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Dot } from 'recharts';
-import { startOfWeek, addDays, format, parseISO, isSameDay } from 'date-fns';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { format, parseISO, isSameDay } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import useTheme from '@/components/theme/useTheme';
 
 export default function InsightsChart({ entries }) {
   const { colors } = useTheme();
+  const navigate = useNavigate();
   
   // Generate last 7 days
   const generateLast7Days = () => {
@@ -19,7 +22,34 @@ export default function InsightsChart({ entries }) {
     return days;
   };
   
-  // Process entries to show dots on days with inventories
+  // Calculate Awareness Score for a single entry
+  const calculateEntryAwareness = (entry) => {
+    const responses = entry.responses || {};
+    let score = 0;
+    
+    // Depth - how many questions were answered
+    const answeredQuestions = Object.keys(responses).filter(key => {
+      const value = responses[key]?.value;
+      return value && value !== '' && (Array.isArray(value) ? value.length > 0 : true);
+    }).length;
+    score += Math.min(answeredQuestions / 5, 1) * 40;
+    
+    // Emotional engagement - facing difficult truths
+    let emotionalEngagement = 0;
+    if (responses.resentful?.value === 'yes') emotionalEngagement++;
+    if (responses.fearful?.value === 'yes') emotionalEngagement++;
+    if (responses.dishonest?.value === 'yes') emotionalEngagement++;
+    score += (emotionalEngagement / 3) * 30;
+    
+    // Gratitude depth
+    const gratitudes = responses.gratitude?.value || [];
+    const gratitudeCount = Array.isArray(gratitudes) ? gratitudes.length : 0;
+    score += Math.min(gratitudeCount / 3, 1) * 30;
+    
+    return Math.min(5, Math.max(1, Math.round(score / 20)));
+  };
+  
+  // Process entries to show awareness over time
   const processData = () => {
     const last7Days = generateLast7Days();
     
@@ -28,48 +58,24 @@ export default function InsightsChart({ entries }) {
       
       if (!entry) {
         return {
-          date: format(date, 'EEE'),
+          date: format(date, 'MMM d'),
+          dayLabel: format(date, 'EEE'),
           fullDate: date,
           hasEntry: false,
-          gratitude: 0,
-          growth: 0,
-          gratitudeScore: 0,
-          growthScore: 0
+          awareness: null,
+          entryId: null
         };
       }
       
-      const responses = entry.responses || {};
-      let gratitudeScore = 0;
-      let challengeScore = 0;
-      
-      // Calculate scores based on responses
-      if (entry.inventory_type === 'aa') {
-        const gratitudes = responses.gratitude?.value || [];
-        gratitudeScore = Array.isArray(gratitudes) ? gratitudes.length : 0;
-        challengeScore = [
-          responses.resentful?.value,
-          responses.dishonest?.value,
-          responses.selfish?.value,
-          responses.fearful?.value,
-          responses.harmful?.value
-        ].filter(v => v === 'yes').length;
-      } else {
-        const gratitudes = responses.gratitude?.value || [];
-        gratitudeScore = Array.isArray(gratitudes) ? gratitudes.length : 0;
-        challengeScore = responses.challenged?.value ? 1 : 0;
-      }
-      
-      const gratitudeLevel = Math.min(5, gratitudeScore);
-      const growthLevel = Math.max(1, 5 - challengeScore);
+      const awarenessScore = calculateEntryAwareness(entry);
       
       return {
-        date: format(date, 'EEE'),
+        date: format(date, 'MMM d'),
+        dayLabel: format(date, 'EEE'),
         fullDate: date,
         hasEntry: true,
-        gratitude: gratitudeLevel,
-        growth: growthLevel,
-        gratitudeScore: gratitudeScore,
-        growthScore: Math.round((growthLevel / 5) * 100)
+        awareness: awarenessScore,
+        entryId: entry.id
       };
     });
   };
@@ -77,16 +83,24 @@ export default function InsightsChart({ entries }) {
   const data = processData();
   
   const hasAnyEntries = data.some(d => d.hasEntry);
+  const entriesWithData = data.filter(d => d.hasEntry);
   
   // Calculate summary stats
-  const avgGratitude = hasAnyEntries 
-    ? (data.filter(d => d.hasEntry).reduce((sum, d) => sum + d.gratitudeScore, 0) / data.filter(d => d.hasEntry).length).toFixed(1)
-    : 0;
-  const avgGrowth = hasAnyEntries
-    ? Math.round(data.filter(d => d.hasEntry).reduce((sum, d) => sum + d.growthScore, 0) / data.filter(d => d.hasEntry).length)
+  const avgAwarenessScore = hasAnyEntries 
+    ? (entriesWithData.reduce((sum, d) => sum + d.awareness, 0) / entriesWithData.length).toFixed(1)
     : 0;
   
-  // Custom dot component - always visible on days with entries
+  const awarenessLabel = () => {
+    if (!hasAnyEntries) return 'N/A';
+    const avg = parseFloat(avgAwarenessScore);
+    if (avg >= 4) return 'High';
+    if (avg >= 2.5) return 'Moderate';
+    return 'Low';
+  };
+  
+  const inventoryConsistency = `${entriesWithData.length} of 7`;
+  
+  // Custom dot component - clickable for days with entries
   const CustomDot = (props) => {
     const { cx, cy, payload } = props;
     if (!payload.hasEntry) return null;
@@ -99,7 +113,9 @@ export default function InsightsChart({ entries }) {
         fill={colors.primary}
         stroke="white"
         strokeWidth={2}
-        className="drop-shadow-md"
+        className="drop-shadow-md cursor-pointer hover:r-8 transition-all"
+        onClick={() => navigate(createPageUrl(`HistoryDetail?id=${payload.entryId}`))}
+        style={{ cursor: 'pointer' }}
       />
     );
   };
@@ -115,12 +131,12 @@ export default function InsightsChart({ entries }) {
         {hasAnyEntries && (
           <div className="flex gap-4 text-xs">
             <div className="text-center">
-              <div className="font-bold text-[#1F2C46]">{avgGratitude}</div>
-              <div className="text-gray-500">Avg Gratitudes</div>
+              <div className="font-bold text-[#1F2C46]">{awarenessLabel()}</div>
+              <div className="text-gray-500">Awareness Score</div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-[#1F2C46]">{avgGrowth}%</div>
-              <div className="text-gray-500">Growth Score</div>
+              <div className="font-bold text-[#1F2C46]">{inventoryConsistency}</div>
+              <div className="text-gray-500">Consistency</div>
             </div>
           </div>
         )}
@@ -137,39 +153,32 @@ export default function InsightsChart({ entries }) {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>
-                  <linearGradient id="gratitudeGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={colors.primary} stopOpacity={0.3}/>
+                  <linearGradient id="awarenessGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={colors.primary} stopOpacity={0.15}/>
                     <stop offset="95%" stopColor={colors.primary} stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={colors.secondary} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={colors.secondary} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <XAxis 
                   dataKey="date" 
                   axisLine={false} 
                   tickLine={false}
-                  tick={{ fill: '#9CA3AF', fontSize: 12 }}
+                  tick={{ fill: '#9CA3AF', fontSize: 11 }}
                 />
-                <YAxis hide domain={[0, 6]} />
+                <YAxis hide domain={[0, 5]} />
                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length && payload[0].payload.hasEntry) {
                       return (
                         <div className="bg-white rounded-xl p-3 shadow-lg border border-gray-100">
                           <p className="text-sm font-semibold text-[#1F2C46] mb-2">
-                            {format(payload[0].payload.fullDate, 'EEE, MMM d')}
+                            {format(payload[0].payload.fullDate, 'EEEE, MMM d')}
                           </p>
                           <div className="space-y-1 text-xs">
                             <div className="flex items-center gap-2">
                               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.primary }} />
-                              <span className="text-gray-600">{payload[0].payload.gratitudeScore} Gratitudes</span>
+                              <span className="text-gray-600">Awareness: {payload[0].payload.awareness}/5</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colors.secondary }} />
-                              <span className="text-gray-600">{payload[0].payload.growthScore}% Growth</span>
-                            </div>
+                            <div className="text-gray-500">Inventory completed</div>
                           </div>
                         </div>
                       );
@@ -179,40 +188,21 @@ export default function InsightsChart({ entries }) {
                 />
                 <Area 
                   type="monotone" 
-                  dataKey="gratitude" 
+                  dataKey="awareness" 
                   stroke={colors.primary}
-                  strokeWidth={2}
-                  fill="url(#gratitudeGradient)" 
-                  name="Gratitude"
+                  strokeWidth={2.5}
+                  fill="url(#awarenessGradient)" 
+                  connectNulls
                   dot={<CustomDot />}
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="growth" 
-                  stroke={colors.secondary}
-                  strokeWidth={2}
-                  fill="url(#growthGradient)" 
-                  name="Growth"
-                  dot={<CustomDot />}
+                  strokeOpacity={(entry) => entry.hasEntry ? 1 : 0.3}
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
           
-          <div className="flex justify-center gap-6 mt-4">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors.primary }} />
-              <span className="text-sm text-gray-600">Gratitude</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors.secondary }} />
-              <span className="text-sm text-gray-600">Growth</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full border-2" style={{ borderColor: colors.primary }} />
-              <span className="text-sm text-gray-600">Inventory Done</span>
-            </div>
-          </div>
+          <p className="text-xs text-gray-500 text-center mt-3">
+            Dots indicate days you completed an inventory. Tap to view that entry.
+          </p>
         </>
       )}
     </motion.div>
