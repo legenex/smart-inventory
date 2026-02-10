@@ -90,9 +90,9 @@ export default function ReviewInventory() {
   
   const generateShareText = () => {
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
-    const today = format(new Date(), 'd MMMM yyyy');
+    const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let text = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    let text = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━━━━━━━━━\n\n`;
     
     questions.forEach((q, i) => {
       const r = responses[q.id];
@@ -216,9 +216,9 @@ ${formattedResponses}`;
     const correctedResponses = { ...responses };
 
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
-    const today = format(new Date(), 'd MMMM yyyy');
+    const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let shareText = `Nightly Inventory - ${today}\n━━━━━━━━━━━━━━━━━━━\n\n`;
+    let shareText = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━━━━━━━━━\n\n`;
     
     questions.forEach((q, i) => {
       const r = correctedResponses[q.id];
@@ -312,7 +312,7 @@ ${formattedResponses}`;
             </button>
             <div>
               <h1 className="text-lg font-semibold text-[#1F2C46]">Your Nightly Inventory</h1>
-              <p className="text-sm text-gray-500">Review your full reflection before continuing</p>
+              <p className="text-sm text-gray-500">{format(inventoryDate, 'EEEE, MMMM d, yyyy')}</p>
             </div>
           </div>
           <NavigationMenu />
