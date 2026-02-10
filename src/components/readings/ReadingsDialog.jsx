@@ -76,7 +76,7 @@ export default function ReadingsDialog({ open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden rounded-3xl bg-white/95 backdrop-blur-md">
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden rounded-3xl bg-white/95 backdrop-blur-md border-2" style={{ borderColor: 'var(--primary)' }}>
         <AnimatePresence mode="wait">
           {!selectedReading ? (
             <motion.div
@@ -144,13 +144,13 @@ export default function ReadingsDialog({ open, onClose }) {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6">
+              <div className="flex-1 overflow-y-auto p-6 pb-12 overscroll-contain">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
                   </div>
                 ) : selectedReading === 'hazelden' && typeof content === 'object' ? (
-                  <div className="space-y-6 text-gray-700 leading-relaxed">
+                  <div className="space-y-6 text-gray-700 leading-relaxed pb-8">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3">Thought for the Day</h3>
                       <p className="whitespace-pre-line">{content.thought}</p>
@@ -165,7 +165,7 @@ export default function ReadingsDialog({ open, onClose }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="text-gray-700 leading-relaxed">
+                  <div className="text-gray-700 leading-relaxed pb-8">
                     <p className="whitespace-pre-line">{typeof content === 'string' ? content : JSON.stringify(content)}</p>
                   </div>
                 )}
