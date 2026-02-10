@@ -293,7 +293,7 @@ export default function QuestionSettings({ user, onSave }) {
       {/* Gratitude Question (always last) */}
       {gratitudeQuestion && (
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">Gratitude (Always Last)</h4>
+          <h4 className="text-sm font-semibold text-gray-700">Gratitude</h4>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
             <div className="flex-1">
               <p className="font-medium text-[#1F2C46]">{gratitudeQuestion.question}</p>
