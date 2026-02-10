@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ArrowLeft, Menu } from 'lucide-react';
 import NavigationMenu from '@/components/home/NavigationMenu';
+import DateSelector from '@/components/inventory/DateSelector';
 import { format, isToday, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import ProgressBar from '@/components/inventory/ProgressBar';
@@ -48,17 +49,26 @@ export default function Inventory() {
   const [responses, setResponses] = useState({});
   const [processing, setProcessing] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [inventoryDate, setInventoryDate] = useState(new Date());
   const navigate = useNavigate();
   
   useEffect(() => {
     loadUser();
+    // Check for date parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    if (dateParam) {
+      setInventoryDate(new Date(dateParam));
+    }
+    
     // Load draft if exists
     const draft = localStorage.getItem('inventory_draft');
     if (draft) {
       try {
-        const { responses: draftResponses, question } = JSON.parse(draft);
+        const { responses: draftResponses, question, date } = JSON.parse(draft);
         setResponses(draftResponses);
         setCurrentQuestion(question);
+        if (date) setInventoryDate(new Date(date));
       } catch (err) {
         console.error('Failed to load draft', err);
       }
@@ -78,15 +88,18 @@ export default function Inventory() {
     }
   };
   
-  // Check for today's entry
+  // Check for entry on selected date
   const { data: entries = [] } = useQuery({
-    queryKey: ['inventoryEntries'],
-    queryFn: () => base44.entities.InventoryEntry.list('-date', 1),
+    queryKey: ['inventoryEntries', format(inventoryDate, 'yyyy-MM-dd')],
+    queryFn: async () => {
+      const allEntries = await base44.entities.InventoryEntry.list('-date', 50);
+      return allEntries.filter(e => e.date === format(inventoryDate, 'yyyy-MM-dd'));
+    },
     enabled: !!user
   });
   
   useEffect(() => {
-    if (entries.length > 0 && isToday(parseISO(entries[0].date))) {
+    if (entries.length > 0) {
       navigate(createPageUrl(`HistoryDetail?id=${entries[0].id}`));
     }
   }, [entries]);
@@ -137,12 +150,13 @@ export default function Inventory() {
       // Update draft with new question
       localStorage.setItem('inventory_draft', JSON.stringify({
         responses,
-        question: nextQuestion
+        question: nextQuestion,
+        date: inventoryDate.toISOString()
       }));
     } else {
       // Clear draft and go to review page
       localStorage.removeItem('inventory_draft');
-      navigate(createPageUrl(`ReviewInventory?responses=${encodeURIComponent(JSON.stringify(responses))}&type=${user.recovery_status}`));
+      navigate(createPageUrl(`ReviewInventory?responses=${encodeURIComponent(JSON.stringify(responses))}&type=${user.recovery_status}&date=${format(inventoryDate, 'yyyy-MM-dd')}`));
     }
   };
 
@@ -154,7 +168,8 @@ export default function Inventory() {
       // Update draft with new question
       localStorage.setItem('inventory_draft', JSON.stringify({
         responses,
-        question: prevQuestion
+        question: prevQuestion,
+        date: inventoryDate.toISOString()
       }));
     }
   };
@@ -195,11 +210,22 @@ export default function Inventory() {
               <h1 className="text-lg font-semibold text-[#1F2C46]">
                 {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
               </h1>
-              <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, MMMM d')}</p>
+              <p className="text-sm text-gray-500">{format(inventoryDate, 'EEEE, MMMM d')}</p>
             </div>
           </div>
           <NavigationMenu />
         </div>
+
+        <DateSelector 
+          selectedDate={inventoryDate} 
+          onDateChange={(newDate) => {
+            setInventoryDate(newDate);
+            // Clear responses when changing date
+            setResponses({});
+            setCurrentQuestion(0);
+            localStorage.removeItem('inventory_draft');
+          }} 
+        />
         
         <ProgressBar current={currentQuestion + 1} total={questions.length} />
         

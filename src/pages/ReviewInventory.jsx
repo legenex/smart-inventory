@@ -51,6 +51,7 @@ export default function ReviewInventory() {
   const [summary, setSummary] = useState('');
   const [prompts, setPrompts] = useState('');
   const [showBackDialog, setShowBackDialog] = useState(false);
+  const [inventoryDate, setInventoryDate] = useState(new Date());
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function ReviewInventory() {
     const urlParams = new URLSearchParams(window.location.search);
     const responsesParam = urlParams.get('responses');
     const typeParam = urlParams.get('type');
+    const dateParam = urlParams.get('date');
     
     if (!responsesParam || !typeParam) {
       navigate(createPageUrl('Inventory'));
@@ -78,6 +80,9 @@ export default function ReviewInventory() {
       setUser(userData);
       setResponses(JSON.parse(decodeURIComponent(responsesParam)));
       setInventoryType(typeParam);
+      if (dateParam) {
+        setInventoryDate(new Date(dateParam));
+      }
     } catch (err) {
       navigate(createPageUrl('Inventory'));
     }
@@ -238,7 +243,7 @@ ${formattedResponses}`;
     
     try {
       const entry = await base44.entities.InventoryEntry.create({
-        date: format(new Date(), 'yyyy-MM-dd'),
+        date: format(inventoryDate, 'yyyy-MM-dd'),
         inventory_type: inventoryType,
         responses: correctedResponses,
         reflective_summary: summary,
