@@ -123,7 +123,8 @@ export default function Inventory() {
     // Save draft
     localStorage.setItem('inventory_draft', JSON.stringify({
       responses: newResponses,
-      question: currentQuestion
+      question: currentQuestion,
+      date: inventoryDate.toISOString()
     }));
   };
   
@@ -139,7 +140,8 @@ export default function Inventory() {
     // Save draft
     localStorage.setItem('inventory_draft', JSON.stringify({
       responses: newResponses,
-      question: currentQuestion
+      question: currentQuestion,
+      date: inventoryDate.toISOString()
     }));
   };
   
