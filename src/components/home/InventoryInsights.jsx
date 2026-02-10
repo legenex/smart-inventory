@@ -153,14 +153,14 @@ export default function InventoryInsights({ entries }) {
       strengths.push("You've been more honest and self-aware");
     }
     if (patterns.service >= 2) {
-      strengths.push('Showing up in service for others');
+      strengths.push("Showing up in service for others");
     }
     if (patterns.kindness >= total * 0.6) {
       strengths.push("You're noticing when you're kind to others");
     }
     
     if (strengths.length === 0 && recentEntries.length >= 3) {
-      strengths.push('You're showing up and doing the work');
+      strengths.push("You're showing up and doing the work");
     }
     
     return strengths.length > 0 ? strengths.slice(0, 3) : ['Keep building your practice'];
