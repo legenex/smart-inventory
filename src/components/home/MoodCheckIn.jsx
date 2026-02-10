@@ -9,16 +9,16 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Smile, Meh, Frown, Heart, Zap } from 'lucide-react';
+import { SmilePlus, Smile, Meh, Frown, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import useTheme from '@/components/theme/useTheme';
 
 const MOODS = [
-  { id: 'great', label: 'Great', icon: Heart, color: '#10B981' },
+  { id: 'great', label: 'Great', icon: SmilePlus, color: '#10B981' },
   { id: 'good', label: 'Good', icon: Smile, color: '#6BC2CE' },
   { id: 'okay', label: 'Okay', icon: Meh, color: '#FCD34D' },
   { id: 'struggling', label: 'Struggling', icon: Frown, color: '#F87171' },
-  { id: 'energized', label: 'Energized', icon: Zap, color: '#7667E5' }
+  { id: 'energized', label: 'Energized', icon: Sparkles, color: '#A48FFF' }
 ];
 
 export default function MoodCheckIn({ open, onClose }) {
@@ -60,8 +60,8 @@ export default function MoodCheckIn({ open, onClose }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md rounded-3xl bg-white/95 backdrop-blur-md border-0">
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+      <DialogContent className="sm:max-w-md rounded-3xl bg-white/90 backdrop-blur-xl border-0 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">How are you feeling today?</DialogTitle>
           <DialogDescription className="text-center">
@@ -74,18 +74,24 @@ export default function MoodCheckIn({ open, onClose }) {
             <motion.button
               key={mood.id}
               onClick={() => setSelectedMood(mood.id)}
-              className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${
-                selectedMood === mood.id ? 'ring-2 ring-offset-2' : 'hover:bg-gray-50'
+              className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-all ${
+                selectedMood === mood.id ? 'ring-2 ring-offset-2 shadow-lg' : 'hover:bg-gray-50/50'
               }`}
-              style={selectedMood === mood.id ? { ringColor: mood.color } : {}}
+              style={selectedMood === mood.id ? { 
+                ringColor: mood.color,
+                backgroundColor: `${mood.color}10`
+              } : {}}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <mood.icon 
-                className="w-8 h-8" 
-                style={{ color: mood.color }}
+                className="w-10 h-10" 
+                style={{ 
+                  color: mood.color,
+                  strokeWidth: selectedMood === mood.id ? 2.5 : 2
+                }}
               />
-              <span className="text-xs font-medium text-gray-700">{mood.label}</span>
+              <span className="text-xs font-semibold text-gray-700">{mood.label}</span>
             </motion.button>
           ))}
         </div>
