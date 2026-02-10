@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon, BookOpen } from 'lucide-react';
+import InventoryDateDialog from '@/components/inventory/InventoryDateDialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +40,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
   const [showReadings, setShowReadings] = useState(false);
+  const [showInventoryDialog, setShowInventoryDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -223,29 +225,36 @@ export default function Dashboard() {
           transition={{ delay: 0.2 }}
           className="mb-8"
         >
-          <Link to={createPageUrl('Inventory')}>
-            <div className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group">
-              <div className="flex items-center gap-4">
-                <div 
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
-                  style={{
-                    background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
-                  }}
-                >
-                  <PenLine className="w-7 h-7 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-[#1F2C46]">
-                    {todayEntry ? "View Today's Inventory" : "Start Today's Inventory"}
-                  </h2>
-                  <p className="text-gray-500 text-sm">
-                    {todayEntry ? 'You already reflected today' : format(new Date(), 'EEEE, MMMM d')}
-                  </p>
-                </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+          <button
+            onClick={() => {
+              if (todayEntry) {
+                navigate(createPageUrl(`HistoryDetail?id=${todayEntry.id}`));
+              } else {
+                setShowInventoryDialog(true);
+              }
+            }}
+            className="w-full bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+          >
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
+                style={{
+                  background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
+                }}
+              >
+                <PenLine className="w-7 h-7 text-white" />
               </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-[#1F2C46]">
+                  {todayEntry ? "View Today's Inventory" : "Write Inventory"}
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  {todayEntry ? 'You already reflected today' : 'Reflect on today or catch up on past days'}
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
             </div>
-          </Link>
+          </button>
         </motion.div>
         
         {/* Weekly Insights */}
@@ -414,6 +423,11 @@ export default function Dashboard() {
       <ReadingsDialog
         open={showReadings}
         onClose={() => setShowReadings(false)}
+      />
+
+      <InventoryDateDialog
+        open={showInventoryDialog}
+        onClose={() => setShowInventoryDialog(false)}
       />
     </div>
   );
