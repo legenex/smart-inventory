@@ -20,12 +20,27 @@ export default function ProfileEditor({ user, onUpdate }) {
   const nameParts = displayName.trim().split(' ');
   const [firstName, setFirstName] = useState(toTitleCase(nameParts[0] || ''));
   const [lastName, setLastName] = useState(toTitleCase(nameParts.slice(1).join(' ') || ''));
-  const [age, setAge] = useState(user.age || '');
+  const [dateOfBirth, setDateOfBirth] = useState(user.date_of_birth || '');
   const [sobrietyDate, setSobrietyDate] = useState(user.sobriety_date || '');
   const [location, setLocation] = useState(user.location || '');
   const [bio, setBio] = useState(user.bio || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  
+  // Calculate age from date of birth
+  const calculateAge = (dob) => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+  
+  const userAge = calculateAge(user.date_of_birth);
   
   // Calculate sobriety time
   const calculateSobrietyTime = () => {
@@ -67,7 +82,7 @@ export default function ProfileEditor({ user, onUpdate }) {
       const displayName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
       await base44.auth.updateMe({ 
         display_name: displayName,
-        age: age || null,
+        date_of_birth: dateOfBirth || null,
         sobriety_date: sobrietyDate || null,
         location: location || null,
         bio: bio || null
@@ -203,12 +218,11 @@ export default function ProfileEditor({ user, onUpdate }) {
               
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Age</label>
+                  <label className="text-xs font-medium text-gray-600 mb-1 block">Date of Birth</label>
                   <Input
-                    type="number"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                    placeholder="Age"
+                    type="date"
+                    value={dateOfBirth}
+                    onChange={(e) => setDateOfBirth(e.target.value)}
                     className="rounded-xl"
                   />
                 </div>
@@ -264,7 +278,7 @@ export default function ProfileEditor({ user, onUpdate }) {
                     const nameParts = displayName.trim().split(' ');
                     setFirstName(toTitleCase(nameParts[0] || ''));
                     setLastName(toTitleCase(nameParts.slice(1).join(' ') || ''));
-                    setAge(user.age || '');
+                    setDateOfBirth(user.date_of_birth || '');
                     setSobrietyDate(user.sobriety_date || '');
                     setLocation(user.location || '');
                     setBio(user.bio || '');
@@ -298,7 +312,7 @@ export default function ProfileEditor({ user, onUpdate }) {
                 <div>
                   <label className="text-xs font-medium text-gray-500 mb-1 block">Age</label>
                   <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                    {user.age || '-'}
+                    {userAge || '-'}
                   </div>
                 </div>
                 <div>
