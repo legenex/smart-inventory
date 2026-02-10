@@ -45,9 +45,9 @@ export default function InventoryInsights({ entries }) {
   const recentEntries = entries.slice(0, 30); // Last 30 entries for better analysis
   const last30Days = recentEntries.slice(0, Math.min(30, recentEntries.length));
   
-  // Calculate Happiness Score (based on gratitudes, positive responses, and growth)
-  let happinessScore = 0;
-  let totalResponses = 0;
+  // Calculate Happiness Score (weighted heavily on negative indicators)
+  let positiveCount = 0;
+  let negativeCount = 0;
   
   recentEntries.forEach(entry => {
     const gratitudes = entry.responses?.gratitude?.value || [];
@@ -55,31 +55,36 @@ export default function InventoryInsights({ entries }) {
     
     // Positive indicators
     if (entry.responses?.do_well?.value === 'yes' || entry.responses?.well?.value) {
-      happinessScore += 2;
-      totalResponses++;
+      positiveCount += 1;
     }
-    if (entry.responses?.unkind?.value === 'yes') {
-      happinessScore += 2;
-      totalResponses++;
+    if (entry.responses?.unkind?.value === 'no') {
+      positiveCount += 1;
     }
-    if (gratitudeCount > 0) {
-      happinessScore += Math.min(gratitudeCount, 3);
-      totalResponses++;
+    if (gratitudeCount >= 3) {
+      positiveCount += 1;
     }
     
-    // Negative indicators (reduce score)
+    // Negative indicators (heavily weighted)
     if (entry.responses?.resentful?.value === 'yes') {
-      happinessScore -= 1;
-      totalResponses++;
+      negativeCount += 2;
     }
     if (entry.responses?.fearful?.value === 'yes') {
-      happinessScore -= 1;
-      totalResponses++;
+      negativeCount += 2;
+    }
+    if (entry.responses?.dishonest?.value === 'yes') {
+      negativeCount += 2;
+    }
+    if (entry.responses?.selfish?.value === 'yes') {
+      negativeCount += 2;
+    }
+    if (entry.responses?.harmful?.value === 'yes') {
+      negativeCount += 2;
     }
   });
   
-  const happinessPercentage = totalResponses > 0 
-    ? Math.max(0, Math.min(100, Math.round((happinessScore / (totalResponses * 2)) * 100)))
+  const totalWeight = positiveCount + negativeCount;
+  const happinessPercentage = totalWeight > 0 
+    ? Math.max(0, Math.min(100, Math.round((positiveCount / totalWeight) * 100)))
     : 0;
   
   // Analyze patterns for insights

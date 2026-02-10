@@ -86,22 +86,58 @@ export default function InsightsChart({ entries }) {
     ? Math.round(data.filter(d => d.hasEntry).reduce((sum, d) => sum + d.growthScore, 0) / data.filter(d => d.hasEntry).length)
     : 0;
   
-  // Custom dot component
+  // Custom dot component that shows for all entries
   const CustomDot = (props) => {
-    const { cx, cy, payload } = props;
+    const { cx, cy, payload, dataKey } = props;
     if (!payload.hasEntry) return null;
     
-    return (
-      <circle
-        cx={cx}
-        cy={cy}
-        r={5}
-        fill={colors.secondary}
-        stroke="white"
-        strokeWidth={2}
-        className="drop-shadow-md"
-      />
-    );
+    // Only show visible dots on the growth line to avoid duplication
+    if (dataKey === 'growth') {
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={5}
+          fill={colors.secondary}
+          stroke="white"
+          strokeWidth={2}
+          className="drop-shadow-md"
+        />
+      );
+    }
+    
+    return null;
+  };
+  
+  // Permanent dots for days with inventories
+  const InventoryDots = () => {
+    return data.map((point, index) => {
+      if (!point.hasEntry) return null;
+      
+      const xPosition = (index / (data.length - 1)) * 100; // Percentage position
+      
+      return (
+        <div
+          key={index}
+          style={{
+            position: 'absolute',
+            left: `${xPosition}%`,
+            bottom: '35px',
+            transform: 'translateX(-50%)',
+          }}
+        >
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: colors.primary,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          />
+        </div>
+      );
+    });
   };
   
   return (
@@ -133,7 +169,8 @@ export default function InsightsChart({ entries }) {
         </div>
       ) : (
         <>
-          <div className="h-[200px]">
+          <div className="h-[200px] relative">
+            <InventoryDots />
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
                 <defs>
