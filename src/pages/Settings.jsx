@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ArrowLeft, Bell, Heart, Sparkles, LogOut, Palette } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import ThemeSelector from '@/components/settings/ThemeSelector';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileEditor from '@/components/settings/ProfileEditor';
+import ThemeSelector from '@/components/settings/ThemeSelector';
 import BackgroundSelector from '@/components/settings/BackgroundSelector';
-import useTheme from '@/components/theme/useTheme';
+import QuestionSettings from '@/components/settings/QuestionSettings';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Settings() {
-  const { updateTheme, colors } = useTheme();
   const [user, setUser] = useState(null);
+  const [settings, setSettings] = useState({});
   const [saving, setSaving] = useState(false);
-  const [settings, setSettings] = useState({
-    recovery_status: 'general',
-    reminder_enabled: true,
-    reminder_time: '21:00',
-    theme: 'light',
-    background: null
-  });
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -39,247 +39,240 @@ export default function Settings() {
       }
       setUser(userData);
       setSettings({
-        recovery_status: userData.recovery_status || 'general',
-        reminder_enabled: userData.reminder_enabled !== false,
+        recovery_status: userData.recovery_status,
         reminder_time: userData.reminder_time || '21:00',
-        theme_color: userData.theme_color || 'purple',
-        background: userData.background || null
+        mood_check_enabled: userData.mood_check_enabled !== false
       });
     } catch (err) {
       navigate(createPageUrl('Onboarding'));
     }
   };
   
-  const handleSave = async (newSettings) => {
+  const handleSaveSettings = async () => {
     setSaving(true);
     try {
-      await base44.auth.updateMe(newSettings);
-      setSettings(prev => ({ ...prev, ...newSettings }));
-      if (newSettings.theme_color) {
-        updateTheme(newSettings.theme_color);
-      }
-      // Reload user to ensure everything is in sync
+      await base44.auth.updateMe(settings);
       await loadUser();
     } catch (err) {
-      console.error(err);
+      console.error('Failed to save settings', err);
     }
     setSaving(false);
   };
   
-  const handleLogout = async () => {
-    await base44.auth.logout();
+  const handleLogout = () => {
+    base44.auth.logout();
+  };
+
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+        const period = hour < 12 ? 'AM' : 'PM';
+        const displayMinute = minute.toString().padStart(2, '0');
+        options.push({
+          value: timeString,
+          label: `${displayHour}:${displayMinute} ${period}`
+        });
+      }
+    }
+    return options;
   };
   
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
   
-  const timeOptions = [];
-  for (let h = 8; h <= 23; h++) {
-    timeOptions.push(`${h.toString().padStart(2, '0')}:00`);
-  }
-  
   return (
-    <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
-        {/* Header */}
+    <div className="min-h-screen pb-24">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-4 mb-8"
         >
-          <Link
-            to={createPageUrl('Dashboard')}
+          <button
+            onClick={() => navigate(createPageUrl('Dashboard'))}
             className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
           >
             <ArrowLeft className="w-5 h-5 text-gray-600" />
-          </Link>
-          <h1 className="text-xl font-semibold text-[#1F2C46]">Settings</h1>
+          </button>
+          <h1 className="text-3xl font-extrabold text-[#1F2C46]">Settings</h1>
         </motion.div>
-        
-        {/* Profile Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
-        >
-          <ProfileEditor user={user} onUpdate={loadUser} />
-        </motion.div>
-        
-        {/* Inventory Type */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
-        >
-          <h3 className="font-semibold text-[#1F2C46] mb-4">Inventory Type</h3>
 
-          <div className="space-y-3">
-            <button
-              onClick={() => handleSave({ ...settings, recovery_status: 'aa' })}
-              className={`w-full p-4 rounded-xl transition-all text-left`}
-              style={{
-                borderWidth: '2px',
-                borderColor: settings.recovery_status === 'aa' ? colors.borderColor : '#e5e7eb',
-                backgroundColor: settings.recovery_status === 'aa' ? `${colors.primary}0D` : 'transparent'
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <Heart className={`w-5 h-5`} style={{ color: settings.recovery_status === 'aa' ? colors.primary : '#9ca3af' }} />
-                <div>
-                  <p className="font-medium text-[#1F2C46]">Recovery (AA)</p>
-                  <p className="text-sm text-gray-500">Step 10-style inventory</p>
-                </div>
-              </div>
-            </button>
+        <Tabs defaultValue="profile" className="w-full">
+          <TabsList className="grid w-full grid-cols-5 mb-8">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="inventory">Inventory</TabsTrigger>
+            <TabsTrigger value="questions">Questions</TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsTrigger value="reminders">Reminders</TabsTrigger>
+          </TabsList>
 
-            <button
-              onClick={() => handleSave({ ...settings, recovery_status: 'general' })}
-              className={`w-full p-4 rounded-xl transition-all text-left`}
-              style={{
-                borderWidth: '2px',
-                borderColor: settings.recovery_status === 'general' ? colors.borderColor : '#e5e7eb',
-                backgroundColor: settings.recovery_status === 'general' ? `${colors.primary}0D` : 'transparent'
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <Sparkles className={`w-5 h-5`} style={{ color: settings.recovery_status === 'general' ? colors.primary : '#9ca3af' }} />
-                <div>
-                  <p className="font-medium text-[#1F2C46]">General Reflection</p>
-                  <p className="text-sm text-gray-500">Personal growth focused</p>
-                </div>
-              </div>
-            </button>
-          </div>
-        </motion.div>
-        
-        {/* Theme Color */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Palette className="w-5 h-5" style={{ color: colors.primary }} />
-            <h3 className="font-semibold text-[#1F2C46]">Theme Color</h3>
-          </div>
-          <ThemeSelector 
-            currentTheme={settings.theme_color} 
-            onThemeChange={(color) => handleSave({ ...settings, theme_color: color })}
-          />
-        </motion.div>
-        
-        {/* Background */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
-        >
-          <h3 className="font-semibold text-[#1F2C46] mb-4">Background</h3>
-          <BackgroundSelector
-            currentBackground={settings.background}
-            onBackgroundChange={(bg) => handleSave({ ...settings, background: bg })}
-          />
-        </motion.div>
-        
-        {/* Reminders */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100 mb-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5" style={{ color: colors.primary }} />
-              <h3 className="font-semibold text-[#1F2C46]">Daily Reminder</h3>
-            </div>
-            <Switch
-              checked={settings.reminder_enabled}
-              onCheckedChange={(checked) => handleSave({ ...settings, reminder_enabled: checked })}
-            />
-          </div>
-          
-          {settings.reminder_enabled && (
+          <TabsContent value="profile">
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              className="mt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <label className="text-sm text-gray-500 mb-2 block">Reminder Time</label>
-              <Select
-                value={settings.reminder_time}
-                onValueChange={(value) => handleSave({ ...settings, reminder_time: value })}
-              >
-                <SelectTrigger className="w-full rounded-xl">
-                 <SelectValue>
-                   {(() => {
-                     const time = settings.reminder_time;
-                     const [hours] = time.split(':');
-                     const hour = parseInt(hours);
-                     if (hour === 12) return '12:00 PM';
-                     if (hour === 0) return '12:00 AM';
-                     if (hour > 12) return `${hour - 12}:00 PM`;
-                     return `${hour}:00 AM`;
-                   })()}
-                 </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                 {timeOptions.map(time => {
-                   const [hours] = time.split(':');
-                   const hour = parseInt(hours);
-                   let display;
-                   if (hour === 12) display = '12:00 PM';
-                   else if (hour === 0) display = '12:00 AM';
-                   else if (hour > 12) display = `${hour - 12}:00 PM`;
-                   else display = `${hour}:00 AM`;
-
-                   return (
-                     <SelectItem key={time} value={time}>
-                       {display}
-                     </SelectItem>
-                   );
-                 })}
-                </SelectContent>
-              </Select>
+              <ProfileEditor user={user} onUpdate={loadUser} />
             </motion.div>
-          )}
-        </motion.div>
-        
-        {/* Logout */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="w-full py-6 rounded-2xl border-2 border-red-200 text-red-600 hover:bg-red-50"
-          >
-            <LogOut className="w-5 h-5 mr-2" />
-            Sign Out
-          </Button>
-        </motion.div>
-        
-        {/* App Info */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-8"
-        >
-          <p className="text-gray-400 text-sm">Smart-Inventory v1.0</p>
-          <p className="text-gray-300 text-xs mt-1">Reflect. Grow. Become your best self.</p>
-        </motion.div>
+          </TabsContent>
+
+          <TabsContent value="inventory">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[25px] p-6 shadow-sm"
+            >
+              <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Inventory Type</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Choose which reflection style works best for you
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => setSettings({ ...settings, recovery_status: 'aa' })}
+                  className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                    settings.recovery_status === 'aa'
+                      ? 'border-[#7667E5] bg-[#7667E5]/5'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-semibold text-[#1F2C46]">Recovery Program (AA/NA)</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Structured 10th step inventory questions
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => setSettings({ ...settings, recovery_status: 'general' })}
+                  className={`w-full p-4 rounded-xl border-2 transition-all text-left ${
+                    settings.recovery_status === 'general'
+                      ? 'border-[#7667E5] bg-[#7667E5]/5'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="font-semibold text-[#1F2C46]">General Reflection</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Open-ended daily reflection prompts
+                  </div>
+                </button>
+              </div>
+
+              <Button 
+                onClick={handleSaveSettings} 
+                disabled={saving}
+                className="w-full mt-6"
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="questions">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-[25px] p-6 shadow-sm"
+            >
+              <QuestionSettings user={user} onSave={loadUser} />
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="appearance">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <div className="bg-white rounded-[25px] p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Theme</h3>
+                <ThemeSelector user={user} onUpdate={loadUser} />
+              </div>
+
+              <div className="bg-white rounded-[25px] p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Background</h3>
+                <BackgroundSelector user={user} onUpdate={loadUser} />
+              </div>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="reminders">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-6"
+            >
+              <div className="bg-white rounded-[25px] p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-[#1F2C46] mb-4">Daily Reminder</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  Set a time to receive a reminder for your daily inventory
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label>Reminder Time</Label>
+                    <Select
+                      value={settings.reminder_time}
+                      onValueChange={(value) => setSettings({ ...settings, reminder_time: value })}
+                    >
+                      <SelectTrigger className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generateTimeOptions().map(option => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t">
+                    <div>
+                      <Label>Daily Mood Check-In</Label>
+                      <p className="text-sm text-gray-500 mt-1">
+                        Quick mood tracking when you open the app
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.mood_check_enabled}
+                      onCheckedChange={(checked) => setSettings({ ...settings, mood_check_enabled: checked })}
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleSaveSettings} 
+                  disabled={saving}
+                  className="w-full mt-6"
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </Button>
+              </div>
+
+              <div className="bg-white rounded-[25px] p-6 shadow-sm">
+                <h3 className="text-lg font-semibold text-red-600 mb-2">Sign Out</h3>
+                <p className="text-sm text-gray-500 mb-4">
+                  You'll need to log back in to access your account
+                </p>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleLogout}
+                  className="w-full"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
