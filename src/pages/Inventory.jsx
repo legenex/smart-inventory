@@ -139,9 +139,11 @@ export default function Inventory() {
   // Filter and order questions based on settings
   const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   const questions = React.useMemo(() => {
+    // Default: show only non-optional questions
+    const defaultQuestions = allQuestions.filter(q => !q.optional);
+    
     if (!questionSettings) {
-      // Default: show only non-optional questions
-      return allQuestions.filter(q => !q.optional);
+      return defaultQuestions;
     }
     
     // Use user's settings
@@ -154,28 +156,11 @@ export default function Inventory() {
       orderedQuestions.push(...questionSettings.custom_questions);
     }
     
-    return orderedQuestions;
+    // If no questions after applying settings, fall back to default
+    return orderedQuestions.length > 0 ? orderedQuestions : defaultQuestions;
   }, [questionSettings, allQuestions]);
   
   const currentQ = questions[currentQuestion];
-  
-  // If there are no questions, show error state
-  if (!currentQ || questions.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="max-w-md mx-auto p-8 bg-white rounded-3xl shadow-lg text-center">
-          <p className="text-lg font-semibold text-[#1F2C46] mb-2">No questions configured</p>
-          <p className="text-gray-500 mb-4">Please enable some questions in Settings to start your inventory.</p>
-          <button
-            onClick={() => navigate(createPageUrl('Settings'))}
-            className="px-6 py-2 bg-[#7667E5] text-white rounded-xl hover:bg-[#6557D5] transition-colors"
-          >
-            Go to Settings
-          </button>
-        </div>
-      </div>
-    );
-  }
   
   const handleValueChange = (value) => {
     const newResponses = {
