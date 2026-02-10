@@ -115,22 +115,26 @@ export default function Inventory() {
     }
   }, [entries]);
   
-  if (!user) {
-    return null;
-  }
-  
   // Fetch user question settings
-  const { data: questionSettings } = useQuery({
+  const { data: questionSettings, isLoading: settingsLoading } = useQuery({
     queryKey: ['questionSettings', user?.recovery_status],
     queryFn: async () => {
       const settings = await base44.entities.UserQuestionSettings.filter({ 
-        inventory_type: user.recovery_status,
-        created_by: user.email 
+        inventory_type: user?.recovery_status,
+        created_by: user?.email 
       });
       return settings[0] || null;
     },
     enabled: !!user
   });
+  
+  if (!user || settingsLoading) {
+    return (
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
   
   // Filter and order questions based on settings
   const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
