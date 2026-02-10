@@ -196,12 +196,6 @@ export default function InsightsChart({ entries }) {
                 />
               </AreaChart>
             </ResponsiveContainer>
-            
-            <p className="text-xs text-gray-500 text-center mt-4">
-              Dots indicate days you completed an inventory. Tap to view that entry.
-            </p>
-              </AreaChart>
-            </ResponsiveContainer>
           </div>
           
           <p className="text-xs text-gray-500 text-center mt-3">
