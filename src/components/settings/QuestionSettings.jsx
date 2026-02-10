@@ -171,6 +171,20 @@ export default function QuestionSettings({ user, onSave }) {
     return <div className="text-center py-8">Loading...</div>;
   }
 
+  // Separate main questions and optional questions
+  const gratitudeIndex = orderedQuestions.findIndex(q => q.id === 'gratitude');
+  const mainQuestions = gratitudeIndex !== -1 
+    ? orderedQuestions.slice(0, gratitudeIndex)
+    : orderedQuestions.filter(q => !q.optional);
+  const gratitudeQuestion = orderedQuestions.find(q => q.id === 'gratitude');
+  const optionalQuestions = allQuestions.filter(q => q.optional);
+  const enabledOptionalQuestions = mainQuestions.filter(q => 
+    optionalQuestions.some(opt => opt.id === q.id)
+  );
+  const additionalQuestions = optionalQuestions.filter(q => 
+    !settings.enabled_questions.includes(q.id)
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -196,77 +210,151 @@ export default function QuestionSettings({ user, onSave }) {
           </Button>
         </div>
       </div>
+      
+      {/* Main Questions (enabled and before gratitude) */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-gray-700">Main Questions</h4>
 
-      {editMode ? (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="questions">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
-                {orderedQuestions.map((question, index) => (
-                  <Draggable key={question.id} draggableId={question.id} index={index}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-3"
-                      >
-                        <div {...provided.dragHandleProps}>
-                          <GripVertical className="w-5 h-5 text-gray-400" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-[#1F2C46]">{question.question}</p>
-                          {question.description && (
-                            <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+        {editMode ? (
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="main-questions">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                  {mainQuestions.filter(q => q.id !== 'gratitude').map((question, index) => (
+                    <Draggable key={question.id} draggableId={question.id} index={index}>
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-3"
+                        >
+                          <div {...provided.dragHandleProps}>
+                            <GripVertical className="w-5 h-5 text-gray-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                            {question.description && (
+                              <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                            )}
+                          </div>
+                          <Switch
+                            checked={settings.enabled_questions.includes(question.id)}
+                            onCheckedChange={() => handleToggle(question.id)}
+                          />
+                          {question.id.startsWith('custom_') && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteCustomQuestion(question.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
                           )}
                         </div>
-                        <Switch
-                          checked={settings.enabled_questions.includes(question.id)}
-                          onCheckedChange={() => handleToggle(question.id)}
-                        />
-                        {question.id.startsWith('custom_') && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteCustomQuestion(question.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      ) : (
-        <div className="space-y-2">
-          {orderedQuestions.map((question, index) => (
-            <div key={question.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
-              <span className="text-sm font-medium text-gray-400 w-8">{index + 1}</span>
-              <div className="flex-1">
-                <p className="font-medium text-[#1F2C46]">{question.question}</p>
-                {question.description && (
-                  <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
+        ) : (
+          <div className="space-y-2">
+            {mainQuestions.filter(q => q.id !== 'gratitude').map((question, index) => (
+              <div key={question.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
+                <span className="text-sm font-medium text-gray-400 w-8">{index + 1}</span>
+                <div className="flex-1">
+                  <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                  {question.description && (
+                    <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                  )}
+                </div>
+                <Switch
+                  checked={settings.enabled_questions.includes(question.id)}
+                  onCheckedChange={() => handleToggle(question.id)}
+                  disabled={!question.optional}
+                />
+                {question.id.startsWith('custom_') && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteCustomQuestion(question.id)}
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </Button>
                 )}
               </div>
-              <Switch
-                checked={settings.enabled_questions.includes(question.id)}
-                onCheckedChange={() => handleToggle(question.id)}
-              />
-              {question.id.startsWith('custom_') && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteCustomQuestion(question.id)}
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      {/* Gratitude Question (always last) */}
+      {gratitudeQuestion && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-gray-700">Gratitude (Always Last)</h4>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
+            <div className="flex-1">
+              <p className="font-medium text-[#1F2C46]">{gratitudeQuestion.question}</p>
+              {gratitudeQuestion.description && (
+                <p className="text-sm text-gray-500 mt-1">{gratitudeQuestion.description}</p>
               )}
             </div>
-          ))}
+            <Switch
+              checked={settings.enabled_questions.includes(gratitudeQuestion.id)}
+              onCheckedChange={() => handleToggle(gratitudeQuestion.id)}
+            />
+          </div>
+        </div>
+      )}
+      
+      {/* Additional Questions (Optional, off by default) */}
+      {additionalQuestions.length > 0 && (
+        <div className="space-y-3">
+          <h4 className="text-sm font-semibold text-gray-700">Additional Questions</h4>
+          <p className="text-xs text-gray-500 mb-2">Enable these questions to add them to your main inventory</p>
+          <div className="space-y-2">
+            {additionalQuestions.map((question) => (
+              <div key={question.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center gap-4">
+                <div className="flex-1">
+                  <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                  {question.description && (
+                    <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                  )}
+                </div>
+                <Switch
+                  checked={settings.enabled_questions.includes(question.id)}
+                  onCheckedChange={() => {
+                    if (!settings.enabled_questions.includes(question.id)) {
+                      // Add to main questions (before gratitude)
+                      const gratitudeIdx = settings.question_order.indexOf('gratitude');
+                      const newOrder = [...settings.question_order];
+                      if (gratitudeIdx !== -1) {
+                        newOrder.splice(gratitudeIdx, 0, question.id);
+                      } else {
+                        newOrder.push(question.id);
+                      }
+                      
+                      setSettings({
+                        ...settings,
+                        enabled_questions: [...settings.enabled_questions, question.id],
+                        question_order: newOrder
+                      });
+                      
+                      // Update ordered questions
+                      const newOrderedQuestions = newOrder
+                        .map(id => allQuestions.find(q => q.id === id) || settings.custom_questions?.find(q => q.id === id))
+                        .filter(q => q);
+                      setOrderedQuestions(newOrderedQuestions);
+                    } else {
+                      handleToggle(question.id);
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
