@@ -47,7 +47,7 @@ export default function InventoryInsights({ entries }) {
   
   // Calculate Awareness Score (based on consistency, depth, and emotional range)
   const calculateAwarenessScore = () => {
-    if (recentEntries.length === 0) return 'Low';
+    if (recentEntries.length === 0) return { label: 'Low', numeric: 1 };
     
     let score = 0;
     
@@ -76,9 +76,14 @@ export default function InventoryInsights({ entries }) {
     });
     score += Math.min((emotionalEngagement / recentEntries.length) * 30, 30);
     
-    if (score >= 70) return 'High';
-    if (score >= 40) return 'Moderate';
-    return 'Low';
+    // Convert to 1-5 scale
+    const numericScore = Math.max(1, Math.min(5, Math.ceil(score / 20)));
+    
+    let label = 'Low';
+    if (numericScore >= 4) label = 'High';
+    else if (numericScore === 3) label = 'Moderate';
+    
+    return { label, numeric: numericScore };
   };
   
   const awarenessScore = calculateAwarenessScore();
@@ -227,8 +232,8 @@ export default function InventoryInsights({ entries }) {
               background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)`
             }}
           >
-            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{awarenessScore}</div>
-            <div className="text-xs text-gray-600">Awareness Score</div>
+            <div className="text-3xl font-bold text-[#1F2C46] mb-1">{awarenessScore.numeric}/5</div>
+            <div className="text-xs text-gray-600">{awarenessScore.label}</div>
             <div className="text-[10px] text-gray-500 mt-1">Based on reflection depth and consistency</div>
           </div>
           
@@ -244,53 +249,80 @@ export default function InventoryInsights({ entries }) {
           </div>
         </div>
 
-        {/* Recurring Patterns */}
-        <div 
-          className="rounded-2xl p-4"
-          style={{
-            background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
-          }}
-        >
-          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Recurring Patterns</h4>
-          <div className="space-y-1.5">
-            {recurringPatterns.map((pattern, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
-                <p className="text-sm text-gray-600 leading-snug">{pattern}</p>
+        {/* Three Column Insights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Recurring Patterns */}
+          <div 
+            className="rounded-2xl p-4"
+            style={{
+              background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: `${colors.primary}20` }}
+              >
+                <span className="text-lg">🔄</span>
               </div>
-            ))}
+              <h4 className="text-sm font-semibold text-[#1F2C46]">Recurring Patterns</h4>
+            </div>
+            <div className="space-y-2">
+              {recurringPatterns.map((pattern, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                  <p className="text-xs text-gray-600 leading-snug">{pattern}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* What You're Doing Well */}
-        <div 
-          className="rounded-2xl p-4"
-          style={{
-            background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
-          }}
-        >
-          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">What You're Doing Well</h4>
-          <div className="space-y-1.5">
-            {strengths.map((strength, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
-                <p className="text-sm text-gray-600 leading-snug">{strength}</p>
+          {/* What You're Doing Well */}
+          <div 
+            className="rounded-2xl p-4"
+            style={{
+              background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: `${colors.secondary}20` }}
+              >
+                <span className="text-lg">✨</span>
               </div>
-            ))}
+              <h4 className="text-sm font-semibold text-[#1F2C46]">What You're Doing Well</h4>
+            </div>
+            <div className="space-y-2">
+              {strengths.map((strength, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <div className="w-1 h-1 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
+                  <p className="text-xs text-gray-600 leading-snug">{strength}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Suggested Focus */}
-        <div 
-          className="rounded-2xl p-4"
-          style={{
-            background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
-          }}
-        >
-          <h4 className="text-sm font-semibold text-[#1F2C46] mb-2">Suggested Focus</h4>
-          <p className="text-sm text-gray-600 leading-snug">
-            {suggestedFocus}
-          </p>
+          {/* Suggested Focus */}
+          <div 
+            className="rounded-2xl p-4"
+            style={{
+              background: `linear-gradient(to bottom right, ${colors.primary}05, ${colors.secondary}05)`
+            }}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <div 
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: `${colors.primary}20` }}
+              >
+                <span className="text-lg">🎯</span>
+              </div>
+              <h4 className="text-sm font-semibold text-[#1F2C46]">Suggested Focus</h4>
+            </div>
+            <p className="text-xs text-gray-600 leading-snug">
+              {suggestedFocus}
+            </p>
+          </div>
         </div>
       </div>
     </motion.div>
