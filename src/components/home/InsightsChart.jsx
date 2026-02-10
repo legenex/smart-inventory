@@ -96,7 +96,7 @@ export default function InsightsChart({ entries }) {
         cx={cx}
         cy={cy}
         r={5}
-        fill={colors.primary}
+        fill={colors.secondary}
         stroke="white"
         strokeWidth={2}
         className="drop-shadow-md"
