@@ -164,12 +164,13 @@ export default function Inventory() {
   
   // Safety check: if currentQ is undefined, reset to first question
   React.useEffect(() => {
-    if (!currentQ && questions.length > 0) {
+    if (!currentQ && questions.length > 0 && currentQuestion !== 0) {
       setCurrentQuestion(0);
     }
-  }, [currentQ, questions]);
+  }, [currentQ, questions, currentQuestion]);
   
   const handleValueChange = (value) => {
+    if (!currentQ) return;
     const newResponses = {
       ...responses,
       [currentQ.id]: {
@@ -187,6 +188,7 @@ export default function Inventory() {
   };
   
   const handleDetailsChange = (details) => {
+    if (!currentQ) return;
     const newResponses = {
       ...responses,
       [currentQ.id]: {
