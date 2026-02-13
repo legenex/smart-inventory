@@ -137,12 +137,12 @@ export default function Inventory() {
   }
   
   // Filter and order questions based on settings
-  const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
+  const allQuestions = user?.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   const questions = React.useMemo(() => {
     // Default: show only non-optional questions
     const defaultQuestions = allQuestions.filter(q => !q.optional);
     
-    if (!questionSettings) {
+    if (!questionSettings || !questionSettings.question_order || !questionSettings.enabled_questions) {
       return defaultQuestions;
     }
     
@@ -152,15 +152,22 @@ export default function Inventory() {
       .filter(q => q && questionSettings.enabled_questions.includes(q.id));
     
     // Add custom questions
-    if (questionSettings.custom_questions) {
+    if (questionSettings.custom_questions && questionSettings.custom_questions.length > 0) {
       orderedQuestions.push(...questionSettings.custom_questions);
     }
     
     // If no questions after applying settings, fall back to default
     return orderedQuestions.length > 0 ? orderedQuestions : defaultQuestions;
-  }, [questionSettings, allQuestions]);
+  }, [questionSettings, allQuestions, user]);
   
   const currentQ = questions[currentQuestion];
+  
+  // Safety check: if currentQ is undefined, reset to first question
+  React.useEffect(() => {
+    if (!currentQ && questions.length > 0) {
+      setCurrentQuestion(0);
+    }
+  }, [currentQ, questions]);
   
   const handleValueChange = (value) => {
     const newResponses = {
@@ -282,23 +289,29 @@ export default function Inventory() {
         
         <ProgressBar current={currentQuestion + 1} total={questions.length} />
         
-        <AnimatePresence mode="wait">
-          <QuestionCard
-            key={currentQ.id}
-            question={currentQ.question}
-            description={currentQ.description}
-            questionNumber={currentQuestion + 1}
-            type={currentQ.type}
-            value={responses[currentQ.id]?.value}
-            details={responses[currentQ.id]?.details}
-            onValueChange={handleValueChange}
-            onDetailsChange={handleDetailsChange}
-            onNext={handleNext}
-            onBack={handleBack}
-            isFirst={currentQuestion === 0}
-            isLast={currentQuestion === questions.length - 1}
-          />
-        </AnimatePresence>
+        {currentQ ? (
+          <AnimatePresence mode="wait">
+            <QuestionCard
+              key={currentQ.id}
+              question={currentQ.question}
+              description={currentQ.description}
+              questionNumber={currentQuestion + 1}
+              type={currentQ.type}
+              value={responses[currentQ.id]?.value}
+              details={responses[currentQ.id]?.details}
+              onValueChange={handleValueChange}
+              onDetailsChange={handleDetailsChange}
+              onNext={handleNext}
+              onBack={handleBack}
+              isFirst={currentQuestion === 0}
+              isLast={currentQuestion === questions.length - 1}
+            />
+          </AnimatePresence>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <p className="text-gray-600">Loading questions...</p>
+          </div>
+        )}
 
         {/* Exit Confirmation Dialog */}
         <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
