@@ -80,6 +80,7 @@ export default function QuestionSettings({ user, onSave }) {
       setOrderedQuestions(defaultQuestions);
       setSettings({
         inventory_type: user.recovery_status,
+        customization_enabled: false,
         enabled_questions: defaultOrder,
         question_order: defaultOrder,
         custom_questions: []
@@ -197,6 +198,7 @@ export default function QuestionSettings({ user, onSave }) {
             variant="outline"
             size="sm"
             onClick={() => setEditMode(!editMode)}
+            disabled={!settings.customization_enabled}
           >
             {editMode ? 'Done Editing' : 'Edit Order'}
           </Button>
@@ -204,10 +206,34 @@ export default function QuestionSettings({ user, onSave }) {
             variant="outline"
             size="sm"
             onClick={() => setShowAddDialog(true)}
+            disabled={!settings.customization_enabled}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Custom
           </Button>
+        </div>
+      </div>
+      
+      {/* Enable/Disable Customization */}
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <h4 className="font-semibold text-[#1F2C46]">Enable Question Customization</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              {settings.customization_enabled 
+                ? 'Custom question settings are active' 
+                : 'Using default questions - toggle to customize'}
+            </p>
+          </div>
+          <Switch
+            checked={settings.customization_enabled || false}
+            onCheckedChange={(checked) => {
+              setSettings({
+                ...settings,
+                customization_enabled: checked
+              });
+            }}
+          />
         </div>
       </div>
       
@@ -238,8 +264,9 @@ export default function QuestionSettings({ user, onSave }) {
                             )}
                           </div>
                           <Switch
-                            checked={settings.enabled_questions.includes(question.id)}
-                            onCheckedChange={() => handleToggle(question.id)}
+                           checked={settings.enabled_questions.includes(question.id)}
+                           onCheckedChange={() => handleToggle(question.id)}
+                           disabled={!settings.customization_enabled}
                           />
                           {question.id.startsWith('custom_') && (
                             <Button
@@ -273,7 +300,7 @@ export default function QuestionSettings({ user, onSave }) {
                 <Switch
                   checked={settings.enabled_questions.includes(question.id)}
                   onCheckedChange={() => handleToggle(question.id)}
-                  disabled={!question.optional}
+                  disabled={!question.optional || !settings.customization_enabled}
                 />
                 {question.id.startsWith('custom_') && (
                   <Button
@@ -304,6 +331,7 @@ export default function QuestionSettings({ user, onSave }) {
             <Switch
               checked={settings.enabled_questions.includes(gratitudeQuestion.id)}
               onCheckedChange={() => handleToggle(gratitudeQuestion.id)}
+              disabled={!settings.customization_enabled}
             />
           </div>
         </div>
@@ -351,6 +379,7 @@ export default function QuestionSettings({ user, onSave }) {
                       handleToggle(question.id);
                     }
                   }}
+                  disabled={!settings.customization_enabled}
                 />
               </div>
             ))}

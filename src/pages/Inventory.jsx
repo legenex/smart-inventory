@@ -143,12 +143,17 @@ export default function Inventory() {
   const defaultQuestions = allQuestions.filter(q => !q.optional);
   
   const questions = React.useMemo(() => {
-    // If no settings yet, return defaults immediately
-    if (!questionSettings || !questionSettings.question_order || !questionSettings.enabled_questions) {
+    // If customization is disabled or no settings, return defaults
+    if (!questionSettings || !questionSettings.customization_enabled) {
       return defaultQuestions;
     }
     
-    // Use user's settings
+    // If settings incomplete, return defaults
+    if (!questionSettings.question_order || !questionSettings.enabled_questions) {
+      return defaultQuestions;
+    }
+    
+    // Use user's custom settings
     const orderedQuestions = questionSettings.question_order
       .map(id => allQuestions.find(q => q.id === id))
       .filter(q => q && questionSettings.enabled_questions.includes(q.id));
