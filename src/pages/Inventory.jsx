@@ -137,11 +137,13 @@ export default function Inventory() {
   }
   
   // Filter and order questions based on settings
-  const allQuestions = user?.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
+  const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
+  
+  // Always use default non-optional questions as the base
+  const defaultQuestions = allQuestions.filter(q => !q.optional);
+  
   const questions = React.useMemo(() => {
-    // Default: show only non-optional questions
-    const defaultQuestions = allQuestions.filter(q => !q.optional);
-    
+    // If no settings yet, return defaults immediately
     if (!questionSettings || !questionSettings.question_order || !questionSettings.enabled_questions) {
       return defaultQuestions;
     }
@@ -156,18 +158,11 @@ export default function Inventory() {
       orderedQuestions.push(...questionSettings.custom_questions);
     }
     
-    // If no questions after applying settings, fall back to default
+    // Always fall back to defaults if nothing is configured
     return orderedQuestions.length > 0 ? orderedQuestions : defaultQuestions;
-  }, [questionSettings, allQuestions, user]);
+  }, [questionSettings]);
   
-  const currentQ = questions[currentQuestion];
-  
-  // Safety check: if currentQ is undefined, reset to first question
-  React.useEffect(() => {
-    if (!currentQ && questions.length > 0 && currentQuestion !== 0) {
-      setCurrentQuestion(0);
-    }
-  }, [currentQ, questions, currentQuestion]);
+  const currentQ = questions[currentQuestion] || questions[0];
   
   const handleValueChange = (value) => {
     if (!currentQ) return;
