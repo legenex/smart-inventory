@@ -136,36 +136,31 @@ export default function Inventory() {
     );
   }
   
-  // Filter and order questions based on settings
+  // Get questions based on user recovery status
   const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
-  
-  // Always use default non-optional questions as the base
   const defaultQuestions = allQuestions.filter(q => !q.optional);
   
-  const questions = React.useMemo(() => {
-    // If customization is disabled or no settings, return defaults
-    if (!questionSettings || !questionSettings.customization_enabled) {
-      return defaultQuestions;
-    }
-    
-    // If settings incomplete, return defaults
-    if (!questionSettings.question_order || !questionSettings.enabled_questions) {
-      return defaultQuestions;
-    }
-    
-    // Use user's custom settings
+  // Determine which questions to show
+  let questions = defaultQuestions;
+  
+  if (questionSettings?.customization_enabled && 
+      questionSettings?.question_order && 
+      questionSettings?.enabled_questions) {
+    // Use custom settings
     const orderedQuestions = questionSettings.question_order
       .map(id => allQuestions.find(q => q.id === id))
       .filter(q => q && questionSettings.enabled_questions.includes(q.id));
     
     // Add custom questions
-    if (questionSettings.custom_questions && questionSettings.custom_questions.length > 0) {
+    if (questionSettings.custom_questions?.length > 0) {
       orderedQuestions.push(...questionSettings.custom_questions);
     }
     
-    // Always fall back to defaults if nothing is configured
-    return orderedQuestions.length > 0 ? orderedQuestions : defaultQuestions;
-  }, [questionSettings]);
+    // Only use custom if we have valid questions
+    if (orderedQuestions.length > 0) {
+      questions = orderedQuestions;
+    }
+  }
   
   const currentQ = questions[currentQuestion] || questions[0];
   
