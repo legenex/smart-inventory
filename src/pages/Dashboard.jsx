@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon, BookOpen } from 'lucide-react';
+import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon, BookOpen, Heart, Zap } from 'lucide-react';
 import InventoryDateDialog from '@/components/inventory/InventoryDateDialog';
 import {
   DropdownMenu,
@@ -258,17 +258,39 @@ export default function Dashboard() {
           </button>
         </motion.div>
         
-        {/* Inventory Insights */}
+        {/* Spiritual Toolkit */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="mb-8"
+          transition={{ delay: 0.22 }}
+          className="mb-3"
         >
-          <InventoryInsights entries={entries} />
+          <h3 className="text-lg font-semibold text-[#1F2C46] mb-3">Spiritual Toolkit</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => navigate(createPageUrl('GratitudeAffirmations'))}
+              className="bg-white rounded-[20px] p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 bg-gradient-to-br from-pink-400 to-rose-500 shadow-md group-hover:scale-105 transition-transform">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-[#1F2C46] text-sm leading-tight">Gratitude &amp; Affirmations</h4>
+              <p className="text-xs text-gray-500 mt-1">Daily practice</p>
+            </button>
+            <button
+              onClick={() => navigate(createPageUrl('SpotCheck'))}
+              className="bg-white rounded-[20px] p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 bg-gradient-to-br from-amber-400 to-orange-500 shadow-md group-hover:scale-105 transition-transform">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-[#1F2C46] text-sm leading-tight">Spot Check</h4>
+              <p className="text-xs text-gray-500 mt-1">Quick inventory</p>
+            </button>
+          </div>
         </motion.div>
-        
-        {/* Inventory Trends */}
+
+        {/* Inventory Insights */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
