@@ -52,6 +52,7 @@ export default function ReviewInventory() {
   const [prompts, setPrompts] = useState('');
   const [showBackDialog, setShowBackDialog] = useState(false);
   const [inventoryDate, setInventoryDate] = useState(new Date());
+  const [savedEntryId, setSavedEntryId] = useState(null);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -197,67 +198,69 @@ ${formattedResponses}`;
       });
       
       const aiResponse = await Promise.race([llmPromise, timeoutPromise]);
-      
-      setSummary(aiResponse.reflective_summary);
-      setPrompts(aiResponse.journaling_prompts);
+
+      const reflectiveSummary = aiResponse.reflective_summary;
+      const journalingPrompts = aiResponse.journaling_prompts;
+
+      setSummary(reflectiveSummary);
+      setPrompts(journalingPrompts);
+
+      // Auto-save the entry immediately after AI generation
+      await autoSave(reflectiveSummary, journalingPrompts);
+
       setProcessing(false);
     } catch (err) {
       console.error(err);
+      // Even on AI failure, auto-save with fallback content
+      const fallbackSummary = 'Unable to generate AI insights at this time. Your responses have been saved.';
+      const fallbackPrompts = '<ul><li>What patterns do you notice in today\'s reflection?</li><li>What would you like to explore more deeply?</li><li>What action can you take tomorrow based on today\'s insights?</li></ul>';
+      setSummary(fallbackSummary);
+      setPrompts(fallbackPrompts);
+      await autoSave(fallbackSummary, fallbackPrompts);
       setProcessing(false);
-      setSummary('Unable to generate AI insights at this time. Your responses have been saved.');
-      setPrompts('<ul><li>What patterns do you notice in today\'s reflection?</li><li>What would you like to explore more deeply?</li><li>What action can you take tomorrow based on today\'s insights?</li></ul>');
     }
   };
 
-  const handleSave = async () => {
-    setProcessing(true);
-    
-    // Use original responses - skip spell check to avoid timeouts
-    const correctedResponses = { ...responses };
-
+  const autoSave = async (reflectiveSummary, journalingPrompts) => {
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
     let shareText = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
-    
+
     questions.forEach((q, i) => {
-      const r = correctedResponses[q.id];
+      const r = responses[q.id];
       shareText += `${zws}${i + 1}. ${q.question}\n`;
-      
       if (q.id === 'gratitude') {
-        const gratList = Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered');
-        shareText += `${gratList}\n\n`;
+        shareText += `${Array.isArray(r?.value) ? r.value.join(', ') : (r?.value || 'Not answered')}\n\n`;
       } else if (typeof r?.value === 'string') {
         shareText += `${r.value}\n\n`;
       } else {
         shareText += `${r?.value ? 'Yes' : 'No'}`;
-        if (r?.details) {
-          const cleanDetails = r.details.replace(/^(yes|no)[,\s]*/i, '');
-          shareText += `, ${cleanDetails}`;
-        }
+        if (r?.details) shareText += `, ${r.details.replace(/^(yes|no)[,\s]*/i, '')}`;
         shareText += '\n\n';
       }
     });
-    
-    shareText += `━━━━━━━━━━━\n📝 Reflective Summary:\n\n${summary}\n\n━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
-    
+    shareText += `━━━━━━━━━━━\n📝 Reflective Summary:\n\n${reflectiveSummary}\n\n━━━━━━━━━━━\n\nShared via Smart-Inventory.co`;
+
     try {
       const entry = await base44.entities.InventoryEntry.create({
         date: format(inventoryDate, 'yyyy-MM-dd'),
         inventory_type: inventoryType,
-        responses: correctedResponses,
-        reflective_summary: summary,
-        journaling_prompts: prompts,
+        responses,
+        reflective_summary: reflectiveSummary,
+        journaling_prompts: journalingPrompts,
         share_text: shareText
       });
-      
-      setProcessing(false);
-      navigate(createPageUrl('Dashboard'));
+      setSavedEntryId(entry.id);
+      localStorage.removeItem('inventory_draft');
     } catch (err) {
-      console.error(err);
-      setProcessing(false);
-      alert('Failed to save inventory. Please try again.');
+      console.error('Auto-save failed:', err);
     }
+  };
+
+  const handleSave = () => {
+    // Entry is already auto-saved after AI generation
+    navigate(createPageUrl('Dashboard'));
   };
   
   if (!responses || !inventoryType) {
@@ -419,9 +422,7 @@ ${formattedResponses}`;
                   const promptsList = prompts.split('</li>').filter(p => p.includes('<li>')).map(p => 
                     p.replace(/<\/?[^>]+(>|$)/g, '').trim()
                   );
-                  const urlParams = new URLSearchParams(window.location.search);
-                  const invId = urlParams.get('inventoryId') || 'temp_' + Date.now();
-                  navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${invId}`));
+                  navigate(createPageUrl(`Journaling?prompts=${encodeURIComponent(JSON.stringify(promptsList))}&inventoryId=${savedEntryId || 'temp_' + Date.now()}`));
                 }}
                 className="w-full py-6 rounded-2xl text-lg font-medium mb-4"
                 style={{
