@@ -37,9 +37,13 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
+      // Only redirect to login if NOT on the public home/marketing page
+      const isPublicRoute = window.location.pathname === '/' || window.location.pathname === '/Home';
+      if (!isPublicRoute) {
+        navigateToLogin();
+        return null;
+      }
+      // Fall through to render routes — the Home page handles its own auth state gracefully
     }
   }
 

@@ -27,10 +27,12 @@ export default function ContactDialog({ children }) {
     setSending(true);
     
     try {
-      await base44.integrations.Core.SendEmail({
-        to: 'support@smartinventory.app',
-        subject: `Contact Form: ${formData.name}`,
-        body: `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+      await base44.entities.ContactMessage.create({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        source: 'marketing_site',
+        status: 'new',
       });
       
       setFormData({ name: '', email: '', message: '' });
