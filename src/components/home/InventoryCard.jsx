@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import useTheme from '../theme/useTheme';
+import useTheme from '@/components/theme/useTheme';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,21 +15,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 export default function InventoryCard({ entry, index, onDelete }) {
   const { colors } = useTheme();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const prefersReducedMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const handleDelete = async (e) => {
     e.preventDefault();
     setIsDeleting(true);
     try {
       await base44.entities.InventoryEntry.delete(entry.id);
-      if (onDelete) {
-        onDelete(entry.id);
-      }
+      if (onDelete) onDelete(entry.id);
     } catch (err) {
       console.error(err);
     }
@@ -40,42 +42,45 @@ export default function InventoryCard({ entry, index, onDelete }) {
   return (
     <>
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, x: -100 }}
-        transition={{ delay: index * 0.1 }}
-        className="relative"
+        transition={{ delay: prefersReducedMotion ? 0 : index * 0.05 }}
+        whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
       >
-        <Link 
+        <Link
           to={createPageUrl(`HistoryDetail?id=${entry.id}`)}
-          className="block bg-white rounded-[20px] p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 group"
+          className="block bg-card rounded-card p-5 shadow-soft border border-border transition-shadow hover:shadow-md group"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 flex-1">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colors.bgLight}`}>
-                <Calendar className={`w-5 h-5 ${colors.textClass}`} />
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: `${colors.primary}12` }}
+              >
+                <Calendar className="w-4 h-4" style={{ color: colors.primary }} strokeWidth={1.5} />
               </div>
-              <div className="flex-1">
-                <p className="font-semibold text-[#1F2C46]">
+              <div className="flex-1 min-w-0">
+                <p className="font-display font-semibold text-foreground">
                   {format(new Date(entry.date), 'EEEE, MMMM d')}
                 </p>
-                <p className="text-sm text-gray-500 capitalize">
+                <p className="text-xs text-muted-foreground capitalize">
                   {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   setShowDeleteDialog(true);
                 }}
-                className="p-2 hover:bg-red-50 rounded-xl transition-colors"
+                className="p-2 hover:bg-muted rounded-control transition-colors"
               >
-                <Trash2 className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+                <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
               </button>
-              <ChevronRight className={`w-5 h-5 text-gray-400 transition-colors`} style={{ '--hover-color': colors.primary }} />
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
             </div>
           </div>
         </Link>
@@ -86,8 +91,8 @@ export default function InventoryCard({ entry, index, onDelete }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Inventory?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this inventory from {format(new Date(entry.date), 'MMMM d, yyyy')}? 
-              This action cannot be undone.
+              Are you sure you want to delete this inventory from{' '}
+              {format(new Date(entry.date), 'MMMM d, yyyy')}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -95,7 +100,7 @@ export default function InventoryCard({ entry, index, onDelete }) {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive hover:bg-destructive/90"
             >
               {isDeleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
