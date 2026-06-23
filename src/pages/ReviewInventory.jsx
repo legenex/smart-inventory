@@ -6,6 +6,7 @@ import { createPageUrl } from '@/utils';
 import { ArrowLeft, Share2, PenLine } from 'lucide-react';
 import NavigationMenu from '@/components/home/NavigationMenu';
 import { format } from 'date-fns';
+import { getCopy } from '@/lib/mode';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,25 +19,29 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Were You Resentful or Angry?' },
-  { id: 'dishonest', question: 'Were You Dishonest?' },
-  { id: 'selfish', question: 'Were You Selfish or Self-Centered?' },
-  { id: 'fearful', question: 'Were You Fearful or Anxious?' },
-  { id: 'harmful', question: 'Did You Harm Anyone?' },
-  { id: 'secret', question: 'Did You Keep a Secret?' },
-  { id: 'unkind', question: 'Were You Kind And Loving Toward All?' },
-  { id: 'better', question: 'Could You Have Done Better?' },
-  { id: 'gratitude', question: 'Gratitudes' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?' },
+  { id: 'do_well', question: 'What Did You Do Well Today?' },
+  { id: 'better', question: 'What Could You Have Done Better Today?' },
+  { id: 'gratitude', question: 'Gratitude List' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly?' },
-  { id: 'challenged', question: 'What Challenged You?' },
-  { id: 'well', question: 'What Did You Do Well?' },
-  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values?' },
-  { id: 'avoided', question: 'Did You Avoid Anything Important?' },
-  { id: 'joy', question: 'Who or What Brought You Joy?' },
-  { id: 'gratitude', question: 'What Are You Grateful For?' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?' },
+  { id: 'do_well', question: 'What Did You Do Well Today?' },
+  { id: 'better', question: 'What Could You Have Done Better Today?' },
+  { id: 'gratitude', question: 'Gratitude List' }
 ];
 
 export default function ReviewInventory() {
@@ -89,7 +94,7 @@ export default function ReviewInventory() {
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let text = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
+    let text = `${getCopy(inventoryType).inventoryTitle} - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
 
     questions.forEach((q, i) => {
       const r = responses[q.id];
@@ -216,7 +221,7 @@ ${formattedResponses}`;
     const questions = inventoryType === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
     const dateFormatted = format(inventoryDate, 'd MMMM yyyy');
     const zws = '\u200B';
-    let shareText = `Nightly Inventory - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
+    let shareText = `${getCopy(inventoryType).inventoryTitle} - ${dateFormatted}\n━━━━━━━━━━━\n\n`;
 
     questions.forEach((q, i) => {
       const r = responses[q.id];
@@ -307,7 +312,7 @@ ${formattedResponses}`;
               <ArrowLeft className="w-5 h-5" style={{ color: 'var(--muted)' }} />
             </button>
             <div>
-              <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>Your Nightly Inventory</h1>
+              <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>{getCopy(inventoryType).inventoryTitle}</h1>
               <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(inventoryDate, 'EEEE, MMMM d, yyyy')}</p>
             </div>
           </div>

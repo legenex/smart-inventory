@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, LayoutGrid, BookOpen, TrendingUp, Settings as SettingsIcon, Plus, Flame } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getCopy } from '@/lib/mode';
 
 const NAV_ITEMS = [
   { label: 'Home', icon: Home, path: '/Dashboard' },
@@ -13,6 +14,7 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ user }) {
   const location = useLocation();
+  const copy = getCopy(user?.recovery_status);
 
   const daysCount = user?.sober_date
     ? Math.floor((new Date() - new Date(user.sober_date)) / (1000 * 60 * 60 * 24))
@@ -43,7 +45,7 @@ export default function Sidebar({ user }) {
           style={{ backgroundColor: 'var(--accent)', color: 'var(--accentInk)' }}
         >
           <Plus className="w-4 h-4" />
-          Inventory
+          {copy.inventoryTitle}
         </Link>
       </div>
 

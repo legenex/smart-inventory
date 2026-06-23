@@ -24,13 +24,23 @@ export default function Heatmap({ entries, streak = 0 }) {
     days.push({ date, dateStr, hasEntry: !!entry, level });
   }
 
+  const hasAnyEntry = days.some(d => d.hasEntry);
+
+  if (!hasAnyEntry) {
+    return (
+      <p className="text-sm text-center py-3" style={{ color: 'var(--muted)' }}>
+        Your consistency will appear here as you log entries.
+      </p>
+    );
+  }
+
   return (
     <div>
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-1">
         {days.map((day, i) => (
           <div
             key={i}
-            className="aspect-square rounded-[5px] transition-transform hover:scale-110"
+            className="h-3 rounded-[3px] transition-transform hover:scale-110"
             style={{
               backgroundColor: day.hasEntry
                 ? `var(--accent)`
@@ -42,7 +52,7 @@ export default function Heatmap({ entries, streak = 0 }) {
         ))}
       </div>
       {streak > 0 && (
-        <div className="flex items-center gap-1.5 mt-3">
+        <div className="flex items-center gap-1.5 mt-2">
           <div
             className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
             style={{ backgroundColor: 'var(--accent)', color: 'var(--accentInk)' }}

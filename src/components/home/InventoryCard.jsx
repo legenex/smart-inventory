@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { getCopy } from '@/lib/mode';
 
 export default function InventoryCard({ entry, index, onDelete }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -60,7 +61,7 @@ export default function InventoryCard({ entry, index, onDelete }) {
                   {format(new Date(entry.date), 'EEEE, MMMM d')}
                 </p>
                 <p className="text-sm capitalize" style={{ color: 'var(--muted)' }}>
-                  {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
+                  {getCopy(entry.inventory_type).inventoryTitle}
                 </p>
               </div>
             </div>

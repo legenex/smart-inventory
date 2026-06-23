@@ -22,11 +22,7 @@ export default function QuestionCard({
   const isTextOnly = type === 'text';
   const isGratitude = type === 'gratitude';
 
-  const canProceed = isGratitude
-    ? Array.isArray(value) && value.length > 0
-    : isTextOnly
-    ? value && value.trim().length > 0
-    : value !== null && value !== undefined;
+  const canProceed = true;
 
   const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -165,12 +161,10 @@ export default function QuestionCard({
           <motion.button
             whileTap={prefersReduced ? undefined : { scale: 0.97 }}
             onClick={onNext}
-            disabled={!canProceed}
-            className={`min-h-[48px] rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 ${isFirst ? 'flex-1' : 'flex-1'}`}
+            className="min-h-[48px] rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 flex-1"
             style={{
-              backgroundColor: canProceed ? 'var(--accent)' : 'var(--line)',
-              color: canProceed ? 'var(--accentInk)' : 'var(--muted)',
-              opacity: canProceed ? 1 : 0.5
+              backgroundColor: 'var(--accent)',
+              color: 'var(--accentInk)'
             }}
           >
             {isLast ? 'Complete Inventory' : 'Continue'}

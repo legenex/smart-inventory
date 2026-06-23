@@ -10,6 +10,7 @@ import { format, isToday, parseISO } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import ProgressBar from '@/components/inventory/ProgressBar';
 import QuestionCard from '@/components/inventory/QuestionCard';
+import { getCopy } from '@/lib/mode';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,36 +23,29 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const AA_QUESTIONS = [
-  { id: 'resentful', question: 'Were You Resentful or Angry Today?', description: 'Notice any people, situations, or thoughts you replayed in your mind that disturbed your peace or kept you emotionally stuck.', type: 'yesno-text' },
-  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', description: 'Look at what you said, what you avoided saying, and how you may have presented yourself in a way that was not fully truthful.', type: 'yesno-text' },
-  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', description: 'Reflect on where you put your comfort, control, image, or personal agenda ahead of honesty, fairness, or connection.', type: 'yesno-text' },
-  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', description: 'Reflect on where fear or anxiety showed up today, particularly around rejection, abandonment, failure, loss of control, security, or not being enough, and how those fears influenced your thoughts, emotions, or actions.', type: 'yesno-text' },
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?', description: 'Notice any people, situations, or thoughts you replayed that disturbed your peace or kept you emotionally stuck.', type: 'yesno-text' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', description: 'Look at what you said, what you avoided saying, and any way you presented yourself that was not fully truthful.', type: 'yesno-text' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', description: 'Reflect on where you put your comfort, control, image, or agenda ahead of honesty, fairness, or connection.', type: 'yesno-text' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', description: 'Reflect on where fear or anxiety showed up today and how it influenced your thoughts, emotions, or actions.', type: 'yesno-text' },
   { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', description: 'Consider whether your words, actions, or omissions caused harm, discomfort, or confusion for someone else.', type: 'yesno-text' },
-  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', description: 'Since keeping secrets builds shame and isolation, reflect on any secrets, shame, rationalizations, or justifications that you had throughout the day.', type: 'yesno-text' },
-  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?', description: 'Observe moments where you were impatient, irritable, dismissive, cold, selfish or emotionally unavailable.', type: 'yesno-text-no' },
-  { id: 'do_well', question: 'What Did You Do Well Today?', description: 'Reflect on what you handled properly today, especially in situations where you normally would have acted from fear, ego, or old patterns.', type: 'yesno-text' },
-  { id: 'better', question: 'Is There Anything That You Could Have Done Better Today?', description: 'Reflect on whether you could have handled something better today to see if there was room for growth or a better choice.', type: 'yesno-text' },
-  { id: 'gratitude', question: 'Gratitudes', type: 'gratitude' },
-  { id: 'avoidance', question: 'Did You Avoid Anything You Needed to Face Today?', description: 'Look at where you procrastinated, avoided conflict, avoided honesty, avoided vulnerability, or stayed in comfort instead of growth.', type: 'yesno-text', optional: true },
-  { id: 'authentic', question: 'Were You Authentic Today?', description: 'Reflect on whether you showed up as your real self, or whether you performed, people-pleased, manipulated, hid your feelings, or tried to control how others saw you.', type: 'yesno-text', optional: true },
-  { id: 'boundaries', question: 'Did You Respect Your Boundaries and Other People\'s Boundaries Today?', description: 'Reflect on whether you said yes when you meant no, overgave, overcontrolled, crossed boundaries, or allowed resentment to build by not being honest.', type: 'yesno-text', optional: true },
-  { id: 'present', question: 'Were You Present Today?', description: 'Reflect on whether you lived in the moment or escaped into distractions, fantasy, overthinking, social media, validation seeking, or future-tripping.', type: 'yesno-text', optional: true },
-  { id: 'surrender', question: 'What Did You Need to Let Go of Today?', description: 'Step 10 requires surrender. Reflect on what you tried to control, obsess over, or cling to, and what you may need to release to stay spiritually free.', type: 'yesno-text', optional: true },
-  { id: 'prayer', question: 'Did You Take Time for Prayer or Meditation Today?', description: 'Step 10 encourages continued spiritual practice. Reflect on whether you connected to a Higher Power, practiced mindfulness, or grounded yourself spiritually.', type: 'yesno-text', optional: true },
-  { id: 'triggers', question: 'What Triggered You Today?', description: 'Reflect on situations or people that activated you emotionally. Look for patterns where you reacted from old wounds, insecurities, or ego.', type: 'yesno-text', optional: true },
-  { id: 'lesson', question: 'What Was the Biggest Lesson You Learned Today?', description: 'Step 10 is about growth through awareness. Reflect on what today taught you about yourself, your recovery, your relationships, or your character defects.', type: 'yesno-text', optional: true },
-  { id: 'tomorrow', question: 'What Intention Do You Want to Set for Tomorrow?', description: 'Choose one simple intention to carry forward into tomorrow. This creates momentum and keeps you focused on progress instead of perfection.', type: 'yesno-text', optional: true },
-  { id: 'service', question: 'Were You of Service Today?', description: 'Step 10 is strengthened through service. Reflect on whether you helped someone, supported someone emotionally, showed kindness, or contributed to someone else\'s well-being without expecting anything in return.', type: 'yesno-text', optional: true }
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', description: 'Keeping secrets builds shame and isolation. Reflect on any secrets, shame, rationalizations, or justifications from the day.', type: 'yesno-text' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?', description: 'Observe moments where you were impatient, irritable, dismissive, cold, or emotionally unavailable.', type: 'yesno-text-no' },
+  { id: 'do_well', question: 'What Did You Do Well Today?', description: 'Reflect on what you handled properly today, especially where you would normally have acted from fear, ego, or old patterns.', type: 'text' },
+  { id: 'better', question: 'What Could You Have Done Better Today?', description: 'Reflect on whether you could have handled something better today, to find room for growth or a better choice.', type: 'text' },
+  { id: 'gratitude', question: 'Gratitude List', description: 'List the things, people, experiences, or moments you are grateful for today.', type: 'gratitude' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly Today?', type: 'text' },
-  { id: 'challenged', question: 'What Challenged You Today?', type: 'text' },
-  { id: 'well', question: 'What Did You Do Well Today?', type: 'text' },
-  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values? If So, Explain.', type: 'yesno-text' },
-  { id: 'avoided', question: 'Did You Avoid Anything Important Today?', type: 'yesno-text' },
-  { id: 'joy', question: 'Who or What Brought You Joy Today?', type: 'text' },
-  { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?', description: 'Notice any people, situations, or thoughts you replayed that disturbed your peace or kept you emotionally stuck.', type: 'yesno-text' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?', description: 'Look at what you said, what you avoided saying, and any way you presented yourself that was not fully truthful.', type: 'yesno-text' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?', description: 'Reflect on where you put your comfort, control, image, or agenda ahead of honesty, fairness, or connection.', type: 'yesno-text' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?', description: 'Reflect on where fear or anxiety showed up today and how it influenced your thoughts, emotions, or actions.', type: 'yesno-text' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?', description: 'Consider whether your words, actions, or omissions caused harm, discomfort, or confusion for someone else.', type: 'yesno-text' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?', description: 'Keeping secrets builds shame and isolation. Reflect on any secrets, shame, rationalizations, or justifications from the day.', type: 'yesno-text' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?', description: 'Observe moments where you were impatient, irritable, dismissive, cold, or emotionally unavailable.', type: 'yesno-text-no' },
+  { id: 'do_well', question: 'What Did You Do Well Today?', description: 'Reflect on what you handled properly today, especially where you would normally have acted from fear, ego, or old patterns.', type: 'text' },
+  { id: 'better', question: 'What Could You Have Done Better Today?', description: 'Reflect on whether you could have handled something better today, to find room for growth or a better choice.', type: 'text' },
+  { id: 'gratitude', question: 'Gratitude List', description: 'List the things, people, experiences, or moments you are grateful for today.', type: 'gratitude' }
 ];
 
 export default function Inventory() {
@@ -132,6 +126,7 @@ export default function Inventory() {
     );
   }
 
+  const copy = getCopy(user.recovery_status);
   const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   const defaultQuestions = allQuestions.filter(q => !q.optional);
 
@@ -248,7 +243,7 @@ export default function Inventory() {
             </button>
             <div>
               <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
-                {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
+                {copy.inventoryTitle}
               </h1>
               <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(inventoryDate, 'EEEE, MMMM d')}</p>
             </div>

@@ -250,7 +250,7 @@ export default function Dashboard() {
 
   const moodTrend = useMemo(() => {
     const recent = sparklineData.mood.filter(v => v > 0);
-    if (recent.length < 2) return '—';
+    if (recent.length < 2) return 'Not enough data yet';
     const last = recent[recent.length - 1];
     const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
     if (last > avg + 0.3) return 'Better';
@@ -260,13 +260,16 @@ export default function Dashboard() {
 
   const energyTrend = useMemo(() => {
     const recent = sparklineData.energy.filter(v => v > 0);
-    if (recent.length < 2) return '—';
+    if (recent.length < 2) return 'Not enough data yet';
     const last = recent[recent.length - 1];
     const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
     if (last > avg + 0.3) return 'Deeper';
     if (last < avg - 0.3) return 'Lighter';
     return 'Steady';
   }, [sparklineData]);
+
+  const hasMoodData = sparklineData.mood.some(v => v > 0);
+  const hasEnergyData = sparklineData.energy.some(v => v > 0);
 
   const insightHeadline = useMemo(() => {
     if (entries.length === 0) return 'Complete your first inventory to unlock insights';
@@ -294,7 +297,7 @@ export default function Dashboard() {
   const ctaText = recovery
     ? (isEvening ? "Take tonight's inventory" : "Take today's inventory")
     : (isEvening ? 'Start evening review' : 'Start daily reflection');
-  const questionCount = recovery ? '10 questions' : '7 questions';
+  const questionCount = '10 questions';
   const ctaMinutes = recovery ? '6' : '4';
 
   if (!user) {
@@ -373,7 +376,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {/* HERO: Progress Ring */}
         <motion.div {...cardProps(0.05)}
           className="rounded-[22px] p-6 flex items-center gap-4"
@@ -456,70 +459,14 @@ export default function Dashboard() {
             <ArrowRight className="w-4 h-4" />
           </div>
         </motion.div>
-
-        {/* Mood card */}
-        <motion.div {...cardProps(0.15)}
-          className="rounded-[22px] p-5 flex items-center justify-between"
-          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: 'var(--soft)' }}>
-              <Smile className="w-5 h-5" style={{ color: 'var(--accent)' }} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Mood</p>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>{moodTrend}</p>
-            </div>
-          </div>
-          <Sparkline data={sparklineData.mood} color="var(--accent)" width={70} height={28} />
-        </motion.div>
-
-        {/* Energy card */}
-        <motion.div {...cardProps(0.2)}
-          className="rounded-[22px] p-5 flex items-center justify-between"
-          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: 'var(--soft)' }}>
-              <Activity className="w-5 h-5" style={{ color: 'var(--accent)' }} />
-            </div>
-            <div>
-              <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Energy</p>
-              <p className="text-xs" style={{ color: 'var(--muted)' }}>{energyTrend}</p>
-            </div>
-          </div>
-          <Sparkline data={sparklineData.energy} color="var(--accent)" width={70} height={28} />
-        </motion.div>
-
-        {/* Consistency Heatmap */}
-        <motion.div {...cardProps(0.25)}
-          className="rounded-[22px] p-5 md:col-span-2"
-          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{ backgroundColor: 'var(--soft)' }}>
-                <Flame className="w-5 h-5" style={{ color: 'var(--accent)' }} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Consistency</p>
-                <p className="text-xs" style={{ color: 'var(--muted)' }}>Last 4 weeks</p>
-              </div>
-            </div>
-          </div>
-          <Heatmap entries={entries} streak={streak} />
-        </motion.div>
       </div>
 
       {/* Toolkit */}
-      <motion.div {...cardProps(0.3)}>
+      <motion.div {...cardProps(0.3)} className="mb-4">
         <h3 className="text-sm font-bold uppercase tracking-wide mb-3" style={{ color: 'var(--muted)' }}>
           {copy.toolkit}
         </h3>
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-3 gap-3">
           <motion.button {...cardProps(0.32)}
             onClick={() => navigate(createPageUrl('SpotCheck'))}
             className="rounded-[20px] p-4 flex flex-col items-center text-center"
@@ -528,7 +475,7 @@ export default function Dashboard() {
               style={{ backgroundColor: 'var(--soft)' }}>
               <Zap className="w-5 h-5" style={{ color: 'var(--accent)' }} />
             </div>
-            <p className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>Spot Check</p>
+            <p className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>{copy.spotCheckTitle}</p>
             <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>2-min reset</p>
           </motion.button>
           <motion.button {...cardProps(0.34)}
@@ -539,7 +486,7 @@ export default function Dashboard() {
               style={{ backgroundColor: 'var(--soft)' }}>
               <Heart className="w-5 h-5" style={{ color: 'var(--accent)' }} />
             </div>
-            <p className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>Gratitude</p>
+            <p className="text-xs font-semibold" style={{ color: 'var(--ink)' }}>{copy.gratitudeTitle}</p>
             <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>Name three</p>
           </motion.button>
           <motion.button {...cardProps(0.36)}
@@ -554,6 +501,65 @@ export default function Dashboard() {
             <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>Photo to insight</p>
           </motion.button>
         </div>
+      </motion.div>
+
+      {/* Mood + Energy */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Mood card */}
+        <motion.div {...cardProps(0.15)}
+          className="rounded-[22px] p-5 flex items-center justify-between"
+          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: 'var(--soft)' }}>
+              <Smile className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Mood</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>{hasMoodData ? moodTrend : 'Not enough data yet'}</p>
+            </div>
+          </div>
+          {hasMoodData && <Sparkline data={sparklineData.mood} color="var(--accent)" width={70} height={28} />}
+        </motion.div>
+
+        {/* Energy card */}
+        <motion.div {...cardProps(0.2)}
+          className="rounded-[22px] p-5 flex items-center justify-between"
+          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: 'var(--soft)' }}>
+              <Activity className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Energy</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>{hasEnergyData ? energyTrend : 'Not enough data yet'}</p>
+            </div>
+          </div>
+          {hasEnergyData && <Sparkline data={sparklineData.energy} color="var(--accent)" width={70} height={28} />}
+        </motion.div>
+      </div>
+
+      {/* Consistency Heatmap */}
+      <motion.div {...cardProps(0.25)}
+        className="rounded-[22px] p-5 mb-8"
+        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: 'var(--soft)' }}>
+              <Flame className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Consistency</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>Last 4 weeks</p>
+            </div>
+          </div>
+        </div>
+        <Heatmap entries={entries} streak={streak} />
       </motion.div>
 
       {/* Today's Reflection + Insight Preview */}

@@ -7,7 +7,7 @@
 const RECOVERY_COPY = {
   appTagline: 'A modern spiritual toolkit for daily recovery.',
   inventoryTitle: 'Nightly Inventory',
-  spotCheckTitle: 'Spot Check',
+  spotCheckTitle: 'Spot Check Inventory',
   reflectionTitle: 'Daily Reflection',
   milestoneLabelDefault: 'Sobriety milestone',
   dateFieldLabel: 'Sobriety date',
@@ -21,7 +21,7 @@ const RECOVERY_COPY = {
   streakLabel: 'Day Streak',
   toolkitName: 'Spiritual Toolkit',
   toolkit: 'Spiritual Toolkit',
-  gratitudeTitle: 'Gratitude',
+  gratitudeTitle: 'Gratitude List',
   gratitudeDesc: 'Count your blessings and name what you\'re thankful for',
   affirmationsTitle: 'Affirmations',
   affirmationsDesc: 'Declare who you are and who you\'re becoming',
@@ -32,8 +32,8 @@ const RECOVERY_COPY = {
 
 const GENERAL_COPY = {
   appTagline: 'A modern self-reflection toolkit that learns your patterns.',
-  inventoryTitle: 'Evening Review',
-  spotCheckTitle: 'Check-In',
+  inventoryTitle: 'Daily Inventory',
+  spotCheckTitle: 'Spot Check Inventory',
   reflectionTitle: 'Daily Reflection',
   milestoneLabelDefault: 'Personal milestone',
   dateFieldLabel: 'Start date',
@@ -47,7 +47,7 @@ const GENERAL_COPY = {
   streakLabel: 'Day Streak',
   toolkitName: 'Daily Toolkit',
   toolkit: 'Daily Toolkit',
-  gratitudeTitle: 'Gratitude',
+  gratitudeTitle: 'Gratitude List',
   gratitudeDesc: 'Name what you\'re grateful for today',
   affirmationsTitle: 'Affirmations',
   affirmationsDesc: 'Write positive statements about yourself',

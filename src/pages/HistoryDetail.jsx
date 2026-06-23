@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import ShareButton from '@/components/summary/ShareButton';
 import useTheme from '@/components/theme/useTheme';
 import { Button } from '@/components/ui/button';
+import { getCopy } from '@/lib/mode';
 
 const AA_QUESTIONS = [
   { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
@@ -19,18 +20,22 @@ const AA_QUESTIONS = [
   { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
   { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
   { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?' },
-  { id: 'better', question: 'Is There Anything That You Could Have Done Better Today?' },
-  { id: 'gratitude', question: 'Gratitudes' }
+  { id: 'do_well', question: 'What Did You Do Well Today?' },
+  { id: 'better', question: 'What Could You Have Done Better Today?' },
+  { id: 'gratitude', question: 'Gratitude List' }
 ];
 
 const GENERAL_QUESTIONS = [
-  { id: 'emotions', question: 'What Emotions Did You Feel Most Strongly Today?' },
-  { id: 'challenged', question: 'What Challenged You Today?' },
-  { id: 'well', question: 'What Did You Do Well Today?' },
-  { id: 'alignment', question: 'Did You Act Out of Alignment With Your Values? If So, Explain.' },
-  { id: 'avoided', question: 'Did You Avoid Anything Important Today?' },
-  { id: 'joy', question: 'Who or What Brought You Joy Today?' },
-  { id: 'gratitude', question: 'Gratitudes' }
+  { id: 'resentful', question: 'Were You Resentful or Angry Today?' },
+  { id: 'dishonest', question: 'Were You Dishonest in Any Way Today?' },
+  { id: 'selfish', question: 'Were You Selfish or Self-Centered Today?' },
+  { id: 'fearful', question: 'Were You Fearful or Anxious Today?' },
+  { id: 'harmful', question: 'Did You Harm Anyone Today? Do You Owe an Apology?' },
+  { id: 'secret', question: 'Did You Keep a Secret or Withhold the Truth from Someone?' },
+  { id: 'unkind', question: 'Were You Kind And Loving Toward All Today?' },
+  { id: 'do_well', question: 'What Did You Do Well Today?' },
+  { id: 'better', question: 'What Could You Have Done Better Today?' },
+  { id: 'gratitude', question: 'Gratitude List' }
 ];
 
 export default function HistoryDetail() {
@@ -99,7 +104,7 @@ export default function HistoryDetail() {
             </Link>
             <div>
               <h1 className="text-lg font-semibold" style={{ color: colors.primary }}>
-                {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
+                {getCopy(entry.inventory_type).inventoryTitle}
               </h1>
               <p className="text-sm text-gray-500">{format(new Date(entry.date), 'EEEE, MMMM d, yyyy')}</p>
             </div>
@@ -119,7 +124,7 @@ export default function HistoryDetail() {
             {questions.map((q, index) => {
               const response = entry.responses?.[q.id];
               const isGratitude = q.id === 'gratitude';
-              const isText = isGratitude || q.id === 'emotions' || q.id === 'well' || q.id === 'joy' || q.id === 'challenged';
+              const isText = isGratitude || q.id === 'do_well' || q.id === 'better';
               
               // Format answer by removing duplicate Yes/yes
               let formattedDetails = response?.details || '';
