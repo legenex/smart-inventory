@@ -23,6 +23,8 @@ import InventoryInsights from '@/components/home/InventoryInsights';
 import useTheme from '@/components/theme/useTheme';
 import MoodCheckIn from '@/components/home/MoodCheckIn';
 import ReadingsDialog from '@/components/readings/ReadingsDialog';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import ResponsiveMenu from '@/components/ui/responsive-menu';
 
 const toTitleCase = (str) => {
   if (!str) return '';
@@ -82,6 +84,10 @@ export default function Dashboard() {
     queryKey: ['inventoryEntries'],
     queryFn: () => base44.entities.InventoryEntry.list('-date', 50),
     enabled: !!user
+  });
+
+  const { pullDistance, isRefreshing } = usePullToRefresh(async () => {
+    await refetch();
   });
 
   const { data: journalEntries = [] } = useQuery({
@@ -152,6 +158,14 @@ export default function Dashboard() {
   
   return (
     <div className="min-h-screen">
+      {(pullDistance > 0 || isRefreshing) && (
+        <div className="flex justify-center items-end overflow-hidden" style={{ height: pullDistance }}>
+          <div
+            className={`w-6 h-6 border-2 border-primary border-t-transparent rounded-full ${isRefreshing ? 'animate-spin' : ''}`}
+            style={{ opacity: Math.min(pullDistance / 60, 1) }}
+          />
+        </div>
+      )}
       <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <motion.div
@@ -164,8 +178,8 @@ export default function Dashboard() {
               {getTimeBasedGreeting()}, {toTitleCase(user.display_name || user.full_name)?.split(' ')[0] || 'Friend'}
             </h1>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <ResponsiveMenu
+            trigger={
               <button className="flex items-center gap-2 bg-white rounded-2xl shadow-sm px-3 py-2 hover:shadow-md transition-shadow">
                 <div className="relative">
                   <Avatar className="w-10 h-10 ring-2" style={{ borderColor: colors.primary, borderWidth: '2px' }}>
@@ -178,19 +192,14 @@ export default function Dashboard() {
                 <span className="text-sm font-medium text-[#1F2C46]">{toTitleCase(user.display_name || user.full_name)?.split(' ')[0]}</span>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => navigate(createPageUrl('Settings'))}>
-                <SettingsIcon className="w-4 h-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => base44.auth.logout()} className="text-red-600 focus:text-red-600">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            }
+            title="Account"
+            items={[
+              { label: 'Settings', icon: SettingsIcon, onClick: () => navigate(createPageUrl('Settings')) },
+              { separator: true },
+              { label: 'Sign Out', icon: LogOut, onClick: () => base44.auth.logout(), className: 'text-red-600' },
+            ]}
+          />
         </motion.div>
         
         {/* Top Row: Streak + Readings */}

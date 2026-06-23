@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 
 const THEME_COLORS = {
@@ -74,25 +74,76 @@ const THEME_COLORS = {
   }
 };
 
+function hexToHsl(hex) {
+  hex = hex.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const diff = max - min;
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (diff !== 0) {
+    s = l > 0.5 ? diff / (2 - max - min) : diff / (max + min);
+    switch (max) {
+      case r: h = ((g - b) / diff + (g < b ? 6 : 0)); break;
+      case g: h = ((b - r) / diff + 2); break;
+      case b: h = ((r - g) / diff + 4); break;
+    }
+    h *= 60;
+  }
+  return `${Math.round(h)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
+}
+
 export const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [themeColor, setThemeColor] = useState(null);
+  const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Sync dark mode with system preference
   useEffect(() => {
-    loadTheme();
+    const mql = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleDarkChange = (e) => {
+      document.documentElement.classList.toggle('dark', e.matches);
+      setIsDark(e.matches);
+    };
+    handleDarkChange(mql);
+    mql.addEventListener('change', handleDarkChange);
+    return () => mql.removeEventListener('change', handleDarkChange);
   }, []);
+
+  // Write accent colors to CSS variables whenever theme changes
+  useEffect(() => {
+    if (!themeColor) return;
+    const tc = THEME_COLORS[themeColor];
+    if (!tc) return;
+    const root = document.documentElement;
+    const hsl = hexToHsl(tc.primary);
+    root.style.setProperty('--primary', hsl);
+    root.style.setProperty('--ring', hsl);
+    root.style.setProperty('--sidebar-primary', hsl);
+    root.style.setProperty('--sidebar-ring', hsl);
+    root.style.setProperty('--theme-primary', tc.primary);
+    root.style.setProperty('--theme-secondary', tc.secondary);
+  }, [themeColor]);
 
   const loadTheme = async () => {
     try {
       const user = await base44.auth.me();
       setThemeColor(user.theme_color || 'purple');
-    } catch (err) {
+    } catch {
       setThemeColor('purple');
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadTheme();
+  }, []);
 
   const updateTheme = (newTheme) => {
     setThemeColor(newTheme);
@@ -104,6 +155,7 @@ export function ThemeProvider({ children }) {
     <ThemeContext.Provider value={{
       colors,
       themeColor: themeColor || 'purple',
+      isDark,
       loading,
       updateTheme
     }}>

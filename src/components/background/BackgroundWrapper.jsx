@@ -6,14 +6,18 @@ export default function BackgroundWrapper({ children, background }) {
   const { themeColor } = useTheme();
 
   const getDefaultBackground = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    if (isDark) {
+      return 'linear-gradient(to bottom right, #0F0E0C, #14120F, #0F0E0C)';
+    }
     const themeBackgrounds = {
-      purple: 'linear-gradient(to bottom right, #f3f0ff, #faf5ff, #ffffff)',
-      blue: 'linear-gradient(to bottom right, #eff6ff, #dbeafe, #ffffff)',
-      green: 'linear-gradient(to bottom right, #ecfdf5, #d1fae5, #ffffff)',
-      red: 'linear-gradient(to bottom right, #fef2f2, #fee2e2, #ffffff)',
-      orange: 'linear-gradient(to bottom right, #fff7ed, #ffedd5, #ffffff)'
+      purple: 'linear-gradient(to bottom right, #F7F4EE, #FFFFFF, #F4F0E8)',
+      blue: 'linear-gradient(to bottom right, #F5F4EE, #FFFFFF, #F0F0E8)',
+      green: 'linear-gradient(to bottom right, #F4F5EE, #FFFFFF, #EFF0E8)',
+      red: 'linear-gradient(to bottom right, #F8F4EE, #FFFFFF, #F5F0E8)',
+      orange: 'linear-gradient(to bottom right, #F8F5EE, #FFFFFF, #F5F2E8)'
     };
-    return themeBackgrounds[themeColor] || 'linear-gradient(to bottom right, #F5F5F7, #ffffff, #E1E1E5)';
+    return themeBackgrounds[themeColor] || 'linear-gradient(to bottom right, #F7F4EE, #FFFFFF, #F2EDE4)';
   };
 
   const getBackgroundStyle = () => {
