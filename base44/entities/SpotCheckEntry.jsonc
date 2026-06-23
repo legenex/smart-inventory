@@ -1,0 +1,27 @@
+{
+  "name": "SpotCheckEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the spot check"
+    },
+    "time": {
+      "type": "string",
+      "description": "Time of the spot check"
+    },
+    "responses": {
+      "type": "object",
+      "description": "JSON object containing all responses"
+    },
+    "ai_reflection": {
+      "type": "string",
+      "description": "AI-generated brief insight"
+    }
+  },
+  "required": [
+    "date",
+    "responses"
+  ]
+}

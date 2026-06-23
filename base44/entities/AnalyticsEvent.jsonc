@@ -1,0 +1,78 @@
+{
+  "description": "Product analytics event log. Powers the admin analytics dashboard (signups, logins, completions, shares, conversions). Readable only by admins.",
+  "name": "AnalyticsEvent",
+  "properties": {
+    "event_type": {
+      "description": "Canonical event type",
+      "enum": [
+        "signup",
+        "login",
+        "onboarding_completed",
+        "inventory_completed",
+        "spotcheck_completed",
+        "gratitude_completed",
+        "journal_scanned",
+        "reading_viewed",
+        "share",
+        "trial_started",
+        "subscription_started",
+        "subscription_canceled",
+        "payment_succeeded",
+        "page_view",
+        "feature_used"
+      ],
+      "type": "string"
+    },
+    "label": {
+      "description": "Optional human label or sub-type",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "platform": {
+      "default": "web",
+      "enum": [
+        "web",
+        "ios",
+        "android"
+      ],
+      "type": "string"
+    },
+    "properties": {
+      "description": "Arbitrary event metadata",
+      "type": "object"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_type"
+  ],
+  "rls": {
+    "create": {
+      "data.user_email": "{{user.email}}"
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}

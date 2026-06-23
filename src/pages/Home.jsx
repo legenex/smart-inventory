@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import ContactDialog from '@/components/home/ContactDialog';
 import HomePricingSection from '@/components/home/HomePricingSection';
+import HomeFooter from '@/components/home/HomeFooter';
 
 const FAQ_ITEMS = [
   { q: 'Is my data private?', a: 'Yes. Your reflections are stored securely and only visible to you. We never sell or share your data.' },
@@ -63,6 +64,16 @@ export default function Home() {
     }
   };
 
+  const handleLogin = () => {
+    if (user?.onboarding_completed) {
+      navigate(createPageUrl('Dashboard'));
+    } else if (user) {
+      navigate(createPageUrl('Onboarding'));
+    } else {
+      base44.auth.redirectToLogin();
+    }
+  };
+
   const ctaLabel = user?.onboarding_completed ? 'Open the App' : 'Start Free Trial';
 
   return (
@@ -89,6 +100,11 @@ export default function Home() {
             <ContactDialog>
               <button className="text-gray-600 hover:text-[#7667E5] text-sm font-medium transition-colors">Contact</button>
             </ContactDialog>
+            {!user && (
+              <button onClick={handleLogin} className="text-gray-700 hover:text-[#7667E5] text-sm font-semibold transition-colors">
+                Log In
+              </button>
+            )}
             <Button onClick={handleCTA} size="sm" className="bg-gradient-to-r from-[#7667E5] to-[#5B9FED] text-white rounded-xl">
               {ctaLabel}
             </Button>
@@ -111,6 +127,11 @@ export default function Home() {
               <ContactDialog>
                 <button className="block w-full text-left text-gray-700 py-3 font-medium min-h-[44px]">Contact</button>
               </ContactDialog>
+              {!user && (
+                <button onClick={handleLogin} className="block w-full text-left text-gray-700 py-3 font-medium min-h-[44px]">
+                  Log In
+                </button>
+              )}
               <Button onClick={handleCTA} className="w-full bg-gradient-to-r from-[#7667E5] to-[#5B9FED] text-white rounded-xl mt-2 min-h-[48px]">
                 {ctaLabel}
               </Button>
@@ -269,7 +290,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="py-24 px-6 bg-gradient-to-b from-[#F8F7FF] to-white">
+      <section id="faq" className="py-24 px-6 bg-gradient-to-b from-[#F8F7FF] to-white">
         <div className="max-w-3xl mx-auto">
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
             className="text-4xl font-extrabold text-[#1F2C46] text-center mb-12">
@@ -315,29 +336,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 bg-[#111827] text-gray-400">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <div className="text-xl font-extrabold text-white mb-1">Smart Inventory</div>
-              <div className="text-sm">A modern spiritual &amp; self-reflection toolkit.</div>
-            </div>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <button onClick={() => scrollTo('features')} className="hover:text-white transition-colors min-h-[44px]">Features</button>
-              <button onClick={() => scrollTo('pricing')} className="hover:text-white transition-colors min-h-[44px]">Pricing</button>
-              <ContactDialog>
-                <button className="hover:text-white transition-colors min-h-[44px]">Contact</button>
-              </ContactDialog>
-              {user && (
-                <button onClick={() => navigate(createPageUrl('Dashboard'))} className="hover:text-white transition-colors min-h-[44px]">Dashboard</button>
-              )}
-            </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-gray-800 text-center text-xs text-gray-600">
-            © {new Date().getFullYear()} Smart Inventory. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      <HomeFooter user={user} onCTA={handleCTA} scrollTo={scrollTo} />
     </div>
   );
 }

@@ -1,0 +1,50 @@
+{
+  "description": "Inbound contact/support messages from the marketing site contact dialog. Anonymous create allowed (public form); only admins can read and manage.",
+  "name": "ContactMessage",
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "source": {
+      "default": "marketing_site",
+      "type": "string"
+    },
+    "status": {
+      "default": "new",
+      "enum": [
+        "new",
+        "read",
+        "resolved"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "email",
+    "message"
+  ],
+  "rls": {
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}

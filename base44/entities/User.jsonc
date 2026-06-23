@@ -1,0 +1,117 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "display_name": {
+      "type": "string",
+      "description": "User's preferred display name"
+    },
+    "profile_picture": {
+      "type": "string",
+      "description": "Profile picture URL"
+    },
+    "recovery_status": {
+      "type": "string",
+      "enum": [
+        "aa",
+        "general"
+      ],
+      "description": "aa = person in recovery (shows recovery/AA-style tools and reflections); general = not in recovery (neutral self-reflection tools, no recovery language)"
+    },
+    "reminder_enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "reminder_time": {
+      "type": "string",
+      "default": "21:00"
+    },
+    "theme_color": {
+      "type": "string",
+      "default": "purple"
+    },
+    "background": {
+      "type": "string",
+      "description": "Background type"
+    },
+    "streak": {
+      "type": "integer",
+      "default": 0
+    },
+    "mood_check_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable daily mood check-in popup"
+    },
+    "last_mood_check": {
+      "type": "string",
+      "description": "Date of last mood check-in"
+    },
+    "last_mood": {
+      "type": "string",
+      "description": "Last recorded mood"
+    },
+    "sober_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Recovery/sobriety start date. Used to display a days-sober (or days-since) counter on the dashboard. Optional."
+    },
+    "milestone_label": {
+      "type": "string",
+      "description": "Custom label for the sober_date counter, e.g. 'Sober', 'Clean', 'Days since I started'. Defaults to a neutral label for general users."
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has finished the onboarding flow"
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "pro",
+        "lifetime"
+      ],
+      "default": "free",
+      "description": "Current plan tier, denormalized from Subscription for fast gating"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "none",
+        "trialing",
+        "active",
+        "past_due",
+        "canceled"
+      ],
+      "default": "none",
+      "description": "Denormalized subscription state for fast gating"
+    },
+    "trial_ends": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user's free trial ends"
+    },
+    "last_active": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time the user opened the app, for admin analytics"
+    },
+    "signup_platform": {
+      "type": "string",
+      "enum": [
+        "web",
+        "ios",
+        "android"
+      ],
+      "default": "web",
+      "description": "Platform the user signed up on"
+    }
+  },
+  "required": [
+    "display_name",
+    "profile_picture",
+    "recovery_status",
+    "background"
+  ]
+}

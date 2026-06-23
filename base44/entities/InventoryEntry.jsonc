@@ -1,0 +1,40 @@
+{
+  "name": "InventoryEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the inventory"
+    },
+    "inventory_type": {
+      "type": "string",
+      "enum": [
+        "aa",
+        "general"
+      ],
+      "description": "Type of inventory taken"
+    },
+    "responses": {
+      "type": "object",
+      "description": "JSON object containing all question responses"
+    },
+    "reflective_summary": {
+      "type": "string",
+      "description": "AI-generated reflective summary HTML"
+    },
+    "journaling_prompts": {
+      "type": "string",
+      "description": "AI-generated journaling prompts HTML"
+    },
+    "share_text": {
+      "type": "string",
+      "description": "Formatted text for sharing"
+    }
+  },
+  "required": [
+    "date",
+    "inventory_type",
+    "responses"
+  ]
+}

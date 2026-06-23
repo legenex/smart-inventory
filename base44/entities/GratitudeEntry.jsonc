@@ -1,0 +1,23 @@
+{
+  "name": "GratitudeEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the entry"
+    },
+    "responses": {
+      "type": "object",
+      "description": "JSON object containing all responses"
+    },
+    "ai_reflection": {
+      "type": "string",
+      "description": "AI-generated reflection on gratitudes and affirmations"
+    }
+  },
+  "required": [
+    "date",
+    "responses"
+  ]
+}

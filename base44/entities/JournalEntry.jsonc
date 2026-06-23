@@ -1,0 +1,35 @@
+{
+  "name": "JournalEntry",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the journal entry"
+    },
+    "inventory_id": {
+      "type": "string",
+      "description": "Related inventory entry ID"
+    },
+    "prompts_answered": {
+      "type": "object",
+      "description": "JSON object containing prompt responses"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "URL of uploaded handwritten journal photo"
+    },
+    "transcription": {
+      "type": "string",
+      "description": "AI transcription of handwritten journal"
+    },
+    "emotional_analysis": {
+      "type": "object",
+      "description": "AI-generated emotional state analysis"
+    }
+  },
+  "required": [
+    "date",
+    "inventory_id"
+  ]
+}

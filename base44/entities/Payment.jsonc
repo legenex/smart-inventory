@@ -1,0 +1,95 @@
+{
+  "description": "Individual payment transactions for the admin revenue view. Append-only history.",
+  "name": "Payment",
+  "properties": {
+    "amount_cents": {
+      "description": "Charged amount in US cents",
+      "type": "integer"
+    },
+    "currency": {
+      "default": "usd",
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "paid_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "plan_key": {
+      "type": "string"
+    },
+    "provider": {
+      "default": "stripe",
+      "enum": [
+        "stripe",
+        "apple",
+        "google",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "provider_payment_id": {
+      "type": "string"
+    },
+    "status": {
+      "default": "succeeded",
+      "enum": [
+        "succeeded",
+        "failed",
+        "refunded",
+        "pending"
+      ],
+      "type": "string"
+    },
+    "subscription_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "amount_cents",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}

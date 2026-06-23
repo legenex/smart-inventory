@@ -1,0 +1,59 @@
+{
+  "name": "UserQuestionSettings",
+  "type": "object",
+  "properties": {
+    "inventory_type": {
+      "type": "string",
+      "enum": [
+        "aa",
+        "general"
+      ],
+      "description": "Type of inventory these settings apply to"
+    },
+    "customization_enabled": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether custom question settings are active"
+    },
+    "enabled_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of question IDs that are enabled"
+    },
+    "question_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Ordered array of question IDs"
+    },
+    "custom_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "question": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "User's custom questions"
+    }
+  },
+  "required": [
+    "inventory_type",
+    "enabled_questions",
+    "question_order"
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "description": "A user's subscription record. One active row per paying user. Source of truth for billing state; User.subscription_status is a denormalized copy for fast gating.",
+  "name": "Subscription",
+  "properties": {
+    "amount_cents": {
+      "description": "Recurring amount in US cents",
+      "type": "integer"
+    },
+    "canceled_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "currency": {
+      "default": "usd",
+      "type": "string"
+    },
+    "current_period_end": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "plan_key": {
+      "description": "References Plan.key",
+      "type": "string"
+    },
+    "provider": {
+      "default": "stripe",
+      "enum": [
+        "stripe",
+        "apple",
+        "google",
+        "manual"
+      ],
+      "type": "string"
+    },
+    "provider_customer_id": {
+      "type": "string"
+    },
+    "provider_subscription_id": {
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "status": {
+      "default": "trialing",
+      "enum": [
+        "trialing",
+        "active",
+        "past_due",
+        "canceled",
+        "refunded"
+      ],
+      "type": "string"
+    },
+    "trial_end": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "user_email": {
+      "description": "Owner email",
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_email",
+    "plan_key",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.user_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}

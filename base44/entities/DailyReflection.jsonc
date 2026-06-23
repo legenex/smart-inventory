@@ -1,0 +1,70 @@
+{
+  "description": "Original, app-authored daily reflections. IMPORTANT: content must be original and must never reproduce copyrighted AA literature (Big Book, Twelve and Twelve, Daily Reflections). mode controls who sees it so general (non-recovery) users never see recovery language. Public read, admin write.",
+  "name": "DailyReflection",
+  "properties": {
+    "author": {
+      "default": "Smart Inventory",
+      "type": "string"
+    },
+    "body": {
+      "description": "Original reflection text",
+      "type": "string"
+    },
+    "day_key": {
+      "description": "Perennial key MM-DD (e.g. 01-15) so a reflection can recur yearly, or leave blank for the general rotation pool",
+      "type": "string"
+    },
+    "is_published": {
+      "default": true,
+      "type": "boolean"
+    },
+    "mode": {
+      "default": "both",
+      "description": "Audience: recovery only, general only, or both",
+      "enum": [
+        "recovery",
+        "general",
+        "both"
+      ],
+      "type": "string"
+    },
+    "prompt": {
+      "description": "A single reflective question tied to this reading",
+      "type": "string"
+    },
+    "sort_order": {
+      "default": 0,
+      "type": "integer"
+    },
+    "theme": {
+      "description": "Topic tag e.g. acceptance, resentment, gratitude, honesty, fear, amends, presence",
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "body",
+    "mode"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "type": "object"
+}

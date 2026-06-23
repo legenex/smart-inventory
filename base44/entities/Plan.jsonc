@@ -1,0 +1,97 @@
+{
+  "name": "Plan",
+  "type": "object",
+  "description": "Data-driven pricing plans shown on the marketing/landing page. Admin editable so the funnel can be tuned without code changes.",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Stable identifier, e.g. monthly, annual, lifetime, free_trial"
+    },
+    "name": {
+      "type": "string",
+      "description": "Display name, e.g. Monthly"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "Short supporting line"
+    },
+    "price_cents": {
+      "type": "integer",
+      "description": "Price in US cents (e.g. 999 = $9.99). 0 for free."
+    },
+    "currency": {
+      "type": "string",
+      "default": "usd"
+    },
+    "interval": {
+      "type": "string",
+      "enum": [
+        "month",
+        "year",
+        "once",
+        "trial"
+      ],
+      "description": "Billing interval"
+    },
+    "trial_days": {
+      "type": "integer",
+      "default": 0,
+      "description": "Free trial length in days"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Bullet list of included features"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for checkout"
+    },
+    "apple_product_id": {
+      "type": "string",
+      "description": "Apple App Store in-app purchase product id"
+    },
+    "google_product_id": {
+      "type": "string",
+      "description": "Google Play in-app purchase product id"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Highlight this plan as the recommended choice"
+    },
+    "sort_order": {
+      "type": "integer",
+      "default": 0
+    }
+  },
+  "required": [
+    "key",
+    "name",
+    "interval",
+    "price_cents"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
