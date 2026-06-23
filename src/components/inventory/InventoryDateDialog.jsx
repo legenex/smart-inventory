@@ -6,10 +6,8 @@ import { Calendar as CalendarIcon, ChevronRight } from 'lucide-react';
 import { format, subDays, isToday, isFuture } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import useTheme from '@/components/theme/useTheme';
 
 export default function InventoryDateDialog({ open, onClose }) {
-  const { colors } = useTheme();
   const navigate = useNavigate();
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -31,9 +29,12 @@ export default function InventoryDateDialog({ open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md rounded-3xl bg-white/95 backdrop-blur-xl border-0 shadow-2xl">
+      <DialogContent
+        className="sm:max-w-md rounded-3xl border-0 shadow-2xl"
+        style={{ backgroundColor: 'var(--surface)' }}
+      >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center text-[#1F2C46]">
+          <DialogTitle className="text-2xl font-bold text-center" style={{ color: 'var(--ink)' }}>
             Write Inventory
           </DialogTitle>
         </DialogHeader>
@@ -43,46 +44,48 @@ export default function InventoryDateDialog({ open, onClose }) {
             {/* Today Button */}
             <button
               onClick={handleTodayClick}
-              className="w-full p-5 rounded-2xl border-2 hover:shadow-lg transition-all duration-300 text-left group"
+              className="w-full p-5 rounded-2xl border-2 transition-all text-left group min-h-[72px]"
               style={{
-                borderColor: colors.primary,
-                background: `linear-gradient(to right, ${colors.primary}08, ${colors.secondary}08)`
+                borderColor: 'var(--accent)',
+                backgroundColor: 'var(--soft)'
               }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-[#1F2C46] text-lg">Today</p>
-                  <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, MMMM d')}</p>
+                  <p className="font-semibold text-lg" style={{ color: 'var(--ink)' }}>Today</p>
+                  <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(new Date(), 'EEEE, MMMM d')}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--muted)' }} />
               </div>
             </button>
 
             {/* Yesterday Button */}
             <button
               onClick={() => handleDateSelect(yesterday)}
-              className="w-full p-5 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-300 text-left group"
+              className="w-full p-5 rounded-2xl border transition-all text-left group min-h-[72px]"
+              style={{ borderColor: 'var(--line)' }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-[#1F2C46]">Yesterday</p>
-                  <p className="text-sm text-gray-500">{format(yesterday, 'EEEE, MMMM d')}</p>
+                  <p className="font-semibold" style={{ color: 'var(--ink)' }}>Yesterday</p>
+                  <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(yesterday, 'EEEE, MMMM d')}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--muted)' }} />
               </div>
             </button>
 
             {/* Choose Date Button */}
             <button
               onClick={() => setShowCalendar(true)}
-              className="w-full p-5 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all duration-300 text-left group"
+              className="w-full p-5 rounded-2xl border transition-all text-left group min-h-[72px]"
+              style={{ borderColor: 'var(--line)' }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="w-5 h-5" style={{ color: colors.primary }} />
-                  <p className="font-semibold text-[#1F2C46]">Choose a Date</p>
+                  <CalendarIcon className="w-5 h-5" style={{ color: 'var(--accent)' }} />
+                  <p className="font-semibold" style={{ color: 'var(--ink)' }}>Choose a Date</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--muted)' }} />
               </div>
             </button>
           </div>
@@ -100,23 +103,20 @@ export default function InventoryDateDialog({ open, onClose }) {
                 caption: "flex justify-center pt-1 relative items-center",
                 caption_label: "text-sm font-medium",
                 nav: "space-x-1 flex items-center",
-                nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+                nav_button: "h-7 w-7 p-0 opacity-50 hover:opacity-100",
                 nav_button_previous: "absolute left-1",
                 nav_button_next: "absolute right-1",
                 table: "w-full border-collapse space-y-1",
                 head_row: "flex",
-                head_cell: "text-gray-500 rounded-md w-9 font-normal text-[0.8rem]",
+                head_cell: "rounded-md w-9 font-normal text-[0.8rem]",
                 row: "flex w-full mt-2",
-                cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
-                day_selected: "text-white hover:text-white focus:text-white",
-                day_today: "bg-gray-100 text-gray-900",
-                day_outside: "text-gray-300 opacity-50",
-                day_disabled: "text-gray-300 opacity-50",
+                cell: "text-center text-sm p-0 relative",
+                day: "h-9 w-9 p-0 font-normal rounded-md",
+                day_selected: "text-white",
+                day_today: "font-bold",
+                day_outside: "opacity-50",
+                day_disabled: "opacity-50",
                 day_hidden: "invisible",
-              }}
-              style={{
-                '--selected-bg': colors.primary,
               }}
             />
             <Button

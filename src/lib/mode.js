@@ -17,8 +17,10 @@ const RECOVERY_COPY = {
   spotCheckDesc: 'A quick mid-day pause to check your spiritual condition',
   startDatePlaceholder: 'Enter your sobriety date',
   dayCounterLabel: 'Days Sober',
+  heroLabel: 'Days sober',
   streakLabel: 'Day Streak',
   toolkitName: 'Spiritual Toolkit',
+  toolkit: 'Spiritual Toolkit',
 };
 
 const GENERAL_COPY = {
@@ -30,12 +32,14 @@ const GENERAL_COPY = {
   dateFieldLabel: 'Start date',
   dashboardGreeting: "You're doing great.",
   inventoryVerb: 'Start Evening Review',
-  inventoryDesc: 'Reflect on your day with guided self-inventory prompts',
+  inventoryDesc: 'Reflect on your day with guided self-reflection prompts',
   spotCheckDesc: 'A quick mid-day pause to check in with yourself',
   startDatePlaceholder: 'Enter your start date (optional)',
-  dayCounterLabel: 'Days Since Day One',
+  dayCounterLabel: 'Days Since I Started',
+  heroLabel: 'Days since I started',
   streakLabel: 'Day Streak',
-  toolkitName: 'Reflection Toolkit',
+  toolkitName: 'Daily Toolkit',
+  toolkit: 'Daily Toolkit',
 };
 
 /**
@@ -62,6 +66,10 @@ export const MILESTONES = [
   { days: 1095, label: '3 Years',  emoji: '👑' },
   { days: 1825, label: '5 Years',  emoji: '🎖️' },
   { days: 3650, label: '10 Years', emoji: '🌠' },
+  { days: 4015, label: '11 Years', emoji: '✨' },
+  { days: 4380, label: '12 Years', emoji: '💫' },
+  { days: 5475, label: '15 Years', emoji: '🌠' },
+  { days: 7300, label: '20 Years', emoji: '🎆' },
 ];
 
 export function getCurrentMilestone(days) {

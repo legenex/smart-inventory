@@ -1,95 +1,77 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 
-const THEME_COLORS = {
-  purple: {
-    primary: '#7667E5',
-    secondary: '#A48FFF',
-    light: '#7667E5',
-    accent: '#6BC2CE',
-    shadow: 'shadow-purple-200/50',
-    gradient: 'from-[#7667E5] to-[#A48FFF]',
-    gradientFull: 'bg-gradient-to-r from-[#7667E5] to-[#A48FFF]',
-    textClass: 'text-[#7667E5]',
-    bgLight: 'bg-[#7667E5]/10',
-    borderClass: 'border-[#7667E5]',
-    hoverBorder: 'hover:border-[#7667E5]/30',
-    borderColor: '#7667E5'
+const THEMES = {
+  bone: {
+    light: { bg: '#F4EEE3', surface: '#FBF7EF', ink: '#2B2620', muted: '#8C8175', line: '#E3DACA', accent: '#BC5A38', accentInk: '#FFF6EF', soft: '#F0E2D6' },
+    dark:  { bg: '#1C1815', surface: '#262019', ink: '#EFE7D9', muted: '#9C9080', line: '#382F25', accent: '#D2724F', accentInk: '#1C1006', soft: '#2E2419' }
   },
-  blue: {
-    primary: '#3B82F6',
-    secondary: '#60A5FA',
-    light: '#3B82F6',
-    accent: '#0EA5E9',
-    shadow: 'shadow-blue-200/50',
-    gradient: 'from-[#3B82F6] to-[#60A5FA]',
-    gradientFull: 'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA]',
-    textClass: 'text-[#3B82F6]',
-    bgLight: 'bg-[#3B82F6]/10',
-    borderClass: 'border-[#3B82F6]',
-    hoverBorder: 'hover:border-[#3B82F6]/30',
-    borderColor: '#3B82F6'
+  midnight: {
+    light: { bg: '#F6F1E6', surface: '#FCF8EF', ink: '#2A2418', muted: '#8C8266', line: '#E7DEC8', accent: '#B8893A', accentInk: '#FFFBF0', soft: '#F0E6CF' },
+    dark:  { bg: '#17140F', surface: '#221D16', ink: '#ECE3D2', muted: '#9A8E78', line: '#322A20', accent: '#D9A94E', accentInk: '#1A1206', soft: '#2A2014' }
   },
-  green: {
-    primary: '#10B981',
-    secondary: '#34D399',
-    light: '#10B981',
-    accent: '#14B8A6',
-    shadow: 'shadow-green-200/50',
-    gradient: 'from-[#10B981] to-[#34D399]',
-    gradientFull: 'bg-gradient-to-r from-[#10B981] to-[#34D399]',
-    textClass: 'text-[#10B981]',
-    bgLight: 'bg-[#10B981]/10',
-    borderClass: 'border-[#10B981]',
-    hoverBorder: 'hover:border-[#10B981]/30',
-    borderColor: '#10B981'
+  sage: {
+    light: { bg: '#E7EADF', surface: '#F2F4EA', ink: '#232C25', muted: '#6E7A6B', line: '#D2D8C5', accent: '#2F5D44', accentInk: '#F2F6EE', soft: '#DCE4D2' },
+    dark:  { bg: '#141A15', surface: '#1D241E', ink: '#E4EADD', muted: '#8A968A', line: '#2A332B', accent: '#5B9E78', accentInk: '#08130C', soft: '#233027' }
   },
-  red: {
-    primary: '#F87171',
-    secondary: '#FCA5A5',
-    light: '#F87171',
-    accent: '#FB923C',
-    shadow: 'shadow-red-200/50',
-    gradient: 'from-[#F87171] to-[#FCA5A5]',
-    gradientFull: 'bg-gradient-to-r from-[#F87171] to-[#FCA5A5]',
-    textClass: 'text-[#F87171]',
-    bgLight: 'bg-[#F87171]/10',
-    borderClass: 'border-[#F87171]',
-    hoverBorder: 'hover:border-[#F87171]/30',
-    borderColor: '#F87171'
+  dawn: {
+    light: { bg: '#F7E9EC', surface: '#FCF3F5', ink: '#3A2E36', muted: '#9A7E8A', line: '#ECD7DD', accent: '#DC6F86', accentInk: '#FFF4F6', soft: '#F3DFE5' },
+    dark:  { bg: '#1E161A', surface: '#281E23', ink: '#F0E2E8', muted: '#A98E9A', line: '#382A30', accent: '#E68298', accentInk: '#1E0A10', soft: '#301F27' }
   },
-  orange: {
-    primary: '#F97316',
-    secondary: '#FB923C',
-    light: '#F97316',
-    accent: '#FBBF24',
-    shadow: 'shadow-orange-200/50',
-    gradient: 'from-[#F97316] to-[#FB923C]',
-    gradientFull: 'bg-gradient-to-r from-[#F97316] to-[#FB923C]',
-    textClass: 'text-[#F97316]',
-    bgLight: 'bg-[#F97316]/10',
-    borderClass: 'border-[#F97316]',
-    hoverBorder: 'hover:border-[#F97316]/30',
-    borderColor: '#F97316'
+  tide: {
+    light: { bg: '#ECEFF5', surface: '#F8FAFE', ink: '#1B2530', muted: '#6B7788', line: '#D6DEEC', accent: '#3B83F6', accentInk: '#FFFFFF', soft: '#DEE8FC' },
+    dark:  { bg: '#121620', surface: '#1B2230', ink: '#E3E9F4', muted: '#8A93A6', line: '#28313F', accent: '#5B97F8', accentInk: '#07101F', soft: '#1E2A40' }
   }
 };
+
+function resolveThemeName(name) {
+  if (THEMES[name]) return name;
+  return 'tide';
+}
 
 export const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [themeColor, setThemeColor] = useState(null);
+  const [themeColor, setThemeColor] = useState('tide');
+  const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    setDarkMode(mq.matches);
+    const handler = (e) => setDarkMode(e.matches);
+    mq.addEventListener('change', handler);
+
     loadTheme();
+
+    return () => mq.removeEventListener('change', handler);
   }, []);
+
+  useEffect(() => {
+    const resolved = resolveThemeName(themeColor);
+    const tokens = THEMES[resolved][darkMode ? 'dark' : 'light'];
+    const root = document.documentElement;
+    root.style.setProperty('--bg', tokens.bg);
+    root.style.setProperty('--surface', tokens.surface);
+    root.style.setProperty('--ink', tokens.ink);
+    root.style.setProperty('--muted', tokens.muted);
+    root.style.setProperty('--line', tokens.line);
+    root.style.setProperty('--accent', tokens.accent);
+    root.style.setProperty('--accentInk', tokens.accentInk);
+    root.style.setProperty('--soft', tokens.soft);
+    if (darkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [themeColor, darkMode]);
 
   const loadTheme = async () => {
     try {
       const user = await base44.auth.me();
-      setThemeColor(user.theme_color || 'purple');
+      setThemeColor(user.theme_color || 'tide');
     } catch (err) {
-      setThemeColor('purple');
+      setThemeColor('tide');
     }
     setLoading(false);
   };
@@ -98,18 +80,37 @@ export function ThemeProvider({ children }) {
     setThemeColor(newTheme);
   };
 
-  const colors = themeColor ? THEME_COLORS[themeColor] : THEME_COLORS.purple;
+  const resolved = resolveThemeName(themeColor);
+  const tokens = THEMES[resolved][darkMode ? 'dark' : 'light'];
+
+  // Backward-compatible colors object for components not yet redesigned
+  const colors = {
+    primary: tokens.accent,
+    secondary: tokens.accent,
+    light: tokens.accent,
+    accent: tokens.accent,
+    shadow: '',
+    gradient: '',
+    gradientFull: 'bg-accent-gradient',
+    textClass: 'text-accent-c',
+    bgLight: 'bg-accent-soft',
+    borderClass: 'border-accent-c',
+    hoverBorder: '',
+    borderColor: tokens.accent
+  };
 
   return (
     <ThemeContext.Provider value={{
       colors,
-      themeColor: themeColor || 'purple',
+      themeColor: resolved,
       loading,
-      updateTheme
+      updateTheme,
+      darkMode,
+      tokens
     }}>
       {children}
     </ThemeContext.Provider>
   );
 }
 
-export { THEME_COLORS };
+export { THEMES };

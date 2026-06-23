@@ -5,7 +5,6 @@ import { ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
-import useTheme from '../theme/useTheme';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function InventoryCard({ entry, index, onDelete }) {
-  const { colors } = useTheme();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -46,20 +44,22 @@ export default function InventoryCard({ entry, index, onDelete }) {
         transition={{ delay: index * 0.1 }}
         className="relative"
       >
-        <Link 
+        <Link
           to={createPageUrl(`HistoryDetail?id=${entry.id}`)}
-          className="block bg-white rounded-[20px] p-5 shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 group"
+          className="block rounded-[20px] p-5 transition-all group"
+          style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colors.bgLight}`}>
-                <Calendar className={`w-5 h-5 ${colors.textClass}`} />
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                style={{ backgroundColor: 'var(--soft)' }}>
+                <Calendar className="w-5 h-5" style={{ color: 'var(--accent)' }} />
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-[#1F2C46]">
+                <p className="font-semibold" style={{ color: 'var(--ink)' }}>
                   {format(new Date(entry.date), 'EEEE, MMMM d')}
                 </p>
-                <p className="text-sm text-gray-500 capitalize">
+                <p className="text-sm capitalize" style={{ color: 'var(--muted)' }}>
                   {entry.inventory_type === 'aa' ? 'Recovery Inventory' : 'Daily Reflection'}
                 </p>
               </div>
@@ -71,11 +71,11 @@ export default function InventoryCard({ entry, index, onDelete }) {
                   e.stopPropagation();
                   setShowDeleteDialog(true);
                 }}
-                className="p-2 hover:bg-red-50 rounded-xl transition-colors"
+                className="p-2 rounded-xl transition-colors"
               >
-                <Trash2 className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
+                <Trash2 className="w-5 h-5" style={{ color: 'var(--muted)' }} />
               </button>
-              <ChevronRight className={`w-5 h-5 text-gray-400 transition-colors`} style={{ '--hover-color': colors.primary }} />
+              <ChevronRight className="w-5 h-5" style={{ color: 'var(--muted)' }} />
             </div>
           </div>
         </Link>
@@ -86,7 +86,7 @@ export default function InventoryCard({ entry, index, onDelete }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Inventory?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this inventory from {format(new Date(entry.date), 'MMMM d, yyyy')}? 
+              Are you sure you want to delete this inventory from {format(new Date(entry.date), 'MMMM d, yyyy')}?
               This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
