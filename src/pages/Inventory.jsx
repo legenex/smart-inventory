@@ -62,17 +62,15 @@ export default function Inventory() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [inventoryDate, setInventoryDate] = useState(new Date());
   const navigate = useNavigate();
-  
+
   useEffect(() => {
     loadUser();
-    // Check for date parameter
     const urlParams = new URLSearchParams(window.location.search);
     const dateParam = urlParams.get('date');
     if (dateParam) {
       setInventoryDate(new Date(dateParam));
     }
-    
-    // Load draft if exists
+
     const draft = localStorage.getItem('inventory_draft');
     if (draft) {
       try {
@@ -85,7 +83,7 @@ export default function Inventory() {
       }
     }
   }, []);
-  
+
   const loadUser = async () => {
     try {
       const userData = await base44.auth.me();
@@ -98,8 +96,7 @@ export default function Inventory() {
       navigate(createPageUrl('Onboarding'));
     }
   };
-  
-  // Check for entry on selected date
+
   const { data: entries = [] } = useQuery({
     queryKey: ['inventoryEntries', format(inventoryDate, 'yyyy-MM-dd')],
     queryFn: async () => {
@@ -108,62 +105,56 @@ export default function Inventory() {
     },
     enabled: !!user
   });
-  
+
   useEffect(() => {
     if (entries.length > 0) {
       navigate(createPageUrl(`HistoryDetail?id=${entries[0].id}`));
     }
   }, [entries]);
-  
-  // Fetch user question settings
+
   const { data: questionSettings } = useQuery({
     queryKey: ['questionSettings', user?.recovery_status],
     queryFn: async () => {
-      const settings = await base44.entities.UserQuestionSettings.filter({ 
+      const settings = await base44.entities.UserQuestionSettings.filter({
         inventory_type: user?.recovery_status,
-        created_by: user?.email 
+        created_by: user?.email
       });
       return settings[0] || null;
     },
     enabled: !!user
   });
-  
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: 'var(--line)', borderTopColor: 'var(--accent)' }} />
       </div>
     );
   }
-  
-  // Get questions based on user recovery status
+
   const allQuestions = user.recovery_status === 'aa' ? AA_QUESTIONS : GENERAL_QUESTIONS;
   const defaultQuestions = allQuestions.filter(q => !q.optional);
-  
-  // Determine which questions to show
+
   let questions = defaultQuestions;
-  
-  if (questionSettings?.customization_enabled && 
-      questionSettings?.question_order && 
+
+  if (questionSettings?.customization_enabled &&
+      questionSettings?.question_order &&
       questionSettings?.enabled_questions) {
-    // Use custom settings
     const orderedQuestions = questionSettings.question_order
       .map(id => allQuestions.find(q => q.id === id))
       .filter(q => q && questionSettings.enabled_questions.includes(q.id));
-    
-    // Add custom questions
+
     if (questionSettings.custom_questions?.length > 0) {
       orderedQuestions.push(...questionSettings.custom_questions);
     }
-    
-    // Only use custom if we have valid questions
+
     if (orderedQuestions.length > 0) {
       questions = orderedQuestions;
     }
   }
-  
+
   const currentQ = questions[currentQuestion] || questions[0];
-  
+
   const handleValueChange = (value) => {
     if (!currentQ) return;
     const newResponses = {
@@ -174,14 +165,13 @@ export default function Inventory() {
       }
     };
     setResponses(newResponses);
-    // Save draft
     localStorage.setItem('inventory_draft', JSON.stringify({
       responses: newResponses,
       question: currentQuestion,
       date: inventoryDate.toISOString()
     }));
   };
-  
+
   const handleDetailsChange = (details) => {
     if (!currentQ) return;
     const newResponses = {
@@ -192,37 +182,32 @@ export default function Inventory() {
       }
     };
     setResponses(newResponses);
-    // Save draft
     localStorage.setItem('inventory_draft', JSON.stringify({
       responses: newResponses,
       question: currentQuestion,
       date: inventoryDate.toISOString()
     }));
   };
-  
+
   const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
       const nextQuestion = currentQuestion + 1;
       setCurrentQuestion(nextQuestion);
-      // Update draft with new question
       localStorage.setItem('inventory_draft', JSON.stringify({
         responses,
         question: nextQuestion,
         date: inventoryDate.toISOString()
       }));
     } else {
-      // Clear draft and go to review page
       localStorage.removeItem('inventory_draft');
       navigate(createPageUrl(`ReviewInventory?responses=${encodeURIComponent(JSON.stringify(responses))}&type=${user.recovery_status}&date=${format(inventoryDate, 'yyyy-MM-dd')}`));
     }
   };
 
-  
   const handleBack = () => {
     if (currentQuestion > 0) {
       const prevQuestion = currentQuestion - 1;
       setCurrentQuestion(prevQuestion);
-      // Update draft with new question
       localStorage.setItem('inventory_draft', JSON.stringify({
         responses,
         question: prevQuestion,
@@ -240,7 +225,6 @@ export default function Inventory() {
   };
 
   const confirmExit = () => {
-    // Keep draft saved
     navigate(createPageUrl('Home'));
   };
 
@@ -248,44 +232,42 @@ export default function Inventory() {
     localStorage.removeItem('inventory_draft');
     navigate(createPageUrl('Home'));
   };
-  
 
-  
   return (
     <div className="min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-2xl mx-auto px-4 md:px-6 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleExit}
-              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+              className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-colors"
+              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5" style={{ color: 'var(--muted)' }} />
             </button>
             <div>
-              <h1 className="text-lg font-semibold text-[#1F2C46]">
+              <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>
                 {user.recovery_status === 'aa' ? 'Nightly Inventory' : 'Daily Reflection'}
               </h1>
-              <p className="text-sm text-gray-500">{format(inventoryDate, 'EEEE, MMMM d')}</p>
+              <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(inventoryDate, 'EEEE, MMMM d')}</p>
             </div>
           </div>
           <NavigationMenu />
         </div>
 
-        <DateSelector 
-          selectedDate={inventoryDate} 
+        <DateSelector
+          selectedDate={inventoryDate}
           onDateChange={(newDate) => {
             setInventoryDate(newDate);
-            // Clear responses when changing date
             setResponses({});
             setCurrentQuestion(0);
             localStorage.removeItem('inventory_draft');
-          }} 
+          }}
         />
-        
+
         <ProgressBar current={currentQuestion + 1} total={questions.length} />
-        
+
         {currentQ ? (
           <AnimatePresence mode="wait">
             <QuestionCard
@@ -305,8 +287,8 @@ export default function Inventory() {
             />
           </AnimatePresence>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-            <p className="text-gray-600">Loading questions...</p>
+          <div className="rounded-2xl p-6 text-center" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}>
+            <p style={{ color: 'var(--muted)' }}>Loading questions...</p>
           </div>
         )}
 

@@ -1,16 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Check, X, ArrowLeft, ArrowRight } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
-import { Check, X } from 'lucide-react';
 import GratitudeInput from './GratitudeInput';
-import useTheme from '../theme/useTheme';
 
-export default function QuestionCard({ 
+export default function QuestionCard({
   question,
   description,
   questionNumber,
-  type, // 'yesno', 'text', 'yesno-text', 'gratitude'
+  type,
   value,
   details,
   onValueChange,
@@ -20,83 +18,97 @@ export default function QuestionCard({
   isFirst,
   isLast
 }) {
-  const { colors } = useTheme();
   const showDetails = (type === 'yesno-text' && value === true) || (type === 'yesno-text-no' && value === false);
   const isTextOnly = type === 'text';
   const isGratitude = type === 'gratitude';
-  
+
   const canProceed = isGratitude
     ? Array.isArray(value) && value.length > 0
-    : isTextOnly 
-    ? value && value.trim().length > 0 
+    : isTextOnly
+    ? value && value.trim().length > 0
     : value !== null && value !== undefined;
+
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const slideVariants = {
+    enter: prefersReduced ? { opacity: 0 } : { opacity: 0, x: 40 },
+    center: { opacity: 1, x: 0 },
+    exit: prefersReduced ? { opacity: 0 } : { opacity: 0, x: -40 }
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -50 }}
-      transition={{ duration: 0.3 }}
+      variants={slideVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={prefersReduced ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
       className="w-full"
     >
-      <div className="bg-white rounded-[25px] shadow-lg shadow-purple-100/50 p-8 md:p-10">
-        <span 
-          className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-4 ${colors.bgLight} ${colors.textClass}`}
+      <div
+        className="rounded-3xl p-6 md:p-8"
+        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
+      >
+        {/* Question number badge */}
+        <span
+          className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4"
+          style={{ backgroundColor: 'var(--soft)', color: 'var(--accent)' }}
         >
           Question {questionNumber}
         </span>
-        
-        <h2 className="text-xl md:text-2xl font-semibold text-[#1F2C46] mb-3 leading-relaxed">
+
+        {/* Question in serif */}
+        <h2 className="font-display text-2xl md:text-3xl leading-snug mb-3" style={{ color: 'var(--ink)' }}>
           {question}
         </h2>
-        
+
         {description && (
-          <p className="text-sm text-gray-600 mb-8 leading-relaxed">{description}</p>
+          <p className="text-sm md:text-base leading-relaxed mb-8" style={{ color: 'var(--muted)' }}>
+            {description}
+          </p>
         )}
-        
+
+        {/* Yes / No buttons */}
         {!isTextOnly && !isGratitude && (
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-3 mb-6">
             <button
               onClick={() => onValueChange(true)}
-              className={`flex-1 py-4 px-6 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center gap-3 ${
-                value === true 
-                  ? `${colors.borderClass} ${colors.bgLight} ${colors.textClass}` 
-                  : `border-gray-200 ${colors.hoverBorder} text-gray-600`
-              }`}
+              className="flex-1 min-h-[56px] rounded-2xl border-2 transition-all duration-200 flex items-center justify-center gap-2 font-medium"
+              style={{
+                borderColor: value === true ? 'var(--accent)' : 'var(--line)',
+                backgroundColor: value === true ? 'var(--soft)' : 'transparent',
+                color: value === true ? 'var(--accent)' : 'var(--muted)'
+              }}
             >
               <Check className="w-5 h-5" />
-              <span className="font-medium">Yes</span>
+              Yes
             </button>
             <button
               onClick={() => onValueChange(false)}
-              className={`flex-1 py-4 px-6 rounded-2xl border-2 transition-all duration-300 flex items-center justify-center gap-3`}
+              className="flex-1 min-h-[56px] rounded-2xl border-2 transition-all duration-200 flex items-center justify-center gap-2 font-medium"
               style={{
-                borderColor: value === false ? colors.primary : '#e5e7eb',
-                backgroundColor: value === false ? `${colors.primary}15` : 'transparent',
-                color: value === false ? colors.primary : '#4b5563'
-              }}
-              onMouseEnter={(e) => {
-                if (value !== false) e.currentTarget.style.borderColor = `${colors.primary}80`;
-              }}
-              onMouseLeave={(e) => {
-                if (value !== false) e.currentTarget.style.borderColor = '#e5e7eb';
+                borderColor: value === false ? 'var(--accent)' : 'var(--line)',
+                backgroundColor: value === false ? 'var(--soft)' : 'transparent',
+                color: value === false ? 'var(--accent)' : 'var(--muted)'
               }}
             >
               <X className="w-5 h-5" />
-              <span className="font-medium">No</span>
+              No
             </button>
           </div>
         )}
-        
+
         <AnimatePresence>
           {isGratitude && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
+              initial={prefersReduced ? false : { opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
+              exit={prefersReduced ? { opacity: 0 } : { opacity: 0, height: 0 }}
+              transition={prefersReduced ? { duration: 0 } : { duration: 0.3 }}
             >
-              <p className="text-gray-500 text-sm mb-4">List 5 things you were grateful for today</p>
+              <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>
+                List 5 things you were grateful for today
+              </p>
               <GratitudeInput
                 values={Array.isArray(value) ? value : []}
                 onChange={onValueChange}
@@ -105,46 +117,65 @@ export default function QuestionCard({
           )}
           {!isGratitude && (showDetails || isTextOnly) && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
+              initial={prefersReduced ? false : { opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
+              exit={prefersReduced ? { opacity: 0 } : { opacity: 0, height: 0 }}
+              transition={prefersReduced ? { duration: 0 } : { duration: 0.3 }}
             >
               <Textarea
                 placeholder="Please describe with as much detail as possible"
                 value={isTextOnly ? value || '' : details || ''}
                 onChange={(e) => isTextOnly ? onValueChange(e.target.value) : onDetailsChange(e.target.value)}
-                className="w-full min-h-[120px] rounded-2xl border-2 border-gray-200 p-4 text-[#1F2C46] resize-none transition-colors"
+                className="w-full min-h-[140px] rounded-2xl p-4 resize-none transition-colors focus:ring-2"
                 style={{
-                  '--focus-border-color': colors.primary
+                  backgroundColor: 'transparent',
+                  borderColor: 'var(--line)',
+                  color: 'var(--ink)'
                 }}
-                onFocus={(e) => e.target.style.borderColor = colors.primary}
-                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--accent)';
+                  e.target.style.boxShadow = '0 0 0 3px var(--soft)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'var(--line)';
+                  e.target.style.boxShadow = 'none';
+                }}
               />
             </motion.div>
           )}
         </AnimatePresence>
-        
-        <div className="flex gap-4 mt-8">
+
+        {/* Navigation controls */}
+        <div className="flex gap-3 mt-8">
           {!isFirst && (
-            <Button
-              variant="outline"
+            <motion.button
+              whileTap={prefersReduced ? undefined : { scale: 0.96 }}
               onClick={onBack}
-              className="flex-1 py-6 rounded-2xl border-2 border-gray-200 text-gray-600 hover:bg-gray-50"
+              className="min-h-[48px] px-6 rounded-2xl border-2 transition-all flex items-center justify-center gap-2 font-medium"
+              style={{
+                borderColor: 'var(--line)',
+                color: 'var(--muted)',
+                backgroundColor: 'transparent'
+              }}
             >
+              <ArrowLeft className="w-4 h-4" />
               Back
-            </Button>
+            </motion.button>
           )}
-          <Button
+          <motion.button
+            whileTap={prefersReduced ? undefined : { scale: 0.97 }}
             onClick={onNext}
             disabled={!canProceed}
-            className={`flex-1 py-6 rounded-2xl text-white font-medium hover:opacity-90 transition-opacity disabled:opacity-50 ${isFirst ? 'w-full' : ''}`}
+            className={`min-h-[48px] rounded-2xl font-semibold transition-all flex items-center justify-center gap-2 ${isFirst ? 'flex-1' : 'flex-1'}`}
             style={{
-              background: canProceed ? `linear-gradient(to right, ${colors.primary}, ${colors.secondary})` : undefined
+              backgroundColor: canProceed ? 'var(--accent)' : 'var(--line)',
+              color: canProceed ? 'var(--accentInk)' : 'var(--muted)',
+              opacity: canProceed ? 1 : 0.5
             }}
           >
             {isLast ? 'Complete Inventory' : 'Continue'}
-          </Button>
+            <ArrowRight className="w-4 h-4" />
+          </motion.button>
         </div>
       </div>
     </motion.div>

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
-import useTheme from '../theme/useTheme';
+import { motion } from 'framer-motion';
 
 export default function ShareButton({ shareText }) {
-  const { colors } = useTheme();
+  const prefersReduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -13,26 +14,34 @@ export default function ShareButton({ shareText }) {
           text: shareText
         });
       } catch (err) {
-        // User cancelled or error occurred
         if (err.name !== 'AbortError') {
           console.error('Share failed:', err);
         }
       }
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert('Copied to clipboard!');
+      } catch (err) {
+        console.error('Clipboard failed:', err);
+      }
     } else {
-      alert('Sharing is not supported on this device. Please copy the text manually.');
+      alert('Sharing is not supported on this device.');
     }
   };
-  
+
   return (
-    <Button
+    <motion.button
+      whileTap={prefersReduced ? undefined : { scale: 0.97 }}
       onClick={handleShare}
-      className="w-full py-6 rounded-2xl text-white font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+      className="w-full min-h-[52px] rounded-2xl font-semibold transition-all flex items-center justify-center gap-2"
       style={{
-        background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`
+        backgroundColor: 'var(--accent)',
+        color: 'var(--accentInk)'
       }}
     >
       <Share2 className="w-5 h-5" />
       Share Your Inventory
-    </Button>
+    </motion.button>
   );
 }
