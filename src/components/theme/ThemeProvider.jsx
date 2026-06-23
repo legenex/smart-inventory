@@ -26,13 +26,13 @@ const THEMES = {
 
 function resolveThemeName(name) {
   if (THEMES[name]) return name;
-  return 'tide';
+  return 'sage';
 }
 
 export const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  const [themeColor, setThemeColor] = useState('tide');
+  const [themeColor, setThemeColor] = useState('sage');
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -69,9 +69,9 @@ export function ThemeProvider({ children }) {
   const loadTheme = async () => {
     try {
       const user = await base44.auth.me();
-      setThemeColor(user.theme_color || 'tide');
+      setThemeColor(user.theme_color || 'sage');
     } catch (err) {
-      setThemeColor('tide');
+      setThemeColor('sage');
     }
     setLoading(false);
   };
