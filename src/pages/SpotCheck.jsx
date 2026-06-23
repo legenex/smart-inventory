@@ -7,9 +7,7 @@ import { ArrowLeft, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 import QuestionCard from '@/components/inventory/QuestionCard';
 import ProgressBar from '@/components/inventory/ProgressBar';
-import useTheme from '@/components/theme/useTheme';
 import NavigationMenu from '@/components/home/NavigationMenu';
-import { Button } from '@/components/ui/button';
 
 const SPOT_CHECK_QUESTIONS = [
   {
@@ -51,7 +49,6 @@ const SPOT_CHECK_QUESTIONS = [
 ];
 
 export default function SpotCheck() {
-  const { colors } = useTheme();
   const navigate = useNavigate();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [responses, setResponses] = useState({});
@@ -119,51 +116,48 @@ Be direct, warm, and brief. No bullet points.`,
 
   if (processing) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: 'var(--bg)' }}>
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             className="w-16 h-16 mx-auto mb-6 rounded-full border-4"
-            style={{ borderColor: `${colors.primary}20`, borderTopColor: colors.primary }}
+            style={{ borderColor: 'var(--line)', borderTopColor: 'var(--accent)' }}
           />
-          <h2 className="text-xl font-semibold text-[#1F2C46] mb-2">Checking in...</h2>
-          <p className="text-gray-500">Processing your spot check</p>
-        </div>
+          <h2 className="text-xl font-semibold font-display mb-2" style={{ color: 'var(--ink)' }}>Checking in...</h2>
+          <p style={{ color: 'var(--muted)' }}>Processing your spot check</p>
+        </motion.div>
       </div>
     );
   }
 
   if (completed) {
     return (
-      <div className="min-h-screen">
-        <div className="max-w-lg mx-auto px-6 py-8">
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
+        <div className="max-w-lg mx-auto px-4 md:px-6 py-8">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
-              style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})` }}
-            >
-              <Zap className="w-10 h-10 text-white" />
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: 'var(--soft)' }}>
+              <Zap className="w-8 h-8" style={{ color: 'var(--accent)' }} />
             </div>
-            <h2 className="text-2xl font-bold text-[#1F2C46] mb-2">Spot Check Complete</h2>
-            <p className="text-gray-500 mb-6">You paused, checked in, and took stock. That's the practice.</p>
+            <h2 className="text-2xl font-bold font-display mb-2" style={{ color: 'var(--ink)' }}>Spot Check Complete</h2>
+            <p className="mb-6" style={{ color: 'var(--muted)' }}>You paused, checked in, and took stock. That's the practice.</p>
 
             {reflection && (
-              <div
-                className="rounded-[20px] p-6 mb-8 text-left"
-                style={{ background: `linear-gradient(to bottom right, ${colors.primary}10, ${colors.secondary}10)` }}
-              >
-                <p className="text-gray-700 leading-relaxed italic">"{reflection}"</p>
+              <div className="rounded-3xl p-6 mb-8 text-left"
+                style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}>
+                <p className="leading-relaxed italic" style={{ color: 'var(--ink)' }}>"{reflection}"</p>
               </div>
             )}
 
-            <Button
+            <motion.button
+              whileTap={{ scale: 0.97 }}
               onClick={() => navigate(createPageUrl('Dashboard'))}
-              className="w-full py-4 rounded-2xl text-white text-lg font-medium"
-              style={{ background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})` }}
+              className="w-full min-h-[52px] rounded-2xl font-semibold"
+              style={{ backgroundColor: 'var(--accent)', color: 'var(--accentInk)' }}
             >
               Return to Dashboard
-            </Button>
+            </motion.button>
           </motion.div>
         </div>
       </div>
@@ -172,25 +166,26 @@ Be direct, warm, and brief. No bullet points.`,
 
   return (
     <div className="min-h-screen">
-      <div className="max-w-lg mx-auto px-6 py-8">
+      <div className="max-w-2xl mx-auto px-4 md:px-6 py-6">
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(createPageUrl('Dashboard'))}
-              className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center hover:shadow-md transition-shadow"
+              className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center"
+              style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}
             >
-              <ArrowLeft className="w-5 h-5 text-gray-600" />
+              <ArrowLeft className="w-5 h-5" style={{ color: 'var(--muted)' }} />
             </button>
             <div>
-              <h1 className="text-lg font-semibold text-[#1F2C46]">Spot Check Inventory</h1>
-              <p className="text-sm text-gray-500">{format(new Date(), 'EEEE, MMMM d · h:mm a')}</p>
+              <h1 className="text-lg font-semibold" style={{ color: 'var(--ink)' }}>Spot Check Inventory</h1>
+              <p className="text-sm" style={{ color: 'var(--muted)' }}>{format(new Date(), 'EEEE, MMMM d · h:mm a')}</p>
             </div>
           </div>
           <NavigationMenu />
         </div>
 
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 mb-4">
-          <p className="text-amber-800 text-sm font-medium">⚡ Quick check-in — pause and be honest with yourself right now.</p>
+        <div className="rounded-2xl px-4 py-3 mb-4" style={{ backgroundColor: 'var(--soft)' }}>
+          <p className="text-sm font-medium" style={{ color: 'var(--accent)' }}>⚡ Quick check-in — pause and be honest with yourself right now.</p>
         </div>
 
         <ProgressBar current={currentQuestion + 1} total={SPOT_CHECK_QUESTIONS.length} />

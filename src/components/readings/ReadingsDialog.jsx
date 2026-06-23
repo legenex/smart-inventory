@@ -7,31 +7,27 @@ import { base44 } from '@/api/base44Client';
 const READINGS = [
   {
     id: 'aa',
-    title: 'AA Daily Reflections',
-    description: 'Daily reflections from Alcoholics Anonymous',
-    icon: BookOpen,
-    gradient: 'from-blue-500 to-purple-500'
+    title: 'Daily Reflection',
+    description: 'A daily reflection for your journey',
+    icon: BookOpen
   },
   {
     id: 'na',
-    title: 'NA Just For Today',
-    description: 'Daily meditations from Narcotics Anonymous',
-    icon: Heart,
-    gradient: 'from-purple-500 to-pink-500'
+    title: 'Daily Meditation',
+    description: 'A daily meditation for growth',
+    icon: Heart
   },
   {
     id: 'hazelden',
-    title: 'Hazelden Twenty Four Hours a Day Reading',
-    description: 'Daily reflections for spiritual growth',
-    icon: Sparkles,
-    gradient: 'from-pink-500 to-orange-500'
+    title: 'Thought for the Day',
+    description: 'Daily thoughts and meditations',
+    icon: Sparkles
   },
   {
     id: 'slaa',
-    title: 'SLAA State of Grace',
-    description: 'Daily readings from Sex and Love Addicts Anonymous',
-    icon: Coffee,
-    gradient: 'from-teal-500 to-blue-500'
+    title: 'Daily Reading',
+    description: 'A daily reading for reflection',
+    icon: Coffee
   }
 ];
 
@@ -44,15 +40,15 @@ export default function ReadingsDialog({ open, onClose }) {
   const handleSelectReading = async (readingType) => {
     setSelectedReading(readingType);
     setLoading(true);
-    
+
     try {
-      const today = new Date().toLocaleDateString('en-US', { 
+      const today = new Date().toLocaleDateString('en-US', {
         weekday: 'long',
-        month: 'long', 
+        month: 'long',
         day: 'numeric',
         year: 'numeric'
       });
-      
+
       const response = await base44.functions.invoke('fetchDailyReadings', {
         readingType: readingType,
         date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
@@ -76,7 +72,8 @@ export default function ReadingsDialog({ open, onClose }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden rounded-3xl bg-white/95 backdrop-blur-md border-2" style={{ borderColor: 'var(--primary)' }}>
+      <DialogContent className="sm:max-w-2xl max-h-[85vh] p-0 overflow-hidden rounded-3xl"
+        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}>
         <AnimatePresence mode="wait">
           {!selectedReading ? (
             <motion.div
@@ -89,13 +86,14 @@ export default function ReadingsDialog({ open, onClose }) {
               <div className="flex items-center gap-3 mb-6">
                 <button
                   onClick={onClose}
-                  className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: 'var(--soft)' }}
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                  <ArrowLeft className="w-5 h-5" style={{ color: 'var(--muted)' }} />
                 </button>
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Today's Readings</h2>
-                  <p className="text-sm text-gray-500">Daily reflections for your journey</p>
+                  <h2 className="text-xl font-bold font-display" style={{ color: 'var(--ink)' }}>Today's Readings</h2>
+                  <p className="text-sm" style={{ color: 'var(--muted)' }}>Daily reflections for your journey</p>
                 </div>
               </div>
 
@@ -106,18 +104,21 @@ export default function ReadingsDialog({ open, onClose }) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => handleSelectReading(reading.id)}
-                    className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all text-left group"
+                    className="rounded-2xl p-4 transition-all text-left"
+                    style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--line)' }}
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${reading.gradient} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                        <reading.icon className="w-6 h-6 text-white" />
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+                        style={{ backgroundColor: 'var(--soft)' }}>
+                        <reading.icon className="w-6 h-6" style={{ color: 'var(--accent)' }} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{reading.title}</h3>
-                        <p className="text-xs text-gray-500">{reading.description}</p>
+                        <h3 className="font-semibold" style={{ color: 'var(--ink)' }}>{reading.title}</h3>
+                        <p className="text-xs" style={{ color: 'var(--muted)' }}>{reading.description}</p>
                       </div>
-                      <ArrowLeft className="w-5 h-5 text-gray-400 rotate-180" />
+                      <ArrowLeft className="w-5 h-5 rotate-180" style={{ color: 'var(--muted)' }} />
                     </div>
                   </motion.button>
                 ))}
@@ -131,41 +132,43 @@ export default function ReadingsDialog({ open, onClose }) {
               exit={{ opacity: 0, x: -20 }}
               className="h-full flex flex-col"
             >
-              <div className="flex items-center gap-3 p-6 pb-4 border-b border-gray-100">
+              <div className="flex items-center gap-3 p-6 pb-4" style={{ borderBottom: '1px solid var(--line)' }}>
                 <button
                   onClick={handleBack}
-                  className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-colors"
+                  className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: 'var(--soft)' }}
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-600" />
+                  <ArrowLeft className="w-5 h-5" style={{ color: 'var(--muted)' }} />
                 </button>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">{reading?.title}</h2>
-                  <p className="text-xs text-gray-500">{readingDate}</p>
+                  <h2 className="text-lg font-bold font-display" style={{ color: 'var(--ink)' }}>{reading?.title}</h2>
+                  <p className="text-xs" style={{ color: 'var(--muted)' }}>{readingDate}</p>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 pb-12 overscroll-contain">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
-                    <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-4 rounded-full animate-spin"
+                      style={{ borderColor: 'var(--line)', borderTopColor: 'var(--accent)' }} />
                   </div>
                 ) : selectedReading === 'hazelden' && typeof content === 'object' ? (
-                  <div className="space-y-6 text-gray-700 leading-relaxed pb-8">
+                  <div className="space-y-6 leading-relaxed pb-8" style={{ color: 'var(--ink)' }}>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Thought for the Day</h3>
+                      <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--ink)' }}>Thought for the Day</h3>
                       <p className="whitespace-pre-line">{content.thought}</p>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Meditation for the Day</h3>
+                      <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--ink)' }}>Meditation for the Day</h3>
                       <p className="whitespace-pre-line">{content.meditation}</p>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3">Prayer for the Day</h3>
+                      <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--ink)' }}>Prayer for the Day</h3>
                       <p className="whitespace-pre-line">{content.prayer}</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="text-gray-700 leading-relaxed pb-8">
+                  <div className="leading-relaxed pb-8" style={{ color: 'var(--ink)' }}>
                     <p className="whitespace-pre-line">{typeof content === 'string' ? content : JSON.stringify(content)}</p>
                   </div>
                 )}

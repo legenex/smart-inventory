@@ -21,6 +21,13 @@ const RECOVERY_COPY = {
   streakLabel: 'Day Streak',
   toolkitName: 'Spiritual Toolkit',
   toolkit: 'Spiritual Toolkit',
+  gratitudeTitle: 'Gratitude',
+  gratitudeDesc: 'Count your blessings and name what you\'re thankful for',
+  affirmationsTitle: 'Affirmations',
+  affirmationsDesc: 'Declare who you are and who you\'re becoming',
+  journalTitle: 'Journal',
+  journalDesc: 'Write or scan your handwritten reflections',
+  readingsDesc: 'Today\'s spiritual reflection',
 };
 
 const GENERAL_COPY = {
@@ -40,6 +47,13 @@ const GENERAL_COPY = {
   streakLabel: 'Day Streak',
   toolkitName: 'Daily Toolkit',
   toolkit: 'Daily Toolkit',
+  gratitudeTitle: 'Gratitude',
+  gratitudeDesc: 'Name what you\'re grateful for today',
+  affirmationsTitle: 'Affirmations',
+  affirmationsDesc: 'Write positive statements about yourself',
+  journalTitle: 'Journal',
+  journalDesc: 'Write or scan your reflections',
+  readingsDesc: 'Today\'s reflection to guide your day',
 };
 
 /**

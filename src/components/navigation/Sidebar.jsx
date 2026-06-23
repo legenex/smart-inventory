@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PenLine, TrendingUp, BookOpen, Settings as SettingsIcon, Plus, Flame } from 'lucide-react';
+import { Home, LayoutGrid, BookOpen, TrendingUp, Settings as SettingsIcon, Plus, Flame } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const NAV_ITEMS = [
   { label: 'Home', icon: Home, path: '/Dashboard' },
-  { label: 'Inventory', icon: PenLine, path: '/Inventory' },
-  { label: 'Insights', icon: TrendingUp, path: '/History' },
-  { label: 'Today', icon: BookOpen, path: '/TodayReadings' },
+  { label: 'Tools', icon: LayoutGrid, path: '/Tools' },
+  { label: 'Daily Readings', icon: BookOpen, path: '/TodayReadings' },
+  { label: 'Insights', icon: TrendingUp, path: '/Insights' },
   { label: 'Settings', icon: SettingsIcon, path: '/Settings' },
 ];
 
@@ -27,7 +27,7 @@ export default function Sidebar({ user }) {
             className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
             style={{ backgroundColor: 'var(--accent)' }}
           >
-            <PenLine className="w-4 h-4" style={{ color: 'var(--accentInk)' }} />
+            <LayoutGrid className="w-4 h-4" style={{ color: 'var(--accentInk)' }} />
           </div>
           <span className="font-bold text-base tracking-tight" style={{ color: 'var(--ink)' }}>
             Smart Inventory

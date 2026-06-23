@@ -560,13 +560,13 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Today's Reflection */}
         <motion.div {...cardProps(0.4)}
-          onClick={() => dailyReflection ? setShowReflectionDialog(true) : setShowReadings(true)}
+          onClick={() => navigate(createPageUrl('TodayReadings'))}
           className="rounded-[22px] p-5 cursor-pointer"
           style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--line)' }}>
           <div className="flex items-center gap-2 mb-2">
             <BookOpen className="w-4 h-4" style={{ color: 'var(--accent)' }} />
             <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--muted)' }}>
-              Today's Reflection
+              {copy.reflectionTitle}
             </p>
           </div>
           {dailyReflection ? (
@@ -614,7 +614,7 @@ export default function Dashboard() {
       <motion.div {...cardProps(0.5)}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold" style={{ color: 'var(--ink)' }}>Saved Inventories</h3>
-          <Link to={createPageUrl('History')}
+          <Link to={createPageUrl('Tools?tab=history')}
             className="text-xs px-3 py-1.5 rounded-full font-medium"
             style={{ backgroundColor: 'var(--soft)', color: 'var(--accent)' }}>
             View All

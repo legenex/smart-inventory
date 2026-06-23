@@ -1,6 +1,8 @@
 import './App.css'
 import GratitudeAffirmations from './pages/GratitudeAffirmations';
 import SpotCheck from './pages/SpotCheck';
+import Tools from './pages/Tools';
+import Insights from './pages/Insights';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -68,6 +70,8 @@ const AuthenticatedApp = () => {
       ))}
       <Route path="/GratitudeAffirmations" element={<LayoutWrapper currentPageName="GratitudeAffirmations"><GratitudeAffirmations /></LayoutWrapper>} />
       <Route path="/SpotCheck" element={<LayoutWrapper currentPageName="SpotCheck"><SpotCheck /></LayoutWrapper>} />
+      <Route path="/Tools" element={<LayoutWrapper currentPageName="Tools"><Tools /></LayoutWrapper>} />
+      <Route path="/Insights" element={<LayoutWrapper currentPageName="Insights"><Insights /></LayoutWrapper>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

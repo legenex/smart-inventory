@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, PenLine, TrendingUp, BookOpen, Settings as SettingsIcon } from 'lucide-react';
+import { Home, LayoutGrid, BookOpen, TrendingUp, Settings as SettingsIcon } from 'lucide-react';
 
 const TABS = [
   { label: 'Home', icon: Home, path: '/Dashboard' },
-  { label: 'Inventory', icon: PenLine, path: '/Inventory' },
-  { label: 'Insights', icon: TrendingUp, path: '/History' },
-  { label: 'Today', icon: BookOpen, path: '/TodayReadings' },
+  { label: 'Tools', icon: LayoutGrid, path: '/Tools' },
+  { label: 'Daily Readings', icon: BookOpen, path: '/TodayReadings' },
+  { label: 'Insights', icon: TrendingUp, path: '/Insights' },
   { label: 'Settings', icon: SettingsIcon, path: '/Settings' },
 ];
 
@@ -25,7 +25,7 @@ export default function BottomTabBar() {
           <Link
             key={tab.label}
             to={tab.path}
-            className="flex flex-col items-center gap-0.5 py-2 px-3 min-h-[52px] justify-center transition-colors"
+            className="flex flex-col items-center gap-0.5 py-2 px-2 min-h-[52px] justify-center transition-colors max-w-[20%]"
           >
             <tab.icon
               className="w-5 h-5"
@@ -33,7 +33,7 @@ export default function BottomTabBar() {
               strokeWidth={isActive ? 2.5 : 2}
             />
             <span
-              className="text-[10px] font-medium"
+              className="text-[10px] font-medium text-center leading-tight"
               style={{ color: isActive ? 'var(--accent)' : 'var(--muted)' }}
             >
               {tab.label}
