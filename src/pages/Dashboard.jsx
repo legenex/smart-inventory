@@ -1,45 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { PenLine, ChevronRight, Trash2, LogOut, ChevronDown, Settings as SettingsIcon, BookOpen, Heart, Zap } from 'lucide-react';
 import InventoryDateDialog from '@/components/inventory/InventoryDateDialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { format, isToday, differenceInDays, parseISO } from 'date-fns';
-import HeroMilestone from '@/components/home/HeroMilestone';
-import ReadingCard from '@/components/home/ReadingCard';
-import ToolkitSection from '@/components/home/ToolkitSection';
+import StreakCounter from '@/components/home/StreakCounter';
 import InventoryCard from '@/components/home/InventoryCard';
 import InsightsChart from '@/components/home/InsightsChart';
+import InventoryInsights from '@/components/home/InventoryInsights';
 import useTheme from '@/components/theme/useTheme';
 import MoodCheckIn from '@/components/home/MoodCheckIn';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import ResponsiveMenu from '@/components/ui/responsive-menu';
-import { getCopy } from '@/lib/mode';
+import ReadingsDialog from '@/components/readings/ReadingsDialog';
 
 const toTitleCase = (str) => {
   if (!str) return '';
-  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+  return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+};
+
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good Morning';
+  if (hour < 18) return 'Good Afternoon';
+  return 'Good Evening';
 };
 
 export default function Dashboard() {
   const { colors } = useTheme();
   const [user, setUser] = useState(null);
   const [showMoodCheckIn, setShowMoodCheckIn] = useState(false);
+  const [showReadings, setShowReadings] = useState(false);
   const [showInventoryDialog, setShowInventoryDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const prefersReducedMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+  
   useEffect(() => {
     loadUser();
   }, [location]);
-
+  
   const loadUser = async () => {
     try {
       const userData = await base44.auth.me();
@@ -53,7 +62,7 @@ export default function Dashboard() {
     }
   };
 
-  // Reload user data periodically to keep it fresh
+  // Reload user data every 2 seconds to keep it fresh
   useEffect(() => {
     const interval = setInterval(loadUser, 2000);
     return () => clearInterval(interval);
@@ -68,26 +77,22 @@ export default function Dashboard() {
       }
     }
   }, [user]);
-
+  
   const { data: entries = [], isLoading, refetch } = useQuery({
     queryKey: ['inventoryEntries'],
     queryFn: () => base44.entities.InventoryEntry.list('-date', 50),
-    enabled: !!user,
-  });
-
-  const { pullDistance, isRefreshing } = usePullToRefresh(async () => {
-    await refetch();
+    enabled: !!user
   });
 
   const { data: journalEntries = [] } = useQuery({
     queryKey: ['journalEntries'],
     queryFn: () => base44.entities.JournalEntry.list('-date', 5),
-    enabled: !!user,
+    enabled: !!user
   });
 
   // Check for draft
   const [draftExists, setDraftExists] = useState(false);
-
+  
   useEffect(() => {
     const draft = localStorage.getItem('inventory_draft');
     setDraftExists(!!draft);
@@ -103,272 +108,290 @@ export default function Dashboard() {
   const handleDeleteEntry = (deletedId) => {
     refetch();
   };
-
+  
   // Calculate streak
   const calculateStreak = () => {
     if (!entries.length) return 0;
-
+    
     let streak = 0;
     const sortedEntries = [...entries].sort((a, b) => new Date(b.date) - new Date(a.date));
-
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
+    
     for (let i = 0; i < sortedEntries.length; i++) {
       const entryDate = new Date(sortedEntries[i].date);
       entryDate.setHours(0, 0, 0, 0);
-
+      
       const expectedDate = new Date(today);
       expectedDate.setDate(expectedDate.getDate() - streak);
-
+      
       if (entryDate.getTime() === expectedDate.getTime()) {
         streak++;
       } else if (streak === 0 && differenceInDays(today, entryDate) === 1) {
+        // Allow for yesterday if no entry today yet
         streak++;
       } else {
         break;
       }
     }
-
+    
     return streak;
   };
-
-  const todayEntry = entries.find((e) => isToday(parseISO(e.date)));
+  
+  const todayEntry = entries.find(e => isToday(parseISO(e.date)));
   const streak = calculateStreak();
-  const copy = getCopy(user?.recovery_status);
-
+  
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#F5F5F7] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-[#7667E5] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
-
-  const firstName =
-    toTitleCase(user.display_name || user.full_name)?.split(' ')[0] || 'Friend';
-
+  
   return (
     <div className="min-h-screen">
-      {(pullDistance > 0 || isRefreshing) && (
-        <div
-          className="flex justify-center items-end overflow-hidden"
-          style={{ height: pullDistance }}
-        >
-          <div
-            className={`w-6 h-6 border-2 border-primary border-t-transparent rounded-full ${
-              isRefreshing ? 'animate-spin' : ''
-            }`}
-            style={{ opacity: Math.min(pullDistance / 60, 1) }}
-          />
-        </div>
-      )}
-
-      <div className="max-w-2xl mx-auto px-5 sm:px-6 py-6 pb-28">
+      <div className="max-w-4xl mx-auto px-6 py-8 pb-24">
         {/* Header */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-6"
+          className="flex items-center justify-between mb-8"
         >
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-0.5">
-              {copy.dashboardGreeting}
-            </p>
-            <h1 className="font-display text-2xl font-semibold text-foreground leading-tight">
-              {firstName}
+            <h1 className="text-3xl font-extrabold text-[#1F2C46] leading-tight">
+              {getTimeBasedGreeting()}, {toTitleCase(user.display_name || user.full_name)?.split(' ')[0] || 'Friend'}
             </h1>
           </div>
-          <ResponsiveMenu
-            trigger={
-              <button className="flex items-center gap-2 bg-card rounded-full shadow-soft border border-border px-2 py-1.5 hover:shadow-md transition-shadow">
-                <Avatar className="w-9 h-9">
-                  <AvatarImage
-                    src={user.profile_picture}
-                    alt={user.display_name || user.full_name}
-                  />
-                  <AvatarFallback
-                    className="text-xs font-medium text-primary-foreground"
-                    style={{ backgroundColor: colors.primary }}
-                  >
-                    {(user.display_name || user.full_name)
-                      ?.split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 bg-white rounded-2xl shadow-sm px-3 py-2 hover:shadow-md transition-shadow">
+                <div className="relative">
+                  <Avatar className="w-10 h-10 ring-2" style={{ borderColor: colors.primary, borderWidth: '2px' }}>
+                    <AvatarImage src={user.profile_picture} alt={user.display_name || user.full_name} />
+                    <AvatarFallback className="text-sm font-medium" style={{ background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`, color: 'white' }}>
+                      {(user.display_name || user.full_name)?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <span className="text-sm font-medium text-[#1F2C46]">{toTitleCase(user.display_name || user.full_name)?.split(' ')[0]}</span>
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
-            }
-            title="Account"
-            items={[
-              { label: 'Settings', icon: SettingsIcon, onClick: () => navigate(createPageUrl('Settings')) },
-              { separator: true },
-              { label: 'Sign Out', icon: LogOut, onClick: () => base44.auth.logout(), className: 'text-red-600' },
-            ]}
-          />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => navigate(createPageUrl('Settings'))}>
+                <SettingsIcon className="w-4 h-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => base44.auth.logout()} className="text-red-600 focus:text-red-600">
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </motion.div>
-
-        {/* Hero Milestone */}
-        <div className="mb-4">
-          <HeroMilestone user={user} streak={streak} />
-        </div>
-
-        {/* Primary Action */}
-        <motion.button
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+        
+        {/* Top Row: Streak + Readings */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: prefersReducedMotion ? 0 : 0.1 }}
-          whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
-          onClick={() => {
-            if (todayEntry) {
-              navigate(createPageUrl(`HistoryDetail?id=${todayEntry.id}`));
-            } else {
-              setShowInventoryDialog(true);
-            }
-          }}
-          className="w-full bg-primary text-primary-foreground rounded-card p-5 shadow-soft flex items-center gap-4 text-left transition-shadow hover:shadow-md mb-4"
+          transition={{ delay: 0.1 }}
+          className="mb-3 grid grid-cols-1 md:grid-cols-2 gap-3"
         >
-          <div className="w-11 h-11 rounded-full flex items-center justify-center bg-primary-foreground/15 flex-shrink-0">
-            <PenLine className="w-5 h-5 text-primary-foreground" strokeWidth={1.5} />
+          <StreakCounter streak={streak} />
+          
+          <button 
+            onClick={() => setShowReadings(true)}
+            className="bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left h-full"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg group-hover:scale-105 transition-transform">
+                <BookOpen className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-[#1F2C46]">Today's Readings</h2>
+                <p className="text-gray-500 text-sm">AA, NA, Hazelden & SLAA daily reflections</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+          </button>
+        </motion.div>
+        
+        {/* Main CTA - Start Inventory */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-3"
+        >
+          <button
+            onClick={() => {
+              if (todayEntry) {
+                navigate(createPageUrl(`HistoryDetail?id=${todayEntry.id}`));
+              } else {
+                setShowInventoryDialog(true);
+              }
+            }}
+            className="w-full bg-white rounded-[25px] p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+          >
+            <div className="flex items-center gap-4">
+              <div 
+                className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform"
+                style={{
+                  background: `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
+                }}
+              >
+                <PenLine className="w-7 h-7 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-lg font-semibold text-[#1F2C46]">
+                  {todayEntry ? "View Today's Inventory" : "Write Inventory"}
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  {todayEntry ? 'You already reflected today' : 'Reflect on today or catch up on past days'}
+                </p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            </div>
+          </button>
+        </motion.div>
+        
+        {/* Spiritual Toolkit */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22 }}
+          className="mb-3"
+        >
+          <h3 className="text-lg font-semibold text-[#1F2C46] mb-3">Spiritual Toolkit</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => navigate(createPageUrl('GratitudeAffirmations'))}
+              className="bg-white rounded-[20px] p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 bg-gradient-to-br from-pink-400 to-rose-500 shadow-md group-hover:scale-105 transition-transform">
+                <Heart className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-[#1F2C46] text-sm leading-tight">Gratitude &amp; Affirmations</h4>
+              <p className="text-xs text-gray-500 mt-1">Daily practice</p>
+            </button>
+            <button
+              onClick={() => navigate(createPageUrl('SpotCheck'))}
+              className="bg-white rounded-[20px] p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 group text-left"
+            >
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 bg-gradient-to-br from-amber-400 to-orange-500 shadow-md group-hover:scale-105 transition-transform">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <h4 className="font-semibold text-[#1F2C46] text-sm leading-tight">Spot Check</h4>
+              <p className="text-xs text-gray-500 mt-1">Quick inventory</p>
+            </button>
           </div>
-          <div className="flex-1">
-            <h2 className="font-display text-base font-semibold">
-              {todayEntry ? "View Today's Entry" : copy.inventoryVerb}
-            </h2>
-            <p className="text-sm text-primary-foreground/80">
-              {todayEntry
-                ? 'You already reflected today'
-                : 'Reflect on today or catch up on past days'}
-            </p>
-          </div>
-          <ChevronRight className="w-5 h-5 text-primary-foreground/80 flex-shrink-0" />
-        </motion.button>
-
-        {/* Reading Card */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: prefersReducedMotion ? 0 : 0.15 }}
-          className="mb-4"
-        >
-          <ReadingCard user={user} />
         </motion.div>
 
-        {/* Toolkit */}
+        {/* Inventory Insights */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: prefersReducedMotion ? 0 : 0.2 }}
-          className="mb-4"
-        >
-          <ToolkitSection user={user} />
-        </motion.div>
-
-        {/* Insights */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: prefersReducedMotion ? 0 : 0.25 }}
+          transition={{ delay: 0.3 }}
           className="mb-8"
         >
           <InsightsChart entries={entries} />
         </motion.div>
-
-        {/* Saved Inventories */}
+        
+        {/* Previous Inventories */}
         <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: prefersReducedMotion ? 0 : 0.3 }}
+          transition={{ delay: 0.4 }}
         >
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display text-lg font-semibold text-foreground">Saved Entries</h3>
-            <Link
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-[#1F2C46]">Saved Inventories</h3>
+            <Link 
               to={createPageUrl('History')}
-              className="text-xs px-3 py-1.5 rounded-full font-medium text-primary border border-border hover:bg-muted transition-colors"
+              className="text-xs px-3 py-1.5 rounded-full font-medium hover:opacity-80 transition-opacity"
+              style={{
+                backgroundColor: `${colors.primary}20`,
+                color: '#000'
+              }}
             >
-              View All
+              View All Inventories
             </Link>
           </div>
-
+          
           {isLoading ? (
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="bg-card rounded-card p-5 shadow-soft border border-border animate-pulse"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-muted rounded-full" />
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="bg-white rounded-[20px] p-5 animate-pulse">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-2xl" />
                     <div className="flex-1">
-                      <div className="h-4 bg-muted rounded w-3/4 mb-2" />
-                      <div className="h-3 bg-muted rounded w-1/2" />
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                      <div className="h-3 bg-gray-100 rounded w-1/2" />
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : entries.length === 0 ? (
-            <div className="bg-card rounded-card p-8 text-center shadow-soft border border-border">
-              <p className="text-muted-foreground">No reflections yet. Start your first inventory.</p>
+            <div className="bg-white rounded-[20px] p-8 text-center">
+              <p className="text-gray-500">No reflections yet. Start your first inventory!</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {draftExists && (
                 <motion.div
-                  initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
+                  className="relative"
                 >
-                  <Link
+                  <Link 
                     to={createPageUrl('Inventory')}
-                    className="block bg-card rounded-card p-5 shadow-soft border-2 border-dashed border-primary hover:shadow-md transition-shadow"
+                    className="block bg-white rounded-[20px] p-5 shadow-sm border-2 border-dashed hover:shadow-md transition-all duration-300"
+                    style={{ borderColor: colors.primary }}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted">
-                          <PenLine
-                            className="w-4 h-4"
-                            style={{ color: colors.primary }}
-                            strokeWidth={1.5}
-                          />
+                      <div className="flex items-center gap-4 flex-1">
+                        <div 
+                          className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                          style={{
+                            background: `linear-gradient(to bottom right, ${colors.primary}20, ${colors.secondary}20)`
+                          }}
+                        >
+                          <PenLine className="w-5 h-5" style={{ color: colors.primary }} />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="font-display font-semibold text-foreground">
-                              {format(new Date(), 'EEEE, MMMM d')}
-                            </p>
-                            <span
-                              className="text-xs px-2 py-0.5 rounded-full font-medium text-primary-foreground"
-                              style={{ backgroundColor: colors.primary }}
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="font-semibold text-[#1F2C46]">{format(new Date(), 'EEEE, MMMM d')}</p>
+                            <span 
+                              className="text-xs px-2 py-0.5 rounded-full font-medium"
+                              style={{
+                                backgroundColor: `${colors.primary}20`,
+                                color: colors.primary
+                              }}
                             >
                               Draft
                             </span>
                           </div>
-                          <p className="text-xs text-muted-foreground">Continue your entry</p>
+                          <p className="text-sm text-gray-500">Continue your inventory</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={handleDeleteDraft}
-                          className="p-2 hover:bg-muted rounded-control transition-colors"
+                          className="p-2 hover:bg-red-50 rounded-xl transition-colors"
                         >
-                          <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive transition-colors" />
+                          <Trash2 className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors" />
                         </button>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
                     </div>
                   </Link>
                 </motion.div>
               )}
               {entries.slice(0, 5).map((entry, index) => (
-                <InventoryCard
-                  key={entry.id}
-                  entry={entry}
-                  index={index}
-                  onDelete={handleDeleteEntry}
-                />
+                <InventoryCard key={entry.id} entry={entry} index={index} onDelete={handleDeleteEntry} />
               ))}
             </div>
           )}
@@ -377,46 +400,45 @@ export default function Dashboard() {
         {/* Journaling History */}
         {journalEntries.length > 0 && (
           <motion.div
-            initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: prefersReducedMotion ? 0 : 0.35 }}
+            transition={{ delay: 0.5 }}
             className="mt-8"
           >
-            <h3 className="font-display text-lg font-semibold text-foreground mb-3">
-              Journaling History
-            </h3>
-            <div className="space-y-2">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-[#1F2C46]">Journaling History</h3>
+            </div>
+            
+            <div className="space-y-3">
               {journalEntries.map((journal, index) => (
                 <motion.div
                   key={journal.id}
-                  initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: prefersReducedMotion ? 0 : 0.35 + index * 0.05 }}
-                  whileTap={prefersReducedMotion ? undefined : { scale: 0.97 }}
+                  transition={{ delay: 0.5 + index * 0.05 }}
                 >
-                  <Link
+                  <Link 
                     to={createPageUrl(`HistoryDetail?id=${journal.inventory_id}`)}
-                    className="block bg-card rounded-card p-5 shadow-soft border border-border hover:shadow-md transition-shadow"
+                    className="block bg-white rounded-[20px] p-5 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-muted">
-                          <PenLine
-                            className="w-4 h-4"
-                            style={{ color: colors.primary }}
-                            strokeWidth={1.5}
-                          />
+                      <div className="flex items-center gap-4 flex-1">
+                        <div 
+                          className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                          style={{
+                            background: `linear-gradient(to bottom right, ${colors.primary}20, ${colors.secondary}20)`
+                          }}
+                        >
+                          <PenLine className="w-5 h-5" style={{ color: colors.primary }} />
                         </div>
                         <div className="flex-1">
-                          <p className="font-display font-semibold text-foreground">
-                            {format(new Date(journal.date), 'EEEE, MMMM d')}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="font-semibold text-[#1F2C46]">{format(new Date(journal.date), 'EEEE, MMMM d')}</p>
+                          <p className="text-sm text-gray-500">
                             {journal.emotional_analysis?.overall_mood || 'Journal entry'}
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
                     </div>
                   </Link>
                 </motion.div>
@@ -426,7 +448,15 @@ export default function Dashboard() {
         )}
       </div>
 
-      <MoodCheckIn open={showMoodCheckIn} onClose={() => setShowMoodCheckIn(false)} />
+      <MoodCheckIn 
+        open={showMoodCheckIn} 
+        onClose={() => setShowMoodCheckIn(false)} 
+      />
+      
+      <ReadingsDialog
+        open={showReadings}
+        onClose={() => setShowReadings(false)}
+      />
 
       <InventoryDateDialog
         open={showInventoryDialog}

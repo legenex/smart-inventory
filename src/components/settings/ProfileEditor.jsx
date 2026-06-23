@@ -1,17 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Edit2, X, Check, LogOut, Trash2, AlertTriangle } from 'lucide-react';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Camera, Edit2, X, Check, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -37,30 +26,6 @@ export default function ProfileEditor({ user, onUpdate }) {
   const [bio, setBio] = useState(user.bio || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  const handleDeleteAccount = async () => {
-    setDeleting(true);
-    try {
-      await base44.entities.InventoryEntry.deleteMany({});
-      await base44.entities.JournalEntry.deleteMany({});
-      await base44.entities.GratitudeEntry.deleteMany({});
-      await base44.entities.SpotCheckEntry.deleteMany({});
-      await base44.auth.updateMe({
-        display_name: null,
-        bio: null,
-        location: null,
-        profile_picture: null,
-        onboarding_completed: false,
-      });
-      await base44.auth.logout();
-    } catch (err) {
-      console.error('Error deleting account:', err);
-      alert('Failed to delete account data. Please try again or contact support.');
-    }
-    setDeleting(false);
-  };
   
   // Calculate age from date of birth
   const calculateAge = (dob) => {
@@ -382,50 +347,13 @@ export default function ProfileEditor({ user, onUpdate }) {
         <p className="text-sm text-gray-500 mb-4">
           You'll need to log back in to access your account
         </p>
-        <Button
-          variant="destructive"
+        <Button 
+          variant="destructive" 
           onClick={() => base44.auth.logout()}
           className="w-full rounded-xl"
         >
           Sign Out
         </Button>
-      </div>
-
-      {/* Delete Account Section */}
-      <div className="bg-card rounded-card p-6 shadow-soft border border-red-100">
-        <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className="w-5 h-5 text-red-600" />
-          <h3 className="text-lg font-semibold text-red-600">Delete Account</h3>
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Permanently delete your account and all associated data. This action cannot be undone.
-        </p>
-        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" className="w-full rounded-xl">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete Account
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete account permanently?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will permanently delete all your inventories, journal entries, gratitude entries, and profile data. This action cannot be undone. If you proceed, you will be signed out immediately.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDeleteAccount}
-                disabled={deleting}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                {deleting ? 'Deleting...' : 'Yes, delete my account'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     </div>
   );
