@@ -47,6 +47,11 @@ const GENERAL_QUESTIONS = [
   { id: 'gratitude', question: 'What Are You Grateful for Today?', type: 'gratitude' }
 ];
 
+const cardStyle = {
+  backgroundColor: 'var(--surface)',
+  border: '1px solid var(--line)',
+};
+
 export default function QuestionSettings({ user, onSave }) {
   const [settings, setSettings] = useState(null);
   const [orderedQuestions, setOrderedQuestions] = useState([]);
@@ -74,7 +79,6 @@ export default function QuestionSettings({ user, onSave }) {
         .filter(q => q);
       setOrderedQuestions(ordered);
     } else {
-      // Initialize with default (non-optional) questions
       const defaultQuestions = allQuestions.filter(q => !q.optional);
       const defaultOrder = defaultQuestions.map(q => q.id);
       setOrderedQuestions(defaultQuestions);
@@ -169,29 +173,35 @@ export default function QuestionSettings({ user, onSave }) {
   };
 
   if (!settings) {
-    return <div className="text-center py-8">Loading...</div>;
+    return <div className="text-center py-8 text-muted-foreground">Loading...</div>;
   }
 
-  // Separate main questions and optional questions
   const gratitudeIndex = orderedQuestions.findIndex(q => q.id === 'gratitude');
-  const mainQuestions = gratitudeIndex !== -1 
+  const mainQuestions = gratitudeIndex !== -1
     ? orderedQuestions.slice(0, gratitudeIndex)
     : orderedQuestions.filter(q => !q.optional);
   const gratitudeQuestion = orderedQuestions.find(q => q.id === 'gratitude');
   const optionalQuestions = allQuestions.filter(q => q.optional);
-  const enabledOptionalQuestions = mainQuestions.filter(q => 
-    optionalQuestions.some(opt => opt.id === q.id)
-  );
-  const additionalQuestions = optionalQuestions.filter(q => 
+  const additionalQuestions = optionalQuestions.filter(q =>
     !settings.enabled_questions.includes(q.id)
   );
+
+  const questionCardStyle = {
+    backgroundColor: 'var(--surface)',
+    border: '1px solid var(--line)',
+  };
+
+  const additionalCardStyle = {
+    backgroundColor: 'var(--soft)',
+    border: '1px solid var(--line)',
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[#1F2C46]">Inventory Questions</h3>
-          <p className="text-sm text-gray-500">Customize which questions appear in your daily inventory</p>
+          <h3 className="text-lg font-semibold text-foreground">Inventory Questions</h3>
+          <p className="text-sm text-muted-foreground">Customize which questions appear in your daily inventory</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -213,15 +223,15 @@ export default function QuestionSettings({ user, onSave }) {
           </Button>
         </div>
       </div>
-      
+
       {/* Enable/Disable Customization */}
-      <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <div className="rounded-xl p-4" style={cardStyle}>
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h4 className="font-semibold text-[#1F2C46]">Enable Question Customization</h4>
-            <p className="text-sm text-gray-600 mt-1">
-              {settings.customization_enabled 
-                ? 'Custom question settings are active' 
+            <h4 className="font-semibold text-foreground">Enable Question Customization</h4>
+            <p className="text-sm text-muted-foreground mt-1">
+              {settings.customization_enabled
+                ? 'Custom question settings are active'
                 : 'Using default questions - toggle to customize'}
             </p>
           </div>
@@ -236,10 +246,10 @@ export default function QuestionSettings({ user, onSave }) {
           />
         </div>
       </div>
-      
-      {/* Main Questions (enabled and before gratitude) */}
+
+      {/* Main Questions */}
       <div className="space-y-3">
-        <h4 className="text-sm font-semibold text-gray-700">Main Questions</h4>
+        <h4 className="text-sm font-semibold text-muted-foreground">Main Questions</h4>
 
         {editMode ? (
           <DragDropContext onDragEnd={handleDragEnd}>
@@ -252,21 +262,22 @@ export default function QuestionSettings({ user, onSave }) {
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-3"
+                          className="rounded-xl p-4 flex items-center gap-3"
+                          style={{ ...questionCardStyle, ...provided.draggableProps.style }}
                         >
                           <div {...provided.dragHandleProps}>
-                            <GripVertical className="w-5 h-5 text-gray-400" />
+                            <GripVertical className="w-5 h-5 text-muted-foreground" />
                           </div>
                           <div className="flex-1">
-                            <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                            <p className="font-medium text-foreground">{question.question}</p>
                             {question.description && (
-                              <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                              <p className="text-sm text-muted-foreground mt-1">{question.description}</p>
                             )}
                           </div>
                           <Switch
-                           checked={settings.enabled_questions.includes(question.id)}
-                           onCheckedChange={() => handleToggle(question.id)}
-                           disabled={!settings.customization_enabled}
+                            checked={settings.enabled_questions.includes(question.id)}
+                            onCheckedChange={() => handleToggle(question.id)}
+                            disabled={!settings.customization_enabled}
                           />
                           {question.id.startsWith('custom_') && (
                             <Button
@@ -274,7 +285,7 @@ export default function QuestionSettings({ user, onSave }) {
                               size="icon"
                               onClick={() => handleDeleteCustomQuestion(question.id)}
                             >
-                              <Trash2 className="w-4 h-4 text-red-500" />
+                              <Trash2 className="w-4 h-4 text-destructive" />
                             </Button>
                           )}
                         </div>
@@ -289,12 +300,12 @@ export default function QuestionSettings({ user, onSave }) {
         ) : (
           <div className="space-y-2">
             {mainQuestions.filter(q => q.id !== 'gratitude').map((question, index) => (
-              <div key={question.id} className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
-                <span className="text-sm font-medium text-gray-400 w-8">{index + 1}</span>
+              <div key={question.id} className="rounded-xl p-4 flex items-center gap-4" style={questionCardStyle}>
+                <span className="text-sm font-medium text-muted-foreground w-8">{index + 1}</span>
                 <div className="flex-1">
-                  <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                  <p className="font-medium text-foreground">{question.question}</p>
                   {question.description && (
-                    <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{question.description}</p>
                   )}
                 </div>
                 <Switch
@@ -308,7 +319,7 @@ export default function QuestionSettings({ user, onSave }) {
                     size="icon"
                     onClick={() => handleDeleteCustomQuestion(question.id)}
                   >
-                    <Trash2 className="w-4 h-4 text-red-500" />
+                    <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 )}
               </div>
@@ -316,16 +327,16 @@ export default function QuestionSettings({ user, onSave }) {
           </div>
         )}
       </div>
-      
-      {/* Gratitude Question (always last) */}
+
+      {/* Gratitude Question */}
       {gratitudeQuestion && (
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">Gratitude</h4>
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 flex items-center gap-4">
+          <h4 className="text-sm font-semibold text-muted-foreground">Gratitude</h4>
+          <div className="rounded-xl p-4 flex items-center gap-4" style={questionCardStyle}>
             <div className="flex-1">
-              <p className="font-medium text-[#1F2C46]">{gratitudeQuestion.question}</p>
+              <p className="font-medium text-foreground">{gratitudeQuestion.question}</p>
               {gratitudeQuestion.description && (
-                <p className="text-sm text-gray-500 mt-1">{gratitudeQuestion.description}</p>
+                <p className="text-sm text-muted-foreground mt-1">{gratitudeQuestion.description}</p>
               )}
             </div>
             <Switch
@@ -336,26 +347,25 @@ export default function QuestionSettings({ user, onSave }) {
           </div>
         </div>
       )}
-      
-      {/* Additional Questions (Optional, off by default) */}
+
+      {/* Additional Questions */}
       {additionalQuestions.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-700">Additional Questions</h4>
-          <p className="text-xs text-gray-500 mb-2">Enable these questions to add them to your main inventory</p>
+          <h4 className="text-sm font-semibold text-muted-foreground">Additional Questions</h4>
+          <p className="text-xs text-muted-foreground mb-2">Enable these questions to add them to your main inventory</p>
           <div className="space-y-2">
             {additionalQuestions.map((question) => (
-              <div key={question.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center gap-4">
+              <div key={question.id} className="rounded-xl p-4 flex items-center gap-4" style={additionalCardStyle}>
                 <div className="flex-1">
-                  <p className="font-medium text-[#1F2C46]">{question.question}</p>
+                  <p className="font-medium text-foreground">{question.question}</p>
                   {question.description && (
-                    <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{question.description}</p>
                   )}
                 </div>
                 <Switch
                   checked={settings.enabled_questions.includes(question.id)}
                   onCheckedChange={() => {
                     if (!settings.enabled_questions.includes(question.id)) {
-                      // Add to main questions (before gratitude)
                       const gratitudeIdx = settings.question_order.indexOf('gratitude');
                       const newOrder = [...settings.question_order];
                       if (gratitudeIdx !== -1) {
@@ -363,14 +373,13 @@ export default function QuestionSettings({ user, onSave }) {
                       } else {
                         newOrder.push(question.id);
                       }
-                      
+
                       setSettings({
                         ...settings,
                         enabled_questions: [...settings.enabled_questions, question.id],
                         question_order: newOrder
                       });
-                      
-                      // Update ordered questions
+
                       const newOrderedQuestions = newOrder
                         .map(id => allQuestions.find(q => q.id === id) || settings.custom_questions?.find(q => q.id === id))
                         .filter(q => q);
@@ -387,7 +396,7 @@ export default function QuestionSettings({ user, onSave }) {
         </div>
       )}
 
-      <Button onClick={handleSave} disabled={saving} className="w-full">
+      <Button onClick={handleSave} disabled={saving} className="w-full min-h-[44px]">
         {saving ? 'Saving...' : 'Save Changes'}
       </Button>
 
@@ -398,7 +407,7 @@ export default function QuestionSettings({ user, onSave }) {
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Question</label>
+              <label className="text-sm font-medium text-foreground mb-2 block">Question</label>
               <Input
                 placeholder="Enter your question..."
                 value={newQuestion.question}
@@ -406,7 +415,7 @@ export default function QuestionSettings({ user, onSave }) {
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Description (optional)</label>
+              <label className="text-sm font-medium text-foreground mb-2 block">Description (optional)</label>
               <Textarea
                 placeholder="Add a description to guide your reflection..."
                 value={newQuestion.description}

@@ -33,19 +33,29 @@ export const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [themeColor, setThemeColor] = useState('sage');
+  const [appearanceMode, setAppearanceModeState] = useState('system');
   const [darkMode, setDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)');
-    setDarkMode(mq.matches);
-    const handler = (e) => setDarkMode(e.matches);
-    mq.addEventListener('change', handler);
-
+    const savedMode = typeof localStorage !== 'undefined'
+      ? (localStorage.getItem('appearance_mode') || 'system')
+      : 'system';
+    setAppearanceModeState(savedMode);
     loadTheme();
-
-    return () => mq.removeEventListener('change', handler);
   }, []);
+
+  useEffect(() => {
+    if (appearanceMode === 'system') {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      setDarkMode(mq.matches);
+      const handler = (e) => setDarkMode(e.matches);
+      mq.addEventListener('change', handler);
+      return () => mq.removeEventListener('change', handler);
+    } else {
+      setDarkMode(appearanceMode === 'dark');
+    }
+  }, [appearanceMode]);
 
   useEffect(() => {
     const resolved = resolveThemeName(themeColor);
@@ -80,6 +90,13 @@ export function ThemeProvider({ children }) {
     setThemeColor(newTheme);
   };
 
+  const setAppearanceMode = (mode) => {
+    setAppearanceModeState(mode);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('appearance_mode', mode);
+    }
+  };
+
   const resolved = resolveThemeName(themeColor);
   const tokens = THEMES[resolved][darkMode ? 'dark' : 'light'];
 
@@ -106,6 +123,8 @@ export function ThemeProvider({ children }) {
       loading,
       updateTheme,
       darkMode,
+      appearanceMode,
+      setAppearanceMode,
       tokens
     }}>
       {children}

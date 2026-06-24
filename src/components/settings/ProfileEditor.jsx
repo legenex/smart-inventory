@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Camera, Edit2, X, Check, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Camera, Edit2, X, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { base44 } from '@/api/base44Client';
-import useTheme from '../theme/useTheme';
+import { isRecovery, getCopy } from '@/lib/mode';
 import { differenceInYears, differenceInMonths, differenceInWeeks, differenceInDays, differenceInMinutes } from 'date-fns';
 
 const toTitleCase = (str) => {
@@ -13,21 +11,33 @@ const toTitleCase = (str) => {
   return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
 };
 
+const cardStyle = {
+  backgroundColor: 'var(--surface)',
+  border: '1px solid var(--line)',
+};
+
+const fieldStyle = {
+  backgroundColor: 'var(--soft)',
+  border: '1px solid var(--line)',
+  color: 'var(--ink)',
+};
+
 export default function ProfileEditor({ user, onUpdate }) {
-  const { colors } = useTheme();
+  const recovery = isRecovery(user.recovery_status);
+  const copy = getCopy(user.recovery_status);
   const [isEditing, setIsEditing] = useState(false);
   const displayName = user.display_name || user.full_name || '';
   const nameParts = displayName.trim().split(' ');
   const [firstName, setFirstName] = useState(toTitleCase(nameParts[0] || ''));
   const [lastName, setLastName] = useState(toTitleCase(nameParts.slice(1).join(' ') || ''));
   const [dateOfBirth, setDateOfBirth] = useState(user.date_of_birth || '');
-  const [sobrietyDate, setSobrietyDate] = useState(user.sobriety_date || '');
+  const [soberDate, setSoberDate] = useState(user.sober_date || '');
   const [location, setLocation] = useState(user.location || '');
   const [bio, setBio] = useState(user.bio || '');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
-  
-  // Calculate age from date of birth
+  const [modeSaving, setModeSaving] = useState(false);
+
   const calculateAge = (dob) => {
     if (!dob) return null;
     const birthDate = new Date(dob);
@@ -39,25 +49,35 @@ export default function ProfileEditor({ user, onUpdate }) {
     }
     return age;
   };
-  
+
   const userAge = calculateAge(user.date_of_birth);
-  
-  // Calculate sobriety time
-  const calculateSobrietyTime = () => {
-    if (!user.sobriety_date) return null;
-    const sobrietyDate = new Date(user.sobriety_date);
+
+  const calculateTimeTracked = () => {
+    if (!user.sober_date) return null;
+    const startDate = new Date(user.sober_date);
     const now = new Date();
-    
     return {
-      years: differenceInYears(now, sobrietyDate),
-      months: differenceInMonths(now, sobrietyDate) % 12,
-      weeks: Math.floor(differenceInWeeks(now, sobrietyDate) % 52),
-      days: differenceInDays(now, sobrietyDate) % 7,
-      minutes: differenceInMinutes(now, sobrietyDate)
+      years: differenceInYears(now, startDate),
+      months: differenceInMonths(now, startDate) % 12,
+      weeks: Math.floor(differenceInWeeks(now, startDate) % 52),
+      days: differenceInDays(now, startDate) % 7,
+      minutes: differenceInMinutes(now, startDate)
     };
   };
-  
-  const sobrietyTime = calculateSobrietyTime();
+
+  const timeTracked = calculateTimeTracked();
+
+  const handleModeChange = async (newMode) => {
+    if (newMode === user.recovery_status) return;
+    setModeSaving(true);
+    try {
+      await base44.auth.updateMe({ recovery_status: newMode });
+      await onUpdate();
+    } catch (err) {
+      console.error('Failed to update mode', err);
+    }
+    setModeSaving(false);
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -76,18 +96,17 @@ export default function ProfileEditor({ user, onUpdate }) {
 
   const handleSave = async () => {
     if (!firstName.trim() && !lastName.trim()) return;
-    
+
     setSaving(true);
     try {
-      const displayName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
-      await base44.auth.updateMe({ 
-        display_name: displayName,
+      const newDisplayName = `${toTitleCase(firstName.trim())} ${toTitleCase(lastName.trim())}`.trim();
+      await base44.auth.updateMe({
+        display_name: newDisplayName,
         date_of_birth: dateOfBirth || null,
-        sobriety_date: sobrietyDate || null,
+        sober_date: soberDate || null,
         location: location || null,
         bio: bio || null
       });
-      // Force reload user data
       await onUpdate();
       setIsEditing(false);
     } catch (err) {
@@ -98,263 +117,308 @@ export default function ProfileEditor({ user, onUpdate }) {
     }
   };
 
+  const cancelEdit = () => {
+    const dn = user.display_name || user.full_name || '';
+    const np = dn.trim().split(' ');
+    setFirstName(toTitleCase(np[0] || ''));
+    setLastName(toTitleCase(np.slice(1).join(' ') || ''));
+    setDateOfBirth(user.date_of_birth || '');
+    setSoberDate(user.sober_date || '');
+    setLocation(user.location || '');
+    setBio(user.bio || '');
+    setIsEditing(false);
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Profile Picture and Name */}
-      <div className="flex items-start gap-6">
-        <div className="flex-shrink-0">
-          <div className="relative">
-            <div 
-              className="w-24 h-24 rounded-2xl flex items-center justify-center text-white text-3xl font-bold overflow-hidden"
-              style={{
-                background: user.profile_picture 
-                  ? 'none' 
-                  : `linear-gradient(to bottom right, ${colors.primary}, ${colors.secondary})`
-              }}
-            >
-              {user.profile_picture ? (
-                <img src={user.profile_picture} alt={user.display_name || user.full_name} className="w-full h-full object-cover" />
-              ) : (
-                (user.display_name || user.full_name)?.[0] || user.email?.[0] || 'U'
-              )}
-            </div>
-            <input
-              type="file"
-              id="profile-pic"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              disabled={uploading}
-            />
-            <label
-              htmlFor="profile-pic"
-              className={`absolute -bottom-1 -right-1 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-md ${uploading ? 'bg-gray-300' : 'bg-white hover:bg-gray-50'}`}
-            >
-              {uploading ? (
-                <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <Camera className="w-5 h-5 text-gray-600" />
-              )}
-            </label>
-          </div>
-          
-          {/* Sobriety Time Display */}
-          {sobrietyTime && (
-            <div className="mt-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-3 border border-green-100 w-[200px]">
-              <p className="text-xs font-semibold text-green-700 mb-2 text-center">Sobriety Time</p>
-              <div className="grid grid-cols-2 gap-2 text-center">
-                <div>
-                  <div className="text-lg font-bold text-green-600">{sobrietyTime.years}</div>
-                  <div className="text-xs text-gray-600">Years</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-green-600">{sobrietyTime.months}</div>
-                  <div className="text-xs text-gray-600">Months</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-green-600">{sobrietyTime.weeks}</div>
-                  <div className="text-xs text-gray-600">Weeks</div>
-                </div>
-                <div>
-                  <div className="text-lg font-bold text-green-600">{sobrietyTime.days}</div>
-                  <div className="text-xs text-gray-600">Days</div>
-                </div>
-              </div>
-              <div className="mt-2 pt-2 border-t border-green-200">
-                <div className="text-xs text-center text-gray-500">
-                  {sobrietyTime.minutes.toLocaleString()} minutes
-                </div>
-              </div>
-            </div>
-          )}
+    <div className="space-y-5">
+      {/* Mode Switch */}
+      <div className="rounded-2xl p-5" style={cardStyle}>
+        <h3 className="text-sm font-semibold text-foreground mb-1">Mode</h3>
+        <p className="text-xs text-muted-foreground mb-3">Choose your reflection style</p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => handleModeChange('aa')}
+            disabled={modeSaving}
+            className="rounded-xl p-3 text-left transition-all min-h-[44px] disabled:opacity-50"
+            style={{
+              border: `2px solid ${user.recovery_status === 'aa' ? 'var(--accent)' : 'var(--line)'}`,
+              backgroundColor: user.recovery_status === 'aa' ? 'var(--soft)' : 'var(--surface)',
+            }}
+          >
+            <div className="font-semibold text-sm text-foreground">Recovery</div>
+            <div className="text-xs text-muted-foreground mt-0.5">AA/NA Step 10</div>
+          </button>
+          <button
+            onClick={() => handleModeChange('general')}
+            disabled={modeSaving}
+            className="rounded-xl p-3 text-left transition-all min-h-[44px] disabled:opacity-50"
+            style={{
+              border: `2px solid ${user.recovery_status === 'general' ? 'var(--accent)' : 'var(--line)'}`,
+              backgroundColor: user.recovery_status === 'general' ? 'var(--soft)' : 'var(--surface)',
+            }}
+          >
+            <div className="font-semibold text-sm text-foreground">General</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Open self-reflection</div>
+          </button>
         </div>
-        
-        <div className="flex-1 space-y-4">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h2 className="font-bold text-[#1F2C46] text-xl">
-                  {toTitleCase(user.display_name || user.full_name) || 'User'}
-                </h2>
-                {user.sobriety_date && (
-                  <span className="text-sm font-bold text-green-600 px-3 py-1 bg-green-50 rounded-full">
-                    Sober since {new Date(user.sobriety_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </span>
+      </div>
+
+      {/* Profile Picture and Info */}
+      <div className="rounded-2xl p-6" style={cardStyle}>
+        <div className="flex items-start gap-5">
+          <div className="flex-shrink-0">
+            <div className="relative">
+              <div
+                className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold overflow-hidden"
+                style={{
+                  background: user.profile_picture
+                    ? 'none'
+                    : 'var(--accent)',
+                  color: 'var(--accentInk)',
+                }}
+              >
+                {user.profile_picture ? (
+                  <img src={user.profile_picture} alt={user.display_name || user.full_name} className="w-full h-full object-cover" />
+                ) : (
+                  (user.display_name || user.full_name)?.[0] || user.email?.[0] || 'U'
                 )}
               </div>
-              <p className="text-gray-500 text-sm mt-1">{user.email}</p>
+              <input
+                type="file"
+                id="profile-pic"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                disabled={uploading}
+              />
+              <label
+                htmlFor="profile-pic"
+                className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full flex items-center justify-center cursor-pointer transition-colors"
+                style={{
+                  backgroundColor: 'var(--surface)',
+                  border: '2px solid var(--line)',
+                  minHeight: 36,
+                }}
+              >
+                {uploading ? (
+                  <div className="w-4 h-4 rounded-full animate-spin" style={{ border: '2px solid var(--line)', borderTopColor: 'var(--accent)' }} />
+                ) : (
+                  <Camera className="w-4 h-4 text-muted-foreground" />
+                )}
+              </label>
             </div>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors flex-shrink-0"
-            >
-              <Edit2 className="w-4 h-4" />
-            </button>
           </div>
-          
-          {isEditing ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">First Name</label>
-                  <Input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First Name"
-                    className="rounded-xl"
-                    autoFocus
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Last Name</label>
-                  <Input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last Name"
-                    className="rounded-xl"
-                  />
-                </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h2 className="font-bold text-xl text-foreground truncate">
+                  {toTitleCase(user.display_name || user.full_name) || 'User'}
+                </h2>
+                {user.sober_date && (
+                  <span
+                    className="inline-block mt-1 text-xs font-semibold px-3 py-1 rounded-full"
+                    style={{ backgroundColor: 'var(--soft)', color: 'var(--accent)' }}
+                  >
+                    {copy.sinceLabel} {new Date(user.sober_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                )}
+                <p className="text-muted-foreground text-sm mt-1 truncate">{user.email}</p>
               </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Date of Birth</label>
-                  <Input
-                    type="date"
-                    value={dateOfBirth}
-                    onChange={(e) => setDateOfBirth(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 mb-1 block">Sobriety Date</label>
-                  <Input
-                    type="date"
-                    value={sobrietyDate}
-                    onChange={(e) => setSobrietyDate(e.target.value)}
-                    className="rounded-xl"
-                  />
-                </div>
-              </div>
-              
+              {!isEditing && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--soft)',
+                    color: 'var(--muted)',
+                    minHeight: 44,
+                    minWidth: 44,
+                  }}
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Fields */}
+        {isEditing ? (
+          <div className="space-y-3 mt-5">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Location</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">First Name</label>
                 <Input
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="City, Country"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First Name"
+                  className="rounded-xl"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Last Name</label>
+                <Input
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Last Name"
                   className="rounded-xl"
                 />
               </div>
-              
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-gray-600 mb-1 block">Bio</label>
-                <Textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell us about yourself..."
-                  className="rounded-xl min-h-[80px]"
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Date of Birth</label>
+                <Input
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
-              
-              <div className="flex items-center gap-2 justify-end pt-2">
-                <button
-                  onClick={handleSave}
-                  disabled={(!firstName.trim() && !lastName.trim()) || saving}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-                    (firstName.trim() || lastName.trim()) ? 'bg-green-100 text-green-600 hover:bg-green-200' : 'bg-gray-100 text-gray-400'
-                  }`}
-                >
-                  {saving ? (
-                    <div className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Check className="w-4 h-4" />
-                  )}
-                  <span className="text-sm font-medium">Save</span>
-                </button>
-                <button
-                  onClick={() => {
-                    const displayName = user.display_name || user.full_name || '';
-                    const nameParts = displayName.trim().split(' ');
-                    setFirstName(toTitleCase(nameParts[0] || ''));
-                    setLastName(toTitleCase(nameParts.slice(1).join(' ') || ''));
-                    setDateOfBirth(user.date_of_birth || '');
-                    setSobrietyDate(user.sobriety_date || '');
-                    setLocation(user.location || '');
-                    setBio(user.bio || '');
-                    setIsEditing(false);
-                  }}
-                  className="px-4 py-2 bg-gray-100 rounded-lg flex items-center gap-2 text-gray-600 hover:bg-gray-200 transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                  <span className="text-sm font-medium">Cancel</span>
-                </button>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{copy.startDateLabel}</label>
+                <Input
+                  type="date"
+                  value={soberDate}
+                  onChange={(e) => setSoberDate(e.target.value)}
+                  className="rounded-xl"
+                />
               </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">First Name</label>
-                  <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                    {toTitleCase(firstName) || '-'}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Last Name</label>
-                  <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                    {toTitleCase(lastName) || '-'}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Age</label>
-                  <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                    {userAge || '-'}
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-500 mb-1 block">Sobriety Date</label>
-                  <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                    {user.sobriety_date ? new Date(user.sobriety_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
-                  </div>
-                </div>
-              </div>
-              
+
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Location</label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="City, Country"
+                className="rounded-xl"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Bio</label>
+              <Textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell us about yourself..."
+                className="rounded-xl min-h-[80px]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 justify-end pt-2">
+              <button
+                onClick={handleSave}
+                disabled={(!firstName.trim() && !lastName.trim()) || saving}
+                className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors min-h-[44px] disabled:opacity-50"
+                style={{ backgroundColor: 'var(--accent)', color: 'var(--accentInk)' }}
+              >
+                {saving ? (
+                  <div className="w-4 h-4 rounded-full animate-spin" style={{ border: '2px solid var(--accentInk)', borderTopColor: 'transparent' }} />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">Save</span>
+              </button>
+              <button
+                onClick={cancelEdit}
+                className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors min-h-[44px]"
+                style={{ backgroundColor: 'var(--soft)', color: 'var(--muted)' }}
+              >
+                <X className="w-4 h-4" />
+                <span className="text-sm font-medium">Cancel</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 mt-5">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Location</label>
-                <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200">
-                  {user.location || '-'}
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">First Name</label>
+                <div className="rounded-xl px-4 py-2.5 text-sm" style={fieldStyle}>
+                  {toTitleCase(firstName) || '-'}
                 </div>
               </div>
-              
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Bio</label>
-                <div className="bg-gray-50 rounded-xl px-4 py-2.5 text-sm text-gray-700 border border-gray-200 min-h-[80px]">
-                  {user.bio || '-'}
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Last Name</label>
+                <div className="rounded-xl px-4 py-2.5 text-sm" style={fieldStyle}>
+                  {toTitleCase(lastName) || '-'}
                 </div>
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">Age</label>
+                <div className="rounded-xl px-4 py-2.5 text-sm" style={fieldStyle}>
+                  {userAge || '-'}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1 block">{copy.startDateLabel}</label>
+                <div className="rounded-xl px-4 py-2.5 text-sm" style={fieldStyle}>
+                  {user.sober_date ? new Date(user.sober_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-'}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Location</label>
+              <div className="rounded-xl px-4 py-2.5 text-sm" style={fieldStyle}>
+                {user.location || '-'}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Bio</label>
+              <div className="rounded-xl px-4 py-2.5 text-sm min-h-[80px]" style={fieldStyle}>
+                {user.bio || '-'}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-      
-      {/* Sign Out Section */}
-      <div className="bg-white rounded-[25px] p-6 shadow-sm border border-gray-100">
-        <h3 className="text-lg font-semibold text-red-600 mb-2">Sign Out</h3>
-        <p className="text-sm text-gray-500 mb-4">
-          You'll need to log back in to access your account
-        </p>
-        <Button 
-          variant="destructive" 
-          onClick={() => base44.auth.logout()}
-          className="w-full rounded-xl"
+
+      {/* Time Tracked Card */}
+      {timeTracked && (
+        <div
+          className="rounded-2xl p-5"
+          style={{
+            backgroundColor: 'var(--soft)',
+            border: '1px solid var(--line)',
+          }}
         >
-          Sign Out
-        </Button>
-      </div>
+          <p className="text-xs font-semibold mb-3 text-center" style={{ color: 'var(--accent)' }}>
+            {copy.timeTrackedLabel}
+          </p>
+          <div className="grid grid-cols-4 gap-2 text-center">
+            <div>
+              <div className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{timeTracked.years}</div>
+              <div className="text-xs text-muted-foreground">Years</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{timeTracked.months}</div>
+              <div className="text-xs text-muted-foreground">Months</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{timeTracked.weeks}</div>
+              <div className="text-xs text-muted-foreground">Weeks</div>
+            </div>
+            <div>
+              <div className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{timeTracked.days}</div>
+              <div className="text-xs text-muted-foreground">Days</div>
+            </div>
+          </div>
+          <div className="mt-3 pt-3" style={{ borderTop: '1px solid var(--line)' }}>
+            <div className="text-xs text-center text-muted-foreground">
+              {timeTracked.minutes.toLocaleString()} minutes total
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
